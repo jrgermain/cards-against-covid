@@ -29,6 +29,26 @@ router.post('/testPost', async function(req, res) {
     res.send("Got it. Thanks for POSTing");
 });
 
+// CONCEPT: make "copies" of each database, each server will play with their "copy" of the db decks (shuffle, pull cards etc)
+// a place to store and manage each games deck
+
+
+// drawing a prompt card aka "black card" from db
+router.drawPrompt('/drawPrompt', async function (req, res){
+    const deckName = req.query.name;
+    console.log("Fetching prompt", deckName)
+    const prompt = await db.get("SELECT * FROM prompt_json ORDER BY random() LIMIT 1;", [deckName]);
+    res.send(prompt);
+});
+
+// drawing a response card aka "white card" from db 
+router.drawResponse('/drawResponse', async function (req, res){
+    const deckName = req.query.name;
+    console.log("Fetching response", deckName)
+    const respon = await db.get("SELECT * FROM response_json ORDER BY random() LIMIT 1;", [deckName]);
+    res.send(respon);
+});
+
 // If there is an "api" url that doesn't match the above, send a 404 (not found)
 router.use('*', async function(req, res) {
     res.sendStatus(404);
