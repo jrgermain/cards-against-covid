@@ -3,6 +3,8 @@ var sqlite = require('sqlite');
 var sqlite3 = require('sqlite3');
 var router = express.Router();
 var db;
+var adultdb;
+var childdb;
 
 // Open a database connection when initializing the server
 sqlite.open({
@@ -31,27 +33,49 @@ router.post('/testPost', async function(req, res) {
 
 // CONCEPT: make "copies" of each database, each server will play with their "copy" of the db decks (shuffle, pull cards etc)
 // a place to store and manage each games deck
+router.startGame('/startGame', async function (req, res){
+    
+});
 
+//retrieve adult deck from database
+router.getAdultDeck('/getAdultDeck', async function (req, res){
+    adultdb = db.get("SELECT * FROM basedecks WHERE decktype LIKE 'adult%';");
+});
 
-// drawing a prompt card aka "black card" from db
+//retrieve adult deck from database
+router.getChildDeck('/getChildDeck', async function (req, res){
+    childdb = db.get("SELECT * FROM basedecks WHERE decktype LIKE 'child%';");
+});
+
+// drawing a prompt card aka "black card" from db, straight from db with different data entries for each
 router.drawPrompt('/drawPrompt', async function (req, res){
     const deckName = req.query.name;
     console.log("Fetching prompt", deckName)
-    const prompt = await db.get("SELECT * FROM prompt_json ORDER BY random() LIMIT 1;", [deckName]);
+    const prompt = await db.get("SELECT * FROM prompt ORDER BY random() LIMIT 1;", [deckName]);
     res.send(prompt);
 });
 
-// drawing a response card aka "white card" from db 
+// drawing a response card aka "white card" from db, straight from db with different data entries for each
 router.drawResponse('/drawResponse', async function (req, res){
     const deckName = req.query.name;
     console.log("Fetching response", deckName)
-    const respon = await db.get("SELECT * FROM response_json ORDER BY random() LIMIT 1;", [deckName]);
+    const respon = await db.get("SELECT * FROM response ORDER BY random() LIMIT 1;", [deckName]);
     res.send(respon);
 });
 
 // If there is an "api" url that doesn't match the above, send a 404 (not found)
 router.use('*', async function(req, res) {
     res.sendStatus(404);
+});
+
+//closes database connection at the end of game
+router.endGame('/endGame', async function (req, res){
+    db.close((err) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        console.log('Close the databaseconnection.');
+    })
 });
 
 module.exports = router;
