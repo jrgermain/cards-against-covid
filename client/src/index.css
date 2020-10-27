@@ -1,13 +1,110 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1, h2, h3 {
+  margin-top: 0;
+}
+
+
+.button-group {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+
+.button-group > * {
+  grid-row: 1;
+  /* margin: 10px; */
+}
+
+.button-wrapper button {
+  width: 100%;
+  height: 100%;
+}
+
+.view {
+  text-align: center;
+  height: 100vh;
+  padding: 5vh 5vw;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.placeholder {
+  background: #eee;
+  margin: 5rem;
+  height: 500px;
+  display: grid;
+  place-items: center;
+  color: #666;
+  pointer-events: none;
+}
+
+input.big-text {
+  font-size: 1rem;
+  padding: .5rem;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+main {
+  display: grid;
+  gap: 10px;
+}
+
+.panel {
+  background: #eee;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel button.panel-toggle {
+  background: #bbb;
+  color: black;
+  font-size: .9rem;
+  border-radius: 10px;
+  padding: .6rem 1rem;
+  margin: .5rem;
+  box-shadow: none;
+  border: none;
+  outline: none;
+}
+
+.panel button.panel-toggle:hover {
+  background: #c0c0c0;
+}
+
+.panel button.panel-toggle:active {
+  background: #999;
+}
+
+@media only screen and (max-width: 799px) {
+  .panel {
+    position: absolute;
+    height: 70vh;
+    width: 100vw;
+    bottom: -70vh;
+    bottom:0;
+    transition: bottom .5s ease-out;
+    box-shadow: 0px -2px 12px 2px rgba(0,0,0,0.2);
+  }
+}
+
+@media only screen and (min-width: 800px) {
+  .panel {
+    height: 100vh;
+    top: 0;
+    right: 0;
+  }
+  .panel-toggle {
+    display: none;
+  }
 }

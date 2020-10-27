@@ -1,0 +1,11 @@
+.chat-messages {
+    margin-top: auto;
+}
+
+.chat-message {
+    text-align: left;
+    margin: .5rem
+}
+.chat-message > strong {
+    margin-right: .5rem;
+}

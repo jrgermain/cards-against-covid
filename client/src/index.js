@@ -1,12 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Home from './views/Home';
 import * as serviceWorker from './serviceWorker';
+import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom';
+import Start from './views/Start'
+import ChooseDeck from './views/ChooseDeck';
+import Join from './views/Join';
+import Play from './views/Play';
+import WaitingForPlayers from './views/WaitingForPlayers';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Home />
+    <BrowserRouter>
+      <Switch>
+        <Route exact path="/"><Start/></Route>
+        <Route path="/start"><ChooseDeck/></Route>
+        <Redirect from="/join/*" to="/waiting"></Redirect>
+        <Route path="/join"><Join/></Route>
+        <Route path="/waiting"><WaitingForPlayers/></Route>
+        <Route path="/play"><Play/></Route>
+        
+        {/* <Route path="/"><Start></Start></Route>
+        <Route path="/"><Start></Start></Route>
+        <Route path="/"><Start></Start></Route>
+        <Route path="/"><Start></Start></Route> */}
+      </Switch>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );

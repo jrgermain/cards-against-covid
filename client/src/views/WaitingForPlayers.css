@@ -1,0 +1,45 @@
+@media only screen and (max-width: 799px) {
+    .user-info {
+        grid-row: 1;
+        grid-column: 1;
+    }
+    
+    .currently-joined {
+        grid-row: 3;
+        grid-column: 1;
+    }
+    
+    
+    .change-name {
+        grid-row: 2;
+        grid-column: 1;
+    }
+    
+    .start-game {
+        grid-row: 4;
+        grid-column: 1;
+    }
+}
+
+@media only screen and (min-width: 800px) {
+    .user-info {
+        grid-row: 1;
+        grid-column: 1;
+    }
+    
+    .currently-joined {
+        grid-row: 1;
+        grid-column: 2;
+    }
+    
+    
+    .change-name {
+        grid-row: 2;
+        grid-column: 1;
+    }
+    
+    .start-game {
+        grid-row: 2;
+        grid-column: 2;
+    }
+}

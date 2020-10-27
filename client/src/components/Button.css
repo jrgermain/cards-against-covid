@@ -1,0 +1,22 @@
+.button-wrapper button {
+    padding: 1.2rem;
+    font-size: 1rem;
+    color: white;
+    background: #444;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    outline: none;
+    transition: background .3s linear;
+    cursor: pointer;
+}
+
+.button-wrapper button:hover {
+    background: #666;
+}
+
+.button-wrapper button:active {
+    background: #222;
+}
+
+
