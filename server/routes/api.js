@@ -31,43 +31,37 @@ router.post('/testPost', async function(req, res) {
     res.send("Got it. Thanks for POSTing");
 });
 
-// CONCEPT: make "copies" of each database, each server will play with their "copy" of the db decks (shuffle, pull cards etc)
-// a place to store and manage each games deck
-router.startGame('/startGame', async function (req, res){
-    
+//retrieve adult deck from db
+router.get('/adultDeck', async function(req, res) {
+    const deck = await db.get("select * from basedecks where category like '%adult%';");
+    res.send(deck);
 });
 
-//retrieve adult deck from database
-router.getAdultDeck('/getAdultDeck', async function (req, res){
-    adultdb = db.get("SELECT * FROM basedecks WHERE decktype LIKE 'adult%';");
+//retrieve child deck from db
+router.get('/childDeck', async function (req, res){
+    const deck = await db.get("select * from basedecks where category like '%child%';");
+    res.send(deck);
 });
 
-//retrieve adult deck from database
-router.getChildDeck('/getChildDeck', async function (req, res){
-    childdb = db.get("SELECT * FROM basedecks WHERE decktype LIKE 'child%';");
-});
+//getiing prompts (not seperated by category)
+router.get('/getBlackCard', async function (req , res){
+    const deck = await db.get("select prompt from basedecks;");
+    res.send(deck);
+}); 
 
-// drawing a prompt card aka "black card" from db, straight from db with different data entries for each
-router.drawPrompt('/drawPrompt', async function (req, res){
-    const deckName = req.query.name;
-    console.log("Fetching prompt", deckName)
-    const prompt = await db.get("SELECT * FROM prompt ORDER BY random() LIMIT 1;", [deckName]);
-    res.send(prompt);
-});
-
-// drawing a response card aka "white card" from db, straight from db with different data entries for each
-router.drawResponse('/drawResponse', async function (req, res){
-    const deckName = req.query.name;
-    console.log("Fetching response", deckName)
-    const respon = await db.get("SELECT * FROM response ORDER BY random() LIMIT 1;", [deckName]);
-    res.send(respon);
-});
+//getting reponses (not seperated by category)
+router.get('/getWhiteCard', async function (req , res){
+    const deck = await db.get("select response from basedecks;");
+    res.send(deck);
+}); 
 
 // If there is an "api" url that doesn't match the above, send a 404 (not found)
 router.use('*', async function(req, res) {
     res.sendStatus(404);
 });
+ 
 
+/* 
 //closes database connection at the end of game
 router.endGame('/endGame', async function (req, res){
     db.close((err) => {
@@ -76,6 +70,6 @@ router.endGame('/endGame', async function (req, res){
         }
         console.log('Close the databaseconnection.');
     })
-});
+});  */
 
 module.exports = router;
