@@ -33,25 +33,25 @@ router.post('/testPost', async function(req, res) {
 
 //retrieve adult deck from db
 router.get('/adultDeck', async function(req, res) {
-    const deck = await db.get("select * from basedecks where category like '%adult%';");
+    const deck = await db.all("select * from basedecks where category like '%adult%';");
     res.send(deck);
 });
 
 //retrieve child deck from db
 router.get('/childDeck', async function (req, res){
-    const deck = await db.get("select * from basedecks where category like '%child%';");
+    const deck = await db.all("select * from basedecks where category like '%child%';");
     res.send(deck);
 });
 
 //getiing prompts (not seperated by category)
 router.get('/getBlackCard', async function (req , res){
-    const deck = await db.get("select prompt from basedecks;");
+    const deck = await db.all("select prompt from basedecks;");
     res.send(deck);
 }); 
 
 //getting reponses (not seperated by category)
 router.get('/getWhiteCard', async function (req , res){
-    const deck = await db.get("select response from basedecks;");
+    const deck = await db.all("select response from basedecks;");
     res.send(deck);
 }); 
 
