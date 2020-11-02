@@ -5,6 +5,7 @@ var router = express.Router();
 var db;
 var adultdb;
 var childdb;
+var games = {};
 
 // Open a database connection when initializing the server
 sqlite.open({
@@ -55,6 +56,21 @@ router.get('/getWhiteCard', async function (req , res){
     res.send(deck);
 }); 
 
+router.post('/startGame', async function(req, res) {
+    const code = generateGameCode();
+    games[code] = {};
+    res.send(code);
+});
+
+router.get('/findGame', async function(req, res) {
+    const code = req.query.code || "";
+    if (code.toUpperCase() in games) {
+        res.send(games[code]);
+    } else {
+        res.sendStatus(404);
+    }
+});
+
 // If there is an "api" url that doesn't match the above, send a 404 (not found)
 router.use('*', async function(req, res) {
     res.sendStatus(404);
@@ -71,5 +87,27 @@ router.endGame('/endGame', async function (req, res){
         console.log('Close the databaseconnection.');
     })
 });  */
+
+
+
+
+
+
+// TODO put this somewhere else?
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function generateGameCode() {
+    let code = "";
+
+    // Get 4 random letters
+    for (let i = 0; i < 4; i++) {
+        const i = Math.floor(Math.random() * 26);
+        code += ALPHABET[i];
+    }
+
+    // If the code already exists, make a new one
+    return (code in games) ? generateGameCode() : code;
+}
+
+
 
 module.exports = router;

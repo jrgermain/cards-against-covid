@@ -17,7 +17,7 @@ ReactDOM.render(
         <Route path="/start"><ChooseDeck/></Route>
         <Redirect from="/join/*" to="/waiting"></Redirect>
         <Route path="/join"><Join/></Route>
-        <Route path="/waiting"><WaitingForPlayers/></Route>
+        <Route path="/waiting/:game" component={WaitingForPlayers} />
         <Route path="/play"><Play/></Route>
         
         {/* <Route path="/"><Start></Start></Route>

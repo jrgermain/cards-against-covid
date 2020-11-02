@@ -5,10 +5,9 @@ import './Button.css';
 class Button extends Component {
 
     render() {
-        const className = this.props.isPrompt ? "card prompt" : "card response";
         return (
             <Link to={this.props.link || "#"} className="button-wrapper">
-                <button className={className}>{this.props.children}</button>
+                <button onClick={this.props.onClick}>{this.props.children}</button>
             </Link>
         );
     }

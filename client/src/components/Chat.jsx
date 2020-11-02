@@ -6,7 +6,9 @@ class Chat extends Component {
         super();
         this.state = {
             messages: [
-                {sender: "Joey", content: "Peepeepoopoo"}
+                {sender: "Joey", content: "Testing"},
+                {sender: "Joey", content: "Testing??"},
+                {sender: "Amanda", content: "It works"}
             ]
         }
     }

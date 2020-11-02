@@ -17,7 +17,7 @@ class WaitingForPlayers extends Component {
                         <h2>About you</h2>
                         <div>
                             <span>Your game code: </span>
-                            <strong className="game-code">ABCD</strong>
+                            <strong className="game-code">{this.props.match.params.game}</strong>
                         </div>
                         <div>
                             <span>Your name: </span>
