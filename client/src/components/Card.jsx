@@ -1,16 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './Card.css';
 
-class Card extends Component {
-
-    render() {
-        const className = this.props.isPrompt ? "card prompt" : "card response";
-        return (
-            <div className={className}>
-                {this.props.text}
-            </div>
-        );
-    }
+function Card({ isPrompt, children }) {
+    const cardType = isPrompt ? "prompt" : "response";
+    return <div className={"card " + cardType}>{children}</div>;
 }
 
 export default Card;

@@ -1,17 +1,7 @@
-import React, { Component } from 'react';
-import Card from './Card';
-// import './Card.css';
+import React from 'react';
 
-class CardDeck extends Component {
-
-    render() {
-        return (
-            <div className="deck">
-                <Card text="Test card #1."></Card>
-                <Card text="Test card #2."></Card>
-            </div>
-        );
-    }
+function CardDeck({ children }) {
+    return <div className="deck">{children}</div>;
 }
 
 export default CardDeck;

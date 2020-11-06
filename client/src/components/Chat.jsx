@@ -1,36 +1,24 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
+import ChatMessage from './ChatMessage';
 import './Chat.css';
 
-class Chat extends Component {
-    constructor() {
-        super();
-        this.state = {
-            messages: [
-                {sender: "Joey", content: "Testing"},
-                {sender: "Joey", content: "Testing??"},
-                {sender: "Amanda", content: "It works"}
-            ]
-        }
-    }
+const DEMO_STATE = [
+    { sender: "joey", content: "This is a test message"},
+    { sender: "joey", content: "This is another test message"},
+    { sender: "amanda", content: "Stop spamming"}
+];
 
-    render() {
-        return (
-            <div className="panel chat">
-                <button className="panel-toggle">Hide Chat</button>
-                <div className="chat-messages">
-                    {this.state.messages.map(ChatMessage)}
-                </div>
-                <input type="text" placeholder="Type a message" className="big-text"></input>
-            </div>
-        );
-    }
-}
-
-function ChatMessage({sender, content}) {
+function Chat() {
+    // const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(DEMO_STATE);
+    
     return (
-        <div className="chat-message">
-            <strong>{sender}</strong>
-            <span>{content}</span>
+        <div className="panel chat">
+            <button className="panel-toggle">Hide Chat</button>
+            <div className="chat-messages">
+                {messages.map(ChatMessage)}
+            </div>
+            <input type="text" placeholder="Type a message" className="big-text"></input>
         </div>
     );
 }

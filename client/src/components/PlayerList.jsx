@@ -1,21 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './PlayerList.css'
 
-class PlayerList extends Component {
+const NOP_FILTER = () => true;
 
-    render() {
-        const filter = typeof this.props.filter === "function" ? this.props.filter : function () { return true };
-        const players = (this.props.players || []).filter(filter);
-        return (
-            <div className="player-list">
-                <label>{this.props.label}</label>
-                <ul className="player-list">
-                    {players.map(player => <li>{player.name}</li>)}
-                </ul>
-            </div>
-            
-        );
-    }
+function PlayerList({ players, filter, label }) {
+    const filterFunction = typeof filter === "function" ? filter : NOP_FILTER;
+    const filteredPlayers = (players || []).filter(filterFunction);
+    return (
+        <div className="player-list">
+            <label>{label}</label>
+            <ul className="player-list">
+                {filteredPlayers.map(player => <li>{player.name}</li>)}
+            </ul>
+        </div>
+        
+    );
 }
 
 export default PlayerList;
