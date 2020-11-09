@@ -2,3 +2,14 @@
     margin-top: 1rem;
     margin-bottom: auto;
 }
+
+input.error {
+    outline: 1.5px solid #d33;
+}
+
+.error-text {
+    display: block;
+    font-size: .9rem;
+    color: #d33;
+    margin: 5px;
+}
