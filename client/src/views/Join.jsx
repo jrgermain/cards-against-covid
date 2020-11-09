@@ -19,6 +19,12 @@ function Join() {
         }
     }
 
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            joinGame();
+        }
+    }
+
     let inputClass = "big-text uppercase";
     if (isError) {
         inputClass += " error";
@@ -29,7 +35,7 @@ function Join() {
             <h1>Join a game</h1>
             <div className="game-code-entry">
                 <label htmlFor="game-code">Enter game code: </label>
-                <input id="game-code" type="text" placeholder="Game Code" className={inputClass} maxLength="4"></input>
+                <input id="game-code" type="text" placeholder="Game Code" className={inputClass} maxLength="4" onKeyPress={handleKeyPress}></input>
                 {isError && <span className="error-text">The game you specified doesn't exist or isn't accepting players.</span>}
             </div>
             <Button onClick={joinGame}>Join</Button>
