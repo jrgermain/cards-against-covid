@@ -1,13 +1,17 @@
-.game-code-entry {
+.user-info {
     margin-top: 1rem;
     margin-bottom: auto;
 }
 
-input.error {
+input[data-error=true] {
     outline: 1.5px solid #d33;
 }
 
 .error-text {
+    display: none;
+}
+
+input[data-error=true] + .error-text {
     display: block;
     font-size: .9rem;
     color: #d33;

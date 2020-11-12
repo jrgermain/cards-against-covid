@@ -1,6 +1,10 @@
 var express = require('express');
 var sqlite = require('sqlite');
 var sqlite3 = require('sqlite3');
+var Deck = require('../types/Deck');
+var Game = require('../types/Game');
+var Player = require('../types/Player');
+var GameCode = Game.Code;
 var router = express.Router();
 var db;
 var adultdb;
@@ -57,16 +61,25 @@ router.get('/getWhiteCard', async function (req , res){
 }); 
 
 router.post('/startGame', async function(req, res) {
-    const code = generateGameCode();
-    games[code] = {};
+    const deckName = req.body.deck;
+    const deck = new Deck("Empty Deck", [], []); // TODO: Use a real deck instead of an empty one
+    const code = GameCode.generate(games);
+    games[code] = new Game(deck);
+    console.log(`Started new game with code "${code}": `, games[code]);
     res.send(code);
 });
 
-router.get('/findGame', async function(req, res) {
-    const code = req.query.code || "";
-    if (code.toUpperCase() in games) {
-        res.send(games[code]);
+router.post('/joinGame', async function(req, res) {
+    const code = (req.body.code || "").toUpperCase();
+    const name = req.body.name;
+    const game = games[code];
+
+    if (game) {
+        game.players.push(new Player(name));
+        console.log(`Player "${name}" joined game "${code}". Current player list: `, game.players);
+        res.send(game);
     } else {
+        console.warn(`Game "${code}" was not found.`);
         res.sendStatus(404);
     }
 });
@@ -87,27 +100,6 @@ router.endGame('/endGame', async function (req, res){
         console.log('Close the databaseconnection.');
     })
 });  */
-
-
-
-
-
-
-// TODO put this somewhere else?
-const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-function generateGameCode() {
-    let code = "";
-
-    // Get 4 random letters
-    for (let i = 0; i < 4; i++) {
-        const i = Math.floor(Math.random() * 26);
-        code += ALPHABET[i];
-    }
-
-    // If the code already exists, make a new one
-    return (code in games) ? generateGameCode() : code;
-}
-
 
 
 module.exports = router;
