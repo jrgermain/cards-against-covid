@@ -90,16 +90,5 @@ router.use('*', async function(req, res) {
 });
  
 
-/* 
-//closes database connection at the end of game
-router.endGame('/endGame', async function (req, res){
-    db.close((err) => {
-        if (err) {
-            return console.error(err.message);
-        }
-        console.log('Close the databaseconnection.');
-    })
-});  */
-
 
 module.exports = router;
