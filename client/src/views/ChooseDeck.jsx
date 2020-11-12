@@ -29,10 +29,13 @@ function ChooseDeck() {
         console.log(event.target.value);
         if (event.target.value == 0){
             console.log('Player chose adult deck');
-        
+            const gameDeck = Ajax.post("./api/adultDeck");
+            console.log(gameDeck);
         }
         if(event.target.value == 1){
             console.log('Player chose kid/child deck');
+            const gameDeck = Ajax.post("./api/childDeck");
+            console.log(gameDeck);
         }   
     }
  

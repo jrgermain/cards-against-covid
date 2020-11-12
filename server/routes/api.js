@@ -42,8 +42,18 @@ router.get('/adultDeck', async function(req, res) {
     res.send(deck);
 });
 
+router.post('/adultDeck', async function(req, res) {
+    const deck = await db.all("select * from basedecks where category like '%adult%';");
+    res.send(deck);
+});
+
 //retrieve child deck from db
 router.get('/childDeck', async function (req, res){
+    const deck = await db.all("select * from basedecks where category like '%child%';");
+    res.send(deck);
+});
+
+router.post('/childDeck', async function (req, res){
     const deck = await db.all("select * from basedecks where category like '%child%';");
     res.send(deck);
 });
