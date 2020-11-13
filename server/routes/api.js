@@ -94,6 +94,18 @@ router.post('/joinGame', async function(req, res) {
     }
 });
 
+router.get('/playerList', async function(req, res) {
+    const code = (req.query.code || "").toUpperCase();
+    const game = games[code];
+
+    if (game) {
+        res.send(game.players);
+    } else {
+        console.warn(`Game "${code}" was not found.`);
+        res.sendStatus(404);
+    }
+})
+
 // If there is an "api" url that doesn't match the above, send a 404 (not found)
 router.use('*', async function(req, res) {
     res.sendStatus(404);

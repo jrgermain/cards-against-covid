@@ -1,8 +1,8 @@
 class Player {
     constructor(name) {
-        this.name = name,
-        this.isJudge = false,
-        this.cards = []
+        this.name = name;
+        this.isJudge = false;
+        this.cards = [];
     }
 }
 
