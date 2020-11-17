@@ -58,6 +58,38 @@ router.post('/childDeck', async function (req, res){
     res.send(deck);
 });
 
+//retreive and post for disney pack
+router.get('/packDisney', async function (req, res){
+    const deck = await db.all("select * from disneydeck;");
+    res.send(deck);
+});
+
+router.post('/packDisney', async function (req, res){
+    const deck = await db.all("select * from disneydeck;");
+    res.send(deck);
+});
+
+//retreive and post for vine pack 
+router.get('/packVine', async function (req, res){
+    const deck = await db.all("select * from vinedeck;");
+    res.send(deck);
+});
+
+router.post('/packVine', async function (req, res){
+    const deck = await db.all("select * from vinedeck;");
+    res.send(deck);
+});
+//retreive and post for harry potter pack 
+router.get('/packHarryPotter', async function (req, res){
+    const deck = await db.all("select * from harrypotterdeck;");
+    res.send(deck);
+});
+
+router.post('/packHarryPotter', async function (req, res){
+    const deck = await db.all("select * from harrypotterdeck;");
+    res.send(deck);
+});
+
 //getiing prompts (not seperated by category)
 router.get('/getBlackCard', async function (req , res){
     const deck = await db.all("select prompt from basedecks;");
