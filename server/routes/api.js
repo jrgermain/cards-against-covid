@@ -6,6 +6,7 @@ var Game = require('../types/Game');
 var Player = require('../types/Player');
 var GameCode = Game.Code;
 var router = express.Router();
+var path = require('path');
 var db;
 var adultdb;
 var childdb;
@@ -13,7 +14,7 @@ var games = {};
 
 // Open a database connection when initializing the server
 sqlite.open({
-    filename: './db/game.db',
+    filename: path.join(__dirname, '/../db/game.db'),
     driver: sqlite3.Database
 }).then(connection => { db = connection })
 .catch(error => console.log("Error connecting to database", error));
