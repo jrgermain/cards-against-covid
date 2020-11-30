@@ -1,42 +1,41 @@
-var createError = require('http-errors');
 var express = require('express');
+var Server = require('http').Server;
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var ip = require("ip");
+var chalk = require('chalk');
 var apiRouter = require('./routes/api');
+var shutDown = require('./types/ServerUtils').shutDown;
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// Setup http server
+var server = new Server(app);
+server.listen(3001);
+process.on('SIGTERM', () => shutDown(server, 8000));
+process.on('SIGINT',  () => shutDown(server, 8000));
 
-app.use(logger('dev'));
+// Setup the express app
+var displayLogs = true; // TODO: only when running a developer build
+if (displayLogs) {
+  app.use(logger('dev'));
+}
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-
-// If the request url starts with /api, send it to the API router
+// Setup routing: if the request url starts with /api, send it to the API router
 app.use('/api', apiRouter);
 
-// Otherwise, send it to the React app
+// Setup routing: direct all other requests to the React app
 app.use(express.static(path.join(__dirname, '/../client/build')));
-app.use('*', (req, res)=> {
- res.sendFile(path.join(__dirname, '/../client/build', 'index.html'));
+app.use('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../client/build', 'index.html'));
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+// Print welcome message to users
+console.log('Join the game at ' + chalk.bold('http://' + ip.address() + ":3001"));
+console.log('For help joining, see the troublshooting guide here: https://github.com/jrgermain/cards-against-covid/wiki');
 
 module.exports = app;
