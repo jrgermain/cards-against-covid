@@ -49,35 +49,48 @@ function ChooseDeck() {
             console.log(gameDeck);
         }
         if (event.target.value == 4) {
+            const gameDeck = Ajax.post("./api/packCovid");
+            console.log(gameDeck);
+        }
+        if (event.target.value == 5) {
             const gameDeck = Ajax.post("./api/packVine");
+            console.log(gameDeck);
+        }
+        if (event.target.value == 6) {
+            const gameDeck = Ajax.post("./api/childPackDisney");
             console.log(gameDeck);
         }
     }
 
     return (
         <div className="view" id="choose-deck">
-            <h1>Choose a Deck</h1>            
+                    
 
-            <label htmlFor="player-name">Enter your name: </label>
+            <h1 class="header">Enter your name:</h1> 
             <input id="player-name" type="text" placeholder="Your name" className={"big-text"} data-error={hasSubmitted && !name} value={name} onChange={e => setName(e.target.value)}></input>
             <span className="error-text">Please enter a name.</span>
 
-
+            <h1 class="header-css">Choose a Deck:</h1>  
             <select class="select-css" onChange={handleChange}>
                 <option> Choose a Deck</option>
                 <option value="0"  > Adult (18+)</option>
                 <option value="1"  >Child</option>
             </select>
 
-            <h1 class="header-css">Choose an Expansion Pack</h1>
+            <h1 class="header-css">Choose an Expansion Pack:</h1>
             <select class="select-css" onChange={handleChange}>
-                <option> Choose an Expansion Pack (optional)</option>
-                <option value="2"  > Disney... Plus? (18+)</option>
+                <option>Choose an Expansion Pack (optional)</option>
+                <option value="5"  >Rest in Peace: Vine References</option>
+                <option value="6"  >Disney: The way it was intended</option>
+                <option value="2"  >Disney... Plus? (18+)</option>
                 <option value="3"  >Hogwarts After Hours (18+)</option>
-                <option value="4"  >Rest in Peace: Vine References</option>
+                <option value="4"  >COVID: Pandemics aren't funny... usually (18+)</option>
             </select>
+            
+            <span class="tab"></span>
 
-            <Button onClick={initGame}>Continue</Button>
+            <Button onClick={initGame}>Continue</Button> 
+           
         </div>
 
     );

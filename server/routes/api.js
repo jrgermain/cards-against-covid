@@ -55,7 +55,7 @@ router.post('/childDeck', async function (req, res){
     res.send(deck);
 });
 
-//retreive and post for disney pack
+//retreive and post for ault disney pack
 router.get('/packDisney', async function (req, res){
     const deck = await db.all("select * from disneydeck;");
     res.send(deck);
@@ -63,6 +63,17 @@ router.get('/packDisney', async function (req, res){
 
 router.post('/packDisney', async function (req, res){
     const deck = await db.all("select * from disneydeck;");
+    res.send(deck);
+});
+
+//retrieve and post for child disney pack
+router.get('/childPackDisney', async function (req, res){
+    const deck = await db.all("select * from childdisneydeck;");
+    res.send(deck);
+});
+
+router.post('/childPackDisney', async function (req, res){
+    const deck = await db.all("select * from childdisneydeck;");
     res.send(deck);
 });
 
@@ -76,6 +87,18 @@ router.post('/packVine', async function (req, res){
     const deck = await db.all("select * from vinedeck;");
     res.send(deck);
 });
+
+//retreive and post for covid pack 
+router.get('/packCovid', async function (req, res){
+    const deck = await db.all("select * from coviddeck;");
+    res.send(deck);
+});
+
+router.post('/packCovid', async function (req, res){
+    const deck = await db.all("select * from coviddeck;");
+    res.send(deck);
+});
+
 //retreive and post for harry potter pack 
 router.get('/packHarryPotter', async function (req, res){
     const deck = await db.all("select * from harrypotterdeck;");

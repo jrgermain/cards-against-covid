@@ -23,5 +23,15 @@
 }
 
 .header-css{
+    font-size: 150%;
     padding-top: 50px;
+}
+.header{
+    font-size: 150%;
+}
+
+.tab { 
+    display:inline-block; 
+    margin-left: 40px; 
+    padding-bottom: 300px;
 }
