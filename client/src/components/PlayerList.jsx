@@ -1,5 +1,5 @@
 import React from 'react';
-import './PlayerList.css'
+import './PlayerList.css';
 
 const NOP_FILTER = () => true;
 

@@ -8,6 +8,7 @@ import ChooseDeck from './views/ChooseDeck';
 import Join from './views/Join';
 import Play from './views/Play';
 import WaitingForPlayers from './views/WaitingForPlayers';
+import Expansions from './views/Expansions';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,11 +20,7 @@ ReactDOM.render(
         <Route path="/join"><Join/></Route>
         <Route path="/waiting/:game" component={WaitingForPlayers} />
         <Route path="/play"><Play/></Route>
-        
-        {/* <Route path="/"><Start></Start></Route>
-        <Route path="/"><Start></Start></Route>
-        <Route path="/"><Start></Start></Route>
-        <Route path="/"><Start></Start></Route> */}
+        <Route path="/expansions"><Expansions/></Route>
       </Switch>
     </BrowserRouter>
   </React.StrictMode>,

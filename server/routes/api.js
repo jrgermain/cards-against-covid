@@ -156,7 +156,13 @@ router.get('/playerList', async function(req, res) {
         console.warn(`Game "${code}" was not found.`);
         res.sendStatus(404);
     }
-})
+});
+
+router.post('/expansionPack', async function(req, res) {
+    const { name, prompts, responses } = req.body;
+    console.log("Recieved pack of cards: ", new Deck(name, prompts, responses));
+    res.sendStatus(200);
+});
 
 // If there is an "api" url that doesn't match the above, send a 404 (not found)
 router.use('*', async function(req, res) {
