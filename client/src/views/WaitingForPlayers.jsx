@@ -7,8 +7,10 @@ import Ajax from '../lib/ajax';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
-function WaitingForPlayers({ match }) {
+function WaitingForPlayers({ match, location }) {
     const history = useHistory();
+    console.log(location)
+    const player = new URLSearchParams(location.search).get("player");
     const [players, setPlayers] = useState([]);
 
     // Poll for new players every 2.5 seconds
@@ -38,7 +40,7 @@ function WaitingForPlayers({ match }) {
                     </div>
                     <div>
                         <span>Your name: </span>
-                        <strong className="player-name">Joey</strong>
+                        <strong className="player-name">{player}</strong>
                     </div>
                 </section>
                 <section className="currently-joined">

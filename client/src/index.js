@@ -14,13 +14,13 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Switch>
-        <Route exact path="/"><Start/></Route>
-        <Route path="/start"><ChooseDeck/></Route>
-        <Redirect from="/join/*" to="/waiting"></Redirect>
-        <Route path="/join"><Join/></Route>
+        <Route exact path="/" component={Start} />
+        <Route path="/start" component={ChooseDeck} />
+        <Redirect from="/join/*" to="/waiting" />
+        <Route path="/join" component={Join} />
         <Route path="/waiting/:game" component={WaitingForPlayers} />
-        <Route path="/play"><Play/></Route>
-        <Route path="/expansions"><Expansions/></Route>
+        <Route path="/play" component={Play} />
+        <Route path="/expansions" component={Expansions} />
       </Switch>
     </BrowserRouter>
   </React.StrictMode>,

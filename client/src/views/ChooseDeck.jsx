@@ -24,7 +24,7 @@ function ChooseDeck() {
         try {
             const gameCode = await Ajax.post("/api/startGame");
             await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name }));
-            history.push("/waiting/" + gameCode);
+            history.push(`/waiting/${gameCode}?player=${name}`);
         } catch (e) {
             console.error(e);
         }
