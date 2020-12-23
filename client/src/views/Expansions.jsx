@@ -5,6 +5,7 @@ import DeckMaker from '../components/DeckMaker';
 import TextBox from '../components/TextBox';
 import Ajax from '../lib/ajax';
 import './Expansions.css';
+import { showSuccess } from '../lib/message';
 
 function Expansions() {
     const history = useHistory();
@@ -29,9 +30,9 @@ function Expansions() {
         const pack = { name, prompts: filteredPrompts, responses: filteredResponses }
         try {
             await Ajax.postJSON("/api/expansionPack", JSON.stringify(pack));
+            showSuccess("Successfully saved expansion pack: " + name);
             history.goBack();
         } catch (e) {
-            console.error(e)
             window.alert("There was an error saving your expansion pack. Please try again later.");
         }
     }

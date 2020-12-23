@@ -2,8 +2,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  /* -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; */
 }
 
 h1, h2, h3 {
@@ -22,12 +20,9 @@ h1, h2, h3 {
 }
 
 @media only screen and (max-width: 799px) {
-  .button-group {
-      display: flex;
-      flex-direction: column;
-  }
   .button-group > * {
-      margin-top: 10px;
+      grid-row: initial;
+      grid-column: 1;
   }
 }
 
@@ -89,6 +84,39 @@ main {
 
 .panel button.panel-toggle:active {
   background: #999;
+}
+
+#message-banner {
+  width: 100vw;
+  background: transparent;
+  color: transparent;
+  position: absolute;
+  padding: .8rem;
+  font-size: .8rem;
+  height: 2.4rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  top: -2.4rem;
+  transition: top .2s ease;
+}
+
+#message-banner.visible {
+  top: 0;
+}
+
+#message-banner.info {
+  background: #666;
+  color: white;
+}
+
+#message-banner.success {
+  background: #16ac28;
+  color: white;
+}
+
+#message-banner.error {
+  background: #d33;
+  color: white;
 }
 
 @media only screen and (max-width: 799px) {
