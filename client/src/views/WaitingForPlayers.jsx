@@ -10,7 +10,7 @@ import { useHistory } from 'react-router-dom';
 function WaitingForPlayers({ match, location }) {
     const history = useHistory();
     console.log(location)
-    const player = new URLSearchParams(location.search).get("player");
+    const { name } = location.state;
     const [players, setPlayers] = useState([]);
 
     // Poll for new players every 2.5 seconds
@@ -40,7 +40,7 @@ function WaitingForPlayers({ match, location }) {
                     </div>
                     <div>
                         <span>Your name: </span>
-                        <strong className="player-name">{player}</strong>
+                        <strong className="player-name">{name}</strong>
                     </div>
                 </section>
                 <section className="currently-joined">

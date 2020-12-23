@@ -4,6 +4,7 @@ import '../components/Dropdown.css';
 import Ajax from '../lib/ajax';
 import { useHistory } from "react-router-dom";
 import { useState } from 'react';
+import TextBox from '../components/TextBox';
 
 function ChooseDeck() {
     const history = useHistory();
@@ -24,7 +25,7 @@ function ChooseDeck() {
         try {
             const gameCode = await Ajax.post("/api/startGame");
             await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name }));
-            history.push(`/waiting/${gameCode}?player=${name}`);
+            history.push(`/waiting/${gameCode}`, { name });
         } catch (e) {
             console.error(e);
         }
@@ -62,13 +63,18 @@ function ChooseDeck() {
         }
     }
 
+    const handleNameChange = e => setName(e.target.value);
     return (
         <div className="view" id="choose-deck">
-                    
-
             <h1 class="header">Enter your name:</h1> 
-            <input id="player-name" type="text" placeholder="Your name" className={"big-text"} data-error={hasSubmitted && !name} value={name} onChange={e => setName(e.target.value)}></input>
-            <span className="error-text">Please enter a name.</span>
+            <TextBox 
+                id="player-name"
+                placeholder="Your name"
+                value={name}
+                onChange={handleNameChange}
+                errorCondition={hasSubmitted && !name}
+                errorMessage={"Please enter a name."} 
+            />
 
             <h1 class="header-css">Choose a Deck:</h1>  
             <select class="select-css" onChange={handleChange}>
