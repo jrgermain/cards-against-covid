@@ -1,6 +1,4 @@
 var express = require('express');
-var sqlite = require('sqlite');
-var sqlite3 = require('sqlite3');
 var Deck = require('../types/Deck');
 var Game = require('../types/Game');
 var Player = require('../types/Player');
@@ -8,8 +6,6 @@ var GameCode = Game.Code;
 var router = express.Router();
 var dbLoader = require('../db/loader');
 var db;
-var adultdb;
-var childdb;
 var games = {};
 
 // Open a database connection when initializing the server
@@ -136,13 +132,16 @@ router.post('/joinGame', async function(req, res) {
     const name = req.body.name;
     const game = games[code];
 
-    if (game) {
-        game.players.push(new Player(name));
-        console.log(`Player "${name}" joined game "${code}". Current player list: `, game.players);
-        res.send(game);
-    } else {
+    if (!game) {
         console.warn(`Game "${code}" was not found.`);
         res.sendStatus(404);
+    } else if (game.players.some(player => player.name === name)) {
+        console.warn(`Player "${name}" already exists in game "${code}".`);
+        res.sendStatus(400);
+    } else {
+        game.players.push(new Player(name));
+        console.log(`Player "${name}" joined game "${code}". Current player list: `, game.players);
+        res.sendStatus(200);
     }
 });
 

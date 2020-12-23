@@ -8,27 +8,40 @@ import TextBox from '../components/TextBox';
 
 function Join() {
     const history = useHistory();
-    const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [joinError, setJoinError] = useState(false);
     const [name, setName] = useState(localStorage.getItem("player-name"));
+    const [nameError, setNameError] = useState("");
     const [gameCode, setGameCode] = useState("");
+    const [gameCodeError, setGameCodeError] = useState("");
 
     async function joinGame() {
-        setHasSubmitted(true);
+        setNameError("");
+        setGameCodeError("");
+
+        let inputIsValid = true;
 
         if (!name) {
-            return;
+            setNameError("Please enter a name.");
+            inputIsValid = false;
         }
 
-        // If game code is invalid, show a join error without actually trying to join
-        if (!gameCode || gameCode.length !== 4) {
-            return setJoinError(true);
+        if (!/[a-z]{4}/i.test(gameCode)) {
+            setGameCodeError("Invalid game code.");
+            inputIsValid = false;
+        }
+
+        if (!inputIsValid) {
+            return;
         }
 
         try {
             await Ajax.postJson("./api/joinGame", JSON.stringify({ code: gameCode, name }));
         } catch (e) {
-            return setJoinError(true);
+            if (e === "Not Found") {
+                setGameCodeError("The game you specified doesn't exist or isn't accepting players.");
+            } else if (e === "Bad Request") {
+                setNameError(`There is already a player named "${name}" in game "${gameCode}".`);
+            }
+            return;
         }
 
         localStorage.setItem("player-name", name);
@@ -55,8 +68,8 @@ function Join() {
                         value={name}
                         onChange={handleNameChange}
                         onKeyPress={handleKeyPress}
-                        errorCondition={hasSubmitted && !name}
-                        errorMessage={"Please enter a name."}
+                        errorCondition={!!nameError}
+                        errorMessage={nameError}
                     />
                 </div>
                 <div>
@@ -67,8 +80,8 @@ function Join() {
                         value={gameCode}
                         onChange={handleGameCodeChange}
                         onKeyPress={handleKeyPress}
-                        errorCondition={joinError}
-                        errorMessage={"The game you specified doesn't exist or isn't accepting players."}
+                        errorCondition={!!gameCodeError}
+                        errorMessage={gameCodeError}
                         maxLength="4"
                     />
                 </div>
