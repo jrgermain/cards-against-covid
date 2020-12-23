@@ -20,6 +20,7 @@ function Join() {
             return;
         }
 
+        // If game code is invalid, show a join error without actually trying to join
         if (!gameCode || gameCode.length !== 4) {
             return setJoinError(true);
         }
@@ -35,7 +36,7 @@ function Join() {
     }
 
     function handleKeyPress(event) {
-        if (event.key === 'Enter') {
+        if (event.key === "Enter") {
             joinGame();
         }
     }

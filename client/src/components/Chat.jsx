@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ChatMessage from './ChatMessage';
 import './Chat.css';
+import TextBox from './TextBox';
 
 const DEMO_STATE = [
     { sender: "joey", content: "This is a test message"},
@@ -9,7 +10,6 @@ const DEMO_STATE = [
 ];
 
 function Chat() {
-    // const [messages, setMessages] = useState([]);
     const [messages, setMessages] = useState(DEMO_STATE);
     
     return (
@@ -18,7 +18,7 @@ function Chat() {
             <div className="chat-messages">
                 {messages.map(ChatMessage)}
             </div>
-            <input type="text" placeholder="Type a message" className="big-text"></input>
+            <TextBox placeholder="Type a message" />
         </div>
     );
 }

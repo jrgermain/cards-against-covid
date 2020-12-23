@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Button from '../components/Button';
 import DeckMaker from '../components/DeckMaker';
+import TextBox from '../components/TextBox';
 import Ajax from '../lib/ajax';
 
 function Expansions() {
     const history = useHistory();
+    const [name, setName] = useState("Untitled Expansion Pack");
     const [prompts, setPrompts] = useState([]);
     const [responses, setResponses] = useState([]);
-    const [name, setName] = useState("Untitled Expansion Pack");
 
     async function submitPack() {
-        // Perform pre-save validations
         if (!name) {
-            window.alert("Please enter a name");
             return;
         }
 
@@ -29,22 +28,30 @@ function Expansions() {
         const pack = { name, prompts: filteredPrompts, responses: filteredResponses }
         try {
             await Ajax.postJSON("/api/expansionPack", JSON.stringify(pack));
-            history.push("..");
+            history.goBack();
         } catch (e) {
             console.error(e)
             window.alert("There was an error saving your expansion pack. Please try again later.");
         }
     }
-     
+
+    const handleNameChange = e => setName(e.target.value);
     return (
         <div className="view" id="expansions">
             <h1>Build an expansion pack</h1>
             <div>
-                <label htmlFor="deck-name">Name: </label>
-                <input id="deck-name" type="text" className="big-text" value={name} onChange={event => setName(event.target.value)}></input>
+                <label htmlFor="pack-name">Name: </label>
+                <TextBox
+                    id="pack-name"
+                    placeholder="Expansion pack name"
+                    value={name}
+                    onChange={handleNameChange}
+                    errorCondition={!name}
+                    errorMessage={"Please enter a name."}
+                />
             </div>
-            <DeckMaker label="Prompts" value={prompts} onChange={setPrompts}></DeckMaker>
-            <DeckMaker label="Responses" value={responses} onChange={setResponses}></DeckMaker>
+            <DeckMaker label="Prompts" value={prompts} onChange={setPrompts} />
+            <DeckMaker label="Responses" value={responses} onChange={setResponses} />
             <Button onClick={submitPack}>Save</Button>
         </div>
     )

@@ -19,12 +19,16 @@ h1, h2, h3 {
 
 .button-group > * {
   grid-row: 1;
-  /* margin: 10px; */
 }
 
-.button-wrapper button {
-  width: 100%;
-  height: 100%;
+@media only screen and (max-width: 799px) {
+  .button-group {
+      display: flex;
+      flex-direction: column;
+  }
+  .button-group > * {
+      margin-top: 10px;
+  }
 }
 
 .view {
@@ -36,14 +40,8 @@ h1, h2, h3 {
   box-sizing: border-box;
 }
 
-.placeholder {
-  background: #eee;
-  margin: 5rem;
-  height: 500px;
-  display: grid;
-  place-items: center;
-  color: #666;
-  pointer-events: none;
+.view > .button-wrapper:last-child {
+  margin-top: auto;
 }
 
 input.big-text {
@@ -61,10 +59,6 @@ input.big-text[data-error=true] {
   color: #d33;
   margin: 5px;
 }
-
-/* .uppercase {
-  text-transform: uppercase;
-} */
 
 main {
   display: grid;

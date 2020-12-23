@@ -66,16 +66,20 @@ function ChooseDeck() {
     const handleNameChange = e => setName(e.target.value);
     return (
         <div className="view" id="choose-deck">
-            <h1 class="header">Enter your name:</h1> 
-            <TextBox 
-                id="player-name"
-                placeholder="Your name"
-                value={name}
-                onChange={handleNameChange}
-                errorCondition={hasSubmitted && !name}
-                errorMessage={"Please enter a name."} 
-            />
-
+            <h1>Start a game</h1>
+            
+            <div>
+                <label htmlFor="player-name">Enter your name: </label>
+                <TextBox 
+                    id="player-name"
+                    placeholder="Your name"
+                    value={name}
+                    onChange={handleNameChange}
+                    errorCondition={hasSubmitted && !name}
+                    errorMessage={"Please enter a name."} 
+                />
+            </div>
+            
             <h1 class="header-css">Choose a Deck:</h1>  
             <select class="select-css" onChange={handleChange}>
                 <option> Choose a Deck</option>
@@ -93,10 +97,7 @@ function ChooseDeck() {
                 <option value="4"  >COVID: Pandemics aren't funny... usually (18+)</option>
             </select>
             
-            <span class="tab"></span>
-
             <Button onClick={initGame}>Continue</Button> 
-           
         </div>
 
     );

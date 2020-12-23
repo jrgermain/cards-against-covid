@@ -9,16 +9,15 @@ import { useHistory } from 'react-router-dom';
 
 function WaitingForPlayers({ match, location }) {
     const history = useHistory();
-    console.log(location)
-    const { name } = location.state;
     const [players, setPlayers] = useState([]);
+    const { name } = location.state;
 
     // Poll for new players every 2.5 seconds
     useEffect(() => {
         getPlayerList();
         const refreshInterval = window.setInterval(getPlayerList, 2500);
         return function () {
-            window.clearInterval(refreshInterval)
+            window.clearInterval(refreshInterval);
         }
     }, []);
     

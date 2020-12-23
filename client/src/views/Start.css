@@ -3,13 +3,3 @@
     margin-bottom: auto;
     font-size: 4rem;
 }
-
-@media only screen and (max-width: 799px) {
-    .button-group {
-        display: flex;
-        flex-direction: column;
-    }
-    .button-group > * {
-        margin-top: 10px;
-    }
-}

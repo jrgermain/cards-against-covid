@@ -1,8 +1,15 @@
 .user-info {
     margin-top: 1rem;
-    margin-bottom: auto;
 }
 
 .user-info > * {
     margin-bottom: .5rem;
+}
+
+.user-info label {
+    width: 9rem;
+}
+
+.user-info input {
+    width: 13rem;
 }

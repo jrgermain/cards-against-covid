@@ -9,3 +9,10 @@
 .chat-message > strong {
     margin-right: .5rem;
 }
+
+
+.chat input {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+}
