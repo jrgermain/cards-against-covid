@@ -51,9 +51,20 @@ input.big-text {
   padding: .5rem;
 }
 
-.uppercase {
-  text-transform: uppercase;
+input.big-text[data-error=true] {
+  outline: 2px solid #d33;
 }
+
+.text-box .error-text {
+  display: block;
+  font-size: .9rem;
+  color: #d33;
+  margin: 5px;
+}
+
+/* .uppercase {
+  text-transform: uppercase;
+} */
 
 main {
   display: grid;
