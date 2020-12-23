@@ -4,6 +4,7 @@ import Button from '../components/Button';
 import DeckMaker from '../components/DeckMaker';
 import TextBox from '../components/TextBox';
 import Ajax from '../lib/ajax';
+import './Expansions.css';
 
 function Expansions() {
     const history = useHistory();
@@ -50,8 +51,10 @@ function Expansions() {
                     errorMessage={"Please enter a name."}
                 />
             </div>
-            <DeckMaker label="Prompts" value={prompts} onChange={setPrompts} />
-            <DeckMaker label="Responses" value={responses} onChange={setResponses} />
+            <div id="deck-maker-wrapper">
+                <DeckMaker label="Prompts" value={prompts} onChange={setPrompts} />
+                <DeckMaker label="Responses" value={responses} onChange={setResponses} />
+            </div>
             <Button onClick={submitPack}>Save</Button>
         </div>
     )

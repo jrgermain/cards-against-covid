@@ -9,6 +9,7 @@ import Join from './views/Join';
 import Play from './views/Play';
 import WaitingForPlayers from './views/WaitingForPlayers';
 import Expansions from './views/Expansions';
+import 'normalize.css';
 
 ReactDOM.render(
   <React.StrictMode>

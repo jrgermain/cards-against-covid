@@ -1,0 +1,17 @@
+@media only screen and (min-width: 1200px) {
+    #deck-maker-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem;
+    }
+}
+
+
+#expansions {
+    height: auto;
+    min-height: 100vh;
+}
+
+#pack-name {
+    width: 16rem;
+}
