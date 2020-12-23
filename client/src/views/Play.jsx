@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Card from '../components/Card';
 import CardDeck from '../components/CardDeck';
 import Chat from '../components/Chat';
-import PlayerList from '../components/PlayerList';
+import List from '../components/List';
+import PlayerName from '../components/PlayerName';
 import './Play.css';
 
 const DEMO_STATE = {
@@ -42,7 +43,7 @@ function Play() {
                     <Card isPrompt>{prompt}</Card>
                     {role === "judging" 
                         ? players.filter(needsToAnswer).length > 0
-                            ? <PlayerList label="Still waiting on responses from:" players={players} filter={needsToAnswer} />
+                            ? <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} jsxMapping={PlayerName} />
                             : <CardDeck>{players.filter(player => !player.isJudge).map(player => <Card>{player.response}</Card>)}</CardDeck>
                         : <CardDeck>{cards.map(text => <Card>{text}</Card>)}</CardDeck>}
                 </div>
