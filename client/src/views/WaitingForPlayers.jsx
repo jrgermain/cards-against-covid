@@ -6,7 +6,6 @@ import { useState } from 'react';
 import Ajax from '../lib/ajax';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import PlayerName from '../components/PlayerName';
 
 function WaitingForPlayers({ match, location }) {
     const history = useHistory();
@@ -45,7 +44,7 @@ function WaitingForPlayers({ match, location }) {
                 </section>
                 <section className="currently-joined">
                     <h2>Currently joined:</h2>
-                    <List items={players} jsxMapping={PlayerName} />
+                    <List items={players} map={player => player.name} />
                 </section>
                 <section className="change-name">
                     <Button>Change My Name</Button>

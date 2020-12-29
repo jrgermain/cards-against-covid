@@ -1,15 +1,15 @@
 import React from 'react';
 import './List.css';
 
-function List({ items, filter, label, jsxMapping }) {
-    const mapping = typeof jsxMapping === "function" ? jsxMapping : item => <li>{item}</li>;
+function List({ items, label, filter, map }) {
+    const mapFunction = typeof map === "function" ? map : x => x;
     const filterFunction = typeof filter === "function" ? filter : () => true;
-    const filteredItems = (items || []).filter(filterFunction);
+    const filteredItems = (items || []).filter(filterFunction).map(mapFunction);
     return (
         <div className="list">
             <label>{label}</label>
             <ul className="list">
-                {filteredItems.map(mapping)}
+                {filteredItems.map(item => <li>{item}</li>)}
             </ul>
         </div>
     );
