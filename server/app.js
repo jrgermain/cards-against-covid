@@ -3,18 +3,19 @@ var Server = require('http').Server;
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var ip = require("ip");
+var ip = require('ip');
 var chalk = require('chalk');
 var apiRouter = require('./routes/api');
-var shutDown = require('./types/ServerUtils').shutDown;
+var stoppable = require('stoppable');
 
 var app = express();
 
 // Setup http server
 var server = new Server(app);
+stoppable(server, 5000);
 server.listen(3001);
-process.on('SIGTERM', () => shutDown(server, 8000));
-process.on('SIGINT',  () => shutDown(server, 8000));
+process.on('SIGTERM', () => server.stop());
+process.on('SIGINT',  () => server.stop());
 
 // Setup the express app
 var displayLogs = true; // TODO: only when running a developer build
