@@ -1,0 +1,15 @@
+.expansion-packs {
+    display: grid;
+    margin: 0 auto;
+    gap: 5px;
+    text-align: left;
+}
+
+.expansion-packs input {
+    grid-column: 1;
+    margin-right: 3px;
+}
+
+.expansion-packs label {
+    grid-column: 2;
+}

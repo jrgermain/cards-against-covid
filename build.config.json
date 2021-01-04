@@ -7,15 +7,12 @@
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "ip": "^1.1.5",
-    "morgan": "~1.9.1",
-    "sqlite": "^4.0.14",
-    "sqlite3": "^5.0.0"
+    "morgan": "~1.9.1"
   },
   "bin": "server/app.js",
   "pkg": {
     "assets": [
-      "client/build/**/*",
-      "server/db/*.db"
+      "client/build/**/*"
     ],
     "output": "build/"
   }

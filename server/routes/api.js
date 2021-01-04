@@ -2,127 +2,33 @@ var express = require('express');
 var Deck = require('../types/Deck');
 var Game = require('../types/Game');
 var Player = require('../types/Player');
-var GameCode = Game.Code;
+var cards = require('../cards/loader');
 var router = express.Router();
-var dbLoader = require('../db/loader');
-var db;
 var games = {};
 
-// Open a database connection when initializing the server
-dbLoader.connect().then(connection => db = connection).catch(console.warn);
 
-/************************************************************
- * Below are the request mappings for urls relative to /api *
- ************************************************************/
-
-// Handle a GET request to http://{gameserver}/api/getDeck
-// example: http://localhost:3001/api/getDeck?name=Cards%20Against%20Humanity
-router.get('/getDeck', async function(req, res) {
-    const deckName = req.query.name;
-    console.log("Fetching deck", deckName)
-    const deck = await db.get("SELECT * FROM deck WHERE name = ?;", [deckName]);
-    res.send(deck);
+// Handle a GET request to http://{gameserver}/api/deckList
+router.get('/deckList', async function(req, res) {
+    const decks = await cards.getDecks();
+    res.send(decks);
 });
 
-// Handle a POST request to http://{gameserver}/api/testPost
-router.post('/testPost', async function(req, res) {
-    res.send("Got it. Thanks for POSTing");
+router.get('/expansionList', async function(req, res) {
+    const packs = await cards.getExpansionPacks();
+    res.send(packs);
 });
-
-//retrieve adult deck from db
-router.get('/adultDeck', async function(req, res) {
-    const deck = await db.all("select * from basedecks where category like '%adult%';");
-    res.send(deck);
-});
-
-router.post('/adultDeck', async function(req, res) {
-    const deck = await db.all("select * from basedecks where category like '%adult%';");
-    res.send(deck);
-});
-
-//retrieve child deck from db
-router.get('/childDeck', async function (req, res){
-    const deck = await db.all("select * from basedecks where category like '%child%';");
-    res.send(deck);
-});
-
-router.post('/childDeck', async function (req, res){
-    const deck = await db.all("select * from basedecks where category like '%child%';");
-    res.send(deck);
-});
-
-//retreive and post for ault disney pack
-router.get('/packDisney', async function (req, res){
-    const deck = await db.all("select * from disneydeck;");
-    res.send(deck);
-});
-
-router.post('/packDisney', async function (req, res){
-    const deck = await db.all("select * from disneydeck;");
-    res.send(deck);
-});
-
-//retrieve and post for child disney pack
-router.get('/childPackDisney', async function (req, res){
-    const deck = await db.all("select * from childdisneydeck;");
-    res.send(deck);
-});
-
-router.post('/childPackDisney', async function (req, res){
-    const deck = await db.all("select * from childdisneydeck;");
-    res.send(deck);
-});
-
-//retreive and post for vine pack 
-router.get('/packVine', async function (req, res){
-    const deck = await db.all("select * from vinedeck;");
-    res.send(deck);
-});
-
-router.post('/packVine', async function (req, res){
-    const deck = await db.all("select * from vinedeck;");
-    res.send(deck);
-});
-
-//retreive and post for covid pack 
-router.get('/packCovid', async function (req, res){
-    const deck = await db.all("select * from coviddeck;");
-    res.send(deck);
-});
-
-router.post('/packCovid', async function (req, res){
-    const deck = await db.all("select * from coviddeck;");
-    res.send(deck);
-});
-
-//retreive and post for harry potter pack 
-router.get('/packHarryPotter', async function (req, res){
-    const deck = await db.all("select * from harrypotterdeck;");
-    res.send(deck);
-});
-
-router.post('/packHarryPotter', async function (req, res){
-    const deck = await db.all("select * from harrypotterdeck;");
-    res.send(deck);
-});
-
-//getiing prompts (not seperated by category)
-router.get('/getBlackCard', async function (req , res){
-    const deck = await db.all("select prompt from basedecks;");
-    res.send(deck);
-}); 
-
-//getting reponses (not seperated by category)
-router.get('/getWhiteCard', async function (req , res){
-    const deck = await db.all("select response from basedecks;");
-    res.send(deck);
-}); 
 
 router.post('/startGame', async function(req, res) {
-    const deckName = req.body.deck;
-    const deck = new Deck("Empty Deck", [], []); // TODO: Use a real deck instead of an empty one
-    const code = GameCode.generate(games);
-    games[code] = new Game(deck);
+    const { deckName, expansionPacks } = req.body;
+
+    const allDecks = await cards.getDecks();
+    const allPacks = await cards.getExpansionPacks();
+    const filteredDecks = allDecks.filter(deck => deck.name === deckName);
+    const filteredPacks = allPacks.filter(pack => expansionPacks.includes(pack.name));
+    const combinedCards = [...filteredDecks, ...filteredPacks].map(cards => new Deck(cards)).reduce(Deck.combine);
+
+    const code = Game.Code.generate(games);
+    games[code] = new Game(combinedCards);
     console.log(`Started new game with code "${code}": `, games[code]);
     res.send(code);
 });
@@ -158,8 +64,21 @@ router.get('/playerList', async function(req, res) {
 });
 
 router.post('/expansionPack', async function(req, res) {
-    const { name, prompts, responses } = req.body;
-    console.log("Recieved pack of cards: ", new Deck(name, prompts, responses));
+    const pack = new Deck(req.body);
+    console.log("Recieved pack of cards: ", pack);
+    try {
+        await cards.saveExpansionPack(pack);
+    } catch (e) {
+        const message = (e && e.message || e) + "";
+        if (message.startsWith("Pack already exists")) {
+            console.error(message);
+            res.sendStatus(400);
+        } else {
+            console.error(e);
+            res.sendStatus(500);
+        }
+        return;
+    }
     res.sendStatus(200);
 });
 
@@ -168,6 +87,5 @@ router.use('*', async function(req, res) {
     res.sendStatus(404);
 });
  
-
 
 module.exports = router;

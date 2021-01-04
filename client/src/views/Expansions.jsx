@@ -33,7 +33,12 @@ function Expansions() {
             showSuccess("Successfully saved expansion pack: " + name);
             history.goBack();
         } catch (e) {
-            window.alert("There was an error saving your expansion pack. Please try again later.");
+            if (e === "Bad Request") {
+                window.alert("A pack with this name already exists. Please choose a new name.");
+            } else {
+                window.alert("An unexpected error occurred.");
+                console.error("Error saving expansion pack: ", e);
+            }
         }
     }
 
@@ -49,7 +54,7 @@ function Expansions() {
                     value={name}
                     onChange={handleNameChange}
                     errorCondition={!name}
-                    errorMessage={"Please enter a name."}
+                    errorMessage="Please enter a name."
                 />
             </div>
             <div id="deck-maker-wrapper">
