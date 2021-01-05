@@ -23,9 +23,9 @@ router.post('/startGame', async function(req, res) {
 
     const allDecks = await cards.getDecks();
     const allPacks = await cards.getExpansionPacks();
-    const filteredDecks = allDecks.filter(deck => deck.name === deckName);
+    const selectedDeck = allDecks.find(deck => deck.name === deckName);
     const filteredPacks = allPacks.filter(pack => expansionPacks.includes(pack.name));
-    const combinedCards = [...filteredDecks, ...filteredPacks].map(cards => new Deck(cards)).reduce(Deck.combine);
+    const combinedCards = [selectedDeck, ...filteredPacks].map(cards => new Deck(cards)).reduce(Deck.combine).shuffle();
 
     const code = Game.Code.generate(games);
     games[code] = new Game(combinedCards);
