@@ -17,13 +17,13 @@ var builtInExpansions = require('./system-expansion-packs.json');
  */
 
 var isBundle = /^([a-z]:\\snapshot|\/snapshot).*/i.test(__dirname);
-var userExpansionLocation = isBundle ? path.dirname(process.execPath) : __dirname;
+var userExpansionFile = path.join(isBundle ? path.dirname(process.execPath) : __dirname, 'custom-cards.json');
 
 // Get the list of user-installed expansion packs from ./custom-cards.json
 // We can't just do a require() because this list may be updated while the game is running
 function _getUserExpansions() {
     return new Promise(resolve => {
-        fs.readFile(path.join(userExpansionLocation, 'custom-cards.json'), 'utf8', (err, data) => {
+        fs.readFile(userExpansionFile, 'utf8', (err, data) => {
             if (err || !_formCheck(data)) {
                 resolve([]);
             } else {
@@ -36,7 +36,7 @@ function _getUserExpansions() {
 // Write a list of user-installed expansion packs to ./custom-cards.json
 function _setUserExpansions(content) {
     return new Promise(resolve => {
-        fs.writeFile(path.join(userExpansionLocation, 'custom-cards.json'), JSON.stringify(content), (err) => {
+        fs.writeFile(userExpansionFile, JSON.stringify(content), (err) => {
             if (err) {
                 reject(err);
             } else {
@@ -50,7 +50,7 @@ function _formCheck(customCardsJson) {
     try {
         const packs = JSON.parse(customCardsJson);
         for (const pack of packs) {
-            if (!(Object.keys(pack).length === 3 && typeof pack.name === "string" && Array.isArray(pack.prompts) && Array.isArray(pack.responses))) {
+            if (!(typeof pack.name === "string" && Array.isArray(pack.prompts) && Array.isArray(pack.responses))) {
                 return false;
             }
         }
