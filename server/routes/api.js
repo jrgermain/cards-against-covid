@@ -27,7 +27,7 @@ router.post('/startGame', async function(req, res) {
 
     const code = Game.Code.generate(games);
     games[code] = new Game(combinedCards);
-    console.log(`Started new game with code "${code}": `, games[code]);
+    console.log(`Started new game with code "${code}"`);
     res.send(code);
 });
 

@@ -8,6 +8,7 @@ function sendUpdate(gameCode) {
 }
 
 io.on('connection', socket => {
+    console.log("Socket: New connection");
     socket.on('join game', (gameCode, name) => {
         // Assign this player to a room based on game code
         socket.join(gameCode);
@@ -16,7 +17,7 @@ io.on('connection', socket => {
         const game = games[gameCode];
         const player = new Player(name);
         game.players.push(player);
-        console.log(`Socket: Player "${name}" joined game "${gameCode}". Current player list: `, game.players);
+        console.log(`Socket: Player "${name}" joined game "${gameCode}". Current player list: `, game.players.map(player => player.name));
 
         sendUpdate(gameCode);
     });
