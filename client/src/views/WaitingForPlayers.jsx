@@ -6,26 +6,39 @@ import { useState } from 'react';
 import Ajax from '../lib/ajax';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { socket } from '../index';
+import { showError } from '../lib/message';
 
 function WaitingForPlayers({ match, location }) {
     const history = useHistory();
     const [players, setPlayers] = useState([]);
-    const { name } = location.state;
-
-    // Poll for new players every 2.5 seconds
-    useEffect(() => {
-        getPlayerList();
-        const refreshInterval = window.setInterval(getPlayerList, 2500);
-        return function () {
-            window.clearInterval(refreshInterval);
-        }
-    }, []);
-    
-    function getPlayerList() {
-        Ajax.getJson("/api/playerList?code=" + match.params.game, { cache: false })
-            .then(setPlayers)
-            .catch(history.goBack);
+    if (!location.state) {
+        history.push("/");
+        window.location.reload();
     }
+    const { name } = location.state;
+    useEffect(() => {
+        socket.connect();
+
+        Ajax.getJson("/api/playerList?code=" + match.params.game, { 
+            cache: false,
+            onSuccess: function (playersAlreadyHere) {
+                setPlayers(playersAlreadyHere);
+                socket.emit('join game', match.params.game, name);
+                socket.on("game updated", game => {
+                    if (game.state === "IN_PROGRESS") {
+                        history.push("/play", { name, game });
+                    } else {
+                        setPlayers(game.players);
+                    }
+                });
+            },
+            onError: function () {
+                showError("Could not find game with code " + match.params.game);
+                history.push("/");
+            }
+        });
+    }, []);
 
     return (
         <div className="view" id="waiting-for-players">
@@ -50,7 +63,7 @@ function WaitingForPlayers({ match, location }) {
                     <Button>Change My Name</Button>
                 </section>
                 <section className="start-game">
-                    <Button link="/play">Everybody's In</Button>
+                    <Button onClick={() => socket.emit('start game', match.params.game)}>Everybody's In</Button>
                 </section>
             </main>
         </div>

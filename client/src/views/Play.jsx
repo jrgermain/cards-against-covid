@@ -1,36 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '../components/Card';
 import CardDeck from '../components/CardDeck';
 import Chat from '../components/Chat';
 import List from '../components/List';
+import { socket } from '../index';
 import './Play.css';
 
-const DEMO_STATE = {
-    name: "Joey", 
-    prompt: "My _______ hurts",
-    cards: [
-        "Card 1",
-        "Card 2",
-        "Card 3",
-        "Card 4",
-        "Card 5"
-    ],
-    players: [
-        { name: "Joey", isJudge: true, response: null },
-        { name: "Amanda", isJudge: false, response: null },
-        { name: "Mark", isJudge: false, response: "mark response" },
-        { name: "Stefan", isJudge: false, response: "stefan response" }
-    ]
-};
 const NORMAL_WEIGHT = {fontWeight: "normal"};
 const needsToAnswer = player => !(player.isJudge || player.response);
 
-function Play() {
+function Play({ location }) {
+    const name = location.state.name;
+    const [game, setGame] = useState(location.state.game);
+    const player = game.players.find(player => player.name === name);
+    const role = player.isJudge ? "judging" : "answering";
 
-    const [state, setState] = useState(DEMO_STATE);
-    const { name, prompt, cards, players } = state;
-    const me = players.find(player => player.name === name);
-    const role = me.isJudge ? "judging" : "answering";
+    useEffect(() => {
+        socket.on("game updated", game => {
+            setGame(game);
+        });
+    }, []);
+
     return (
         <div className="view" id="play">
             <main>
@@ -39,12 +29,12 @@ function Play() {
                 </h1>
                 <div className="game-controls">
                     <span>Your prompt:</span>
-                    <Card isPrompt>{prompt}</Card>
+                    <Card isPrompt>{game.prompt}</Card>
                     {role === "judging" 
-                        ? players.filter(needsToAnswer).length > 0
-                            ? <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} />
-                            : <CardDeck>{players.filter(player => !player.isJudge).map(player => <Card>{player.response}</Card>)}</CardDeck>
-                        : <CardDeck>{cards.map(text => <Card>{text}</Card>)}</CardDeck>}
+                        ? game.players.filter(needsToAnswer).length > 0
+                            ? <List label="Still waiting on responses from:" items={game.players} filter={needsToAnswer} map={player => player.name} />
+                            : <CardDeck>{game.players.filter(player => !player.isJudge).map(player => <Card>{player.response}</Card>)}</CardDeck>
+                        : <CardDeck>{player.cards.map(text => <Card>{text}</Card>)}</CardDeck>}
                 </div>
                 <button className="panel-toggle">Show Chat</button>
             </main>

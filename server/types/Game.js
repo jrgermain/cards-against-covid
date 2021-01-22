@@ -9,7 +9,7 @@ class Game {
     }
 
     start() {
-        for (const player of players) {
+        for (const player of this.players) {
             // Transfer the first 7 cards into the player's hand
             player.cards = this.deck.responses.splice(0,7);
         }
@@ -18,6 +18,14 @@ class Game {
         randomPlayer.isJudge = true;
 
         this.state = Game.State.IN_PROGRESS;
+    }
+
+    toClientData() {
+        return {
+            players: this.players,
+            prompt: this.prompt,
+            state: this.state.description
+        }
     }
 }
 

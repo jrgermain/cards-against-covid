@@ -1,3 +1,5 @@
+exports.games = {};
+
 var express = require('express');
 var Server = require('http').Server;
 var path = require('path');
@@ -11,7 +13,7 @@ var stoppable = require('stoppable');
 var app = express();
 
 // Setup http server
-var server = new Server(app);
+var server = exports.server = new Server(app);
 stoppable(server, 5000);
 server.listen(3001);
 process.on('SIGTERM', () => server.stop());
@@ -35,8 +37,9 @@ app.use('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/../client/build', 'index.html'));
 });
 
+// Setup socket.io
+require('./routes/socket');
+
 // Print welcome message to users
 console.log('Join the game at ' + chalk.bold('http://' + ip.address() + ":3001"));
 console.log('For help joining, see the troublshooting guide here: https://github.com/jrgermain/cards-against-covid/wiki');
-
-module.exports = app;

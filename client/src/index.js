@@ -10,6 +10,7 @@ import Play from './views/Play';
 import WaitingForPlayers from './views/WaitingForPlayers';
 import Expansions from './views/Expansions';
 import 'normalize.css';
+import { io } from 'socket.io-client';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -32,3 +33,6 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+const socket = io();
+export { socket };

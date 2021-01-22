@@ -3,6 +3,7 @@ class Player {
         this.name = name;
         this.isJudge = false;
         this.cards = [];
+        this.response = null;
     }
 }
 

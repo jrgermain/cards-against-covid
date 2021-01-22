@@ -1,11 +1,9 @@
 var express = require('express');
 var Deck = require('../types/Deck');
 var Game = require('../types/Game');
-var Player = require('../types/Player');
 var cards = require('../cards/loader');
 var router = express.Router();
-var games = {};
-
+var games = require('../app').games;
 
 // Handle a GET request to http://{gameserver}/api/deckList
 router.get('/deckList', async function(req, res) {
@@ -45,8 +43,6 @@ router.post('/joinGame', async function(req, res) {
         console.warn(`Player "${name}" already exists in game "${code}".`);
         res.sendStatus(400);
     } else {
-        game.players.push(new Player(name));
-        console.log(`Player "${name}" joined game "${code}". Current player list: `, game.players);
         res.sendStatus(200);
     }
 });
@@ -86,6 +82,5 @@ router.post('/expansionPack', async function(req, res) {
 router.use('*', async function(req, res) {
     res.sendStatus(404);
 });
- 
 
 module.exports = router;
