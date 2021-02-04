@@ -27,4 +27,9 @@ io.on('connection', socket => {
         console.log(`Socket: Game "${gameCode}" has started.`);
         sendUpdate(gameCode);
     });
+
+    socket.on('new message', (gameCode, name, message) => {
+        io.to(gameCode).emit('new message', name, message);
+    });
+   
 });

@@ -38,7 +38,7 @@ function Play({ location }) {
                 </div>
                 <button className="panel-toggle">Show Chat</button>
             </main>
-            <Chat></Chat>
+            <Chat gameCode ={game.gameCode} name={game.player}></Chat>
         </div>
     );
 }
