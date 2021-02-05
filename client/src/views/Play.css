@@ -1,19 +1,21 @@
 #play {
     padding: 0;
+    height: 100vh;
+    height: -webkit-fill-available;
     overflow: hidden;
+    flex-direction: row;
 }
 
 #play main {
-    padding: 5vh 5vw;
-    height: 100vh;
-    height: -webkit-fill-available;
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+    width: 100vw;
 }
 
 @media only screen and (min-width: 800px) {
-    #play {
-        display: grid;
-        grid-template-columns: auto 350px;
+    #play main {
+        width: calc(100vw - 20rem);
     }
 }
 
@@ -21,10 +23,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow: scroll;
 }
 
-#play > * {
-    max-height: 100%;
-    max-height: -webkit-fill-available;
-    overflow: scroll;
+.game-controls > * {
+    flex-shrink: 0;
+}
+
+#play h1 {
+    margin-top: 2rem;
+}
+
+.deck {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }

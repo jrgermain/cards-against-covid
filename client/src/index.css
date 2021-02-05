@@ -1,3 +1,7 @@
+html, body, #root {
+  height: -webkit-fill-available;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -27,9 +31,9 @@ h1, h2, h3 {
 
 .view {
   text-align: center;
-  height: 100vh;
+  height: calc(100vh - 4rem);
   height: -webkit-fill-available;
-  padding: 5vh 5vw;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
 }
@@ -153,8 +157,7 @@ main {
 @media only screen and (min-width: 800px) {
   .panel {
     height: 100vh;
-    top: 0;
-    right: 0;
+    width: 20rem;
   }
   .panel-toggle {
     display: none;
