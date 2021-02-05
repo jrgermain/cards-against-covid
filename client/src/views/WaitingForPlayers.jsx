@@ -12,6 +12,7 @@ import { showError } from '../lib/message';
 function WaitingForPlayers({ match, location }) {
     const history = useHistory();
     const [players, setPlayers] = useState([]);
+    const gameCode = match.params.game;
     if (!location.state) {
         history.push("/");
         window.location.reload();
@@ -20,21 +21,21 @@ function WaitingForPlayers({ match, location }) {
     useEffect(() => {
         socket.connect();
 
-        Ajax.getJson("/api/playerList?code=" + match.params.game, { 
+        Ajax.getJson("/api/playerList?code=" + gameCode, { 
             cache: false,
             onSuccess: function (playersAlreadyHere) {
                 setPlayers(playersAlreadyHere);
-                socket.emit('join game', match.params.game, name);
+                socket.emit('join game', gameCode, name);
                 socket.on("game updated", game => {
                     if (game.state === "IN_PROGRESS") {
-                        history.push("/play", { name, game });
+                        history.push("/play", { name, game, gameCode });
                     } else {
                         setPlayers(game.players);
                     }
                 });
             },
             onError: function () {
-                showError("Could not find game with code " + match.params.game);
+                showError("Could not find game with code " + gameCode);
                 history.push("/");
             }
         });

@@ -28,8 +28,8 @@ io.on('connection', socket => {
         sendUpdate(gameCode);
     });
 
-    socket.on('new message', (gameCode, name, message) => {
-        io.to(gameCode).emit('new message', name, message);
+    socket.on('new message', (gameCode, sender, content) => {
+        io.to(gameCode).emit('new message', { sender, content });
     });
    
 });

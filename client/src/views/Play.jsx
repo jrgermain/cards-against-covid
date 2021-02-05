@@ -10,7 +10,7 @@ const NORMAL_WEIGHT = {fontWeight: "normal"};
 const needsToAnswer = player => !(player.isJudge || player.response);
 
 function Play({ location }) {
-    const name = location.state.name;
+    const { gameCode, name } = location.state;
     const [game, setGame] = useState(location.state.game);
     const player = game.players.find(player => player.name === name);
     const role = player.isJudge ? "judging" : "answering";
@@ -38,7 +38,7 @@ function Play({ location }) {
                 </div>
                 <button className="panel-toggle">Show Chat</button>
             </main>
-            <Chat gameCode ={game.gameCode} name={game.player}></Chat>
+            <Chat gameCode={gameCode} name={name}></Chat>
         </div>
     );
 }
