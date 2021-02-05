@@ -132,6 +132,10 @@ main {
     transform: translateY(calc(100% - 3.2rem));
   }
 
+  .panel[data-collapsed="0"] {
+    transform: translateY(0);
+  }
+
   .panel[data-collapsed="1"] > *:not(.panel-toggle) {
     display: none;
   }
