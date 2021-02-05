@@ -16,13 +16,16 @@ function Chat({ gameCode, name }) {
         socket.on("new message", addMessage);
     }, []);
 
+    const [collapsed, setCollapsed] = useState(true);
+    const toggle = () => setCollapsed(!collapsed);
+
     return (
-        <div className="panel chat">
-            <button className="panel-toggle">Hide Chat</button>
+        <div className="panel chat" data-collapsed={+collapsed}>
+            <button className="panel-toggle" onClick={toggle}>Toggle Chat</button>
             <div className="chat-messages">
                 {messages.map(ChatMessage)}
-            </div>
-            <ChatSubmit gameCode={gameCode} name={name}/>
+                </div>
+            <ChatSubmit gameCode={gameCode} name={name}/>            
         </div>
     );
 }

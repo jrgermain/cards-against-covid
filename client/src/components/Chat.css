@@ -1,10 +1,13 @@
 .chat-messages {
     margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 .chat-message {
     text-align: left;
-    margin: .5rem
+    margin: .3rem
 }
 .chat-message > strong {
     margin-right: .5rem;

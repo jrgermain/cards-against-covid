@@ -36,7 +36,6 @@ function Play({ location }) {
                             : <CardDeck>{game.players.filter(player => !player.isJudge).map(player => <Card>{player.response}</Card>)}</CardDeck>
                         : <CardDeck>{player.cards.map(text => <Card>{text}</Card>)}</CardDeck>}
                 </div>
-                <button className="panel-toggle">Show Chat</button>
             </main>
             <Chat gameCode={gameCode} name={name}></Chat>
         </div>
