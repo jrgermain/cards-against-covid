@@ -2,21 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../index';
 import ChatMessage from './ChatMessage';
 import './Chat.css';
-import TextBox from './TextBox';
-import Button from '../components/Button';
+import ChatSubmit from './ChatSubmit';
 
 function Chat({ gameCode, name }) {
     const [messages, setMessages] = useState([]);
     const messagesRef = useRef(messages);
-    const setMessagesRef = data => {
-        messagesRef.current = data;
-        setMessages(data);
+    const addMessage = message => {
+        const allMessages = messagesRef.current.concat(message);
+        messagesRef.current = allMessages;
+        setMessages(allMessages);
     };
     useEffect(() => {
-        socket.on("new message", message => {
-            console.log(messages, message)
-            setMessagesRef([...messagesRef.current, message]);
-        });
+        socket.on("new message", addMessage);
     }, []);
 
     return (
@@ -25,8 +22,7 @@ function Chat({ gameCode, name }) {
             <div className="chat-messages">
                 {messages.map(ChatMessage)}
             </div>
-            <TextBox id="chat-message" placeholder="Type a message" />
-            <Button onClick={() => socket.emit("new message", gameCode, name, document.getElementById("chat-message").value)}>Send</Button>
+            <ChatSubmit gameCode={gameCode} name={name}/>
         </div>
     );
 }

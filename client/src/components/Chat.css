@@ -10,9 +10,17 @@
     margin-right: .5rem;
 }
 
-
 .chat input {
     width: 100%;
     box-sizing: border-box;
     margin: 0;
+}
+
+.chat-submit {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+.chat-submit > .text-box > input {
+    height: 100%;
 }
