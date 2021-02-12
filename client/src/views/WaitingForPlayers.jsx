@@ -2,37 +2,32 @@ import React from 'react';
 import List from '../components/List';
 import './WaitingForPlayers.css';
 import Button from '../components/Button';
-import { useState } from 'react';
 import Ajax from '../lib/ajax';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { socket } from '../index';
 import { showError } from '../lib/message';
+import { useDispatch, useSelector } from 'react-redux';
+import * as reduxListener from '../redux/socket';
 
-function WaitingForPlayers({ match, location }) {
+function WaitingForPlayers() {
     const history = useHistory();
-    const [players, setPlayers] = useState([]);
-    const gameCode = match.params.game;
-    if (!location.state) {
-        history.push("/");
-        window.location.reload();
-    }
-    const { name } = location.state;
+    const dispatch = useDispatch();
+    const players = useSelector(state => state.players);
+    const gameCode = useSelector(state => state.gameCode);
+    const user = useSelector(state => state.user);
+    const status = useSelector(state => state.status);
+
     useEffect(() => {
         socket.connect();
-
-        Ajax.getJson("/api/playerList?code=" + gameCode, { 
+        socket.emit('join game', gameCode, user.name);
+        Ajax.getJson("/api/playerList?code=" + gameCode, {
             cache: false,
             onSuccess: function (playersAlreadyHere) {
-                setPlayers(playersAlreadyHere);
-                socket.emit('join game', gameCode, name);
-                socket.on("game updated", game => {
-                    if (game.state === "IN_PROGRESS") {
-                        history.push("/play", { name, game, gameCode });
-                    } else {
-                        setPlayers(game.players);
-                    }
+                playersAlreadyHere.forEach(player => {
+                    dispatch({ type: "players/add", payload: player });
                 });
+                reduxListener.start();
             },
             onError: function () {
                 showError("Could not find game with code " + gameCode);
@@ -40,6 +35,10 @@ function WaitingForPlayers({ match, location }) {
             }
         });
     }, []);
+    
+    if (status === "IN_PROGRESS") {
+        history.push("/play");
+    }
 
     return (
         <div className="view" id="waiting-for-players">
@@ -49,11 +48,11 @@ function WaitingForPlayers({ match, location }) {
                     <h2>About you</h2>
                     <div>
                         <span>Your game code: </span>
-                        <strong className="game-code">{match.params.game}</strong>
+                        <strong className="game-code">{gameCode}</strong>
                     </div>
                     <div>
                         <span>Your name: </span>
-                        <strong className="player-name">{name}</strong>
+                        <strong className="player-name">{user.name}</strong>
                     </div>
                 </section>
                 <section className="currently-joined">
@@ -64,7 +63,7 @@ function WaitingForPlayers({ match, location }) {
                     <Button>Change My Name</Button>
                 </section>
                 <section className="start-game">
-                    <Button onClick={() => socket.emit('start game', match.params.game)}>Everybody's In</Button>
+                    <Button onClick={() => socket.emit('start game', gameCode)}>Everybody's In</Button>
                 </section>
             </main>
         </div>

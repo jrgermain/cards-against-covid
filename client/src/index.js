@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import {BrowserRouter, Redirect, Route, Switch} from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Start from './views/Start'
 import ChooseDeck from './views/ChooseDeck';
 import Join from './views/Join';
@@ -11,20 +11,23 @@ import WaitingForPlayers from './views/WaitingForPlayers';
 import Expansions from './views/Expansions';
 import 'normalize.css';
 import { io } from 'socket.io-client';
+import store from './redux/store';
+import {Provider} from 'react-redux';
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Switch>
-        <Route exact path="/" component={Start} />
-        <Route path="/start" component={ChooseDeck} />
-        <Redirect from="/join/*" to="/waiting" />
-        <Route path="/join" component={Join} />
-        <Route path="/waiting/:game" component={WaitingForPlayers} />
-        <Route path="/play" component={Play} />
-        <Route path="/expansions" component={Expansions} />
-      </Switch>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/" component={Start} />
+          <Route path="/start" component={ChooseDeck} />
+          <Route path="/join" component={Join} />
+          <Route path="/waiting" component={WaitingForPlayers} />
+          <Route path="/play" component={Play} />
+          <Route path="/expansions" component={Expansions} />
+        </Switch>
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

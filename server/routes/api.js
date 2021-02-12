@@ -8,12 +8,22 @@ var games = require('../app').games;
 // Handle a GET request to http://{gameserver}/api/deckList
 router.get('/deckList', async function(req, res) {
     const decks = await cards.getDecks();
-    res.send(decks);
+    const deckInfo = decks.map(deck => ({
+        name: deck.name,
+        numPrompts: deck.prompts.length,
+        numResponses: deck.responses.length
+    }));
+    res.send(deckInfo);
 });
 
 router.get('/expansionList', async function(req, res) {
     const packs = await cards.getExpansionPacks();
-    res.send(packs);
+    const packInfo = packs.map(pack => ({
+        name: pack.name,
+        numPrompts: pack.prompts.length,
+        numResponses: pack.responses.length
+    }));
+    res.send(packInfo);
 });
 
 router.post('/startGame', async function(req, res) {

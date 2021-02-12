@@ -7,31 +7,55 @@ import { useState } from 'react';
 import TextBox from '../components/TextBox';
 import CheckBox from '../components/CheckBox';
 import './ChooseDeck.css';
+import { useDispatch, useSelector } from 'react-redux';
 
 function ChooseDeck() {
     const history = useHistory();
-    const [name, setName] = useState(localStorage.getItem("player-name"));
+    const dispatch = useDispatch();
+
+    const user = useSelector(state => state.user);
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [decks, setDecks] = useState([]);
     const [expansions, setExpansions] = useState([]);
-    const [selectedDeck, selectDeck] = useState("Cards Against Humanity (18+)");
-    const selectedExpansions = new Set();
 
     // On first load, get list of available cards
     useEffect(() => {
         Ajax.getJSON("/api/deckList").then(decks => {
-            setDecks(decks.map(deck => deck.name));
+            // Select first deck
+            decks.forEach((deck, i) => {
+                deck.isSelected = i === 0;
+            });
+            setDecks(decks);
         });
-        Ajax.getJSON("/api/expansionList").then(packs => {
-            setExpansions(packs);
+        Ajax.getJSON("/api/expansionList").then(expansions => {
+            expansions.forEach(expansion => {
+                expansion.isSelected = false;
+            });
+            setExpansions(expansions);
         });
     }, []);
 
-    async function initGame() {
+
+    const handleDeckChange = e => {
+        // Set the selected deck based on the value of the dropdown
+        setDecks(decks.map(deck => ({
+            ...deck,
+            isSelected: deck.name === e.target.value
+        })));
+    }
+    const handlePackChange = e => {
+        // Change the value of the input that was clicked
+        // TODO: clean this up
+        setExpansions(expansions.map(pack => ({
+            ...pack,
+            isSelected: pack.name === e.target.labels[0].textContent ? e.target.checked : pack.isSelected
+        })));
+    }
+    const handleSubmit = async () => {
         setHasSubmitted(true);
 
-        if (name) {
-            localStorage.setItem("player-name", name);
+        if (user.name) {
+            localStorage.setItem("player-name", user.name);
         } else {
             console.error("No player name");
             return;
@@ -39,46 +63,47 @@ function ChooseDeck() {
 
         // Create a game, then join it
         try {
-            const gameCode = await Ajax.postJson("/api/startGame", JSON.stringify({ deckName: selectedDeck, expansionPacks: Array.from(selectedExpansions) }));
-            await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name }));
-            history.push(`/waiting/${gameCode}`, { name });
+            const deckName = decks.find(deck => deck.isSelected).name;
+            const expansionPacks = expansions.filter(pack => pack.isSelected).map(pack => pack.name);
+            const gameCode = await Ajax.postJson("/api/startGame", JSON.stringify({ deckName, expansionPacks }));
+            await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
+            dispatch({ type: "gameCode/set", payload: gameCode });
+            
+            history.push("/waiting");
         } catch (e) {
             console.error(e);
         }
-    }
 
-    const handleNameChange = e => setName(e.target.value);
-    const handleDeckChange = e => selectDeck(e.target.value);
-    const handlePackChange = e => e.target.checked ? selectedExpansions.add(e.target.labels[0].innerText) : selectedExpansions.delete(e.target.labels[0].innerText);
+    }
 
     return (
         <div className="view" id="choose-deck">
             <h1>Start a game</h1>
             
             <div>
-                <label htmlFor="player-name">Enter your name: </label>
-                <TextBox 
+                <label htmlFor="player-name">Enter your name: </label>                
+                <TextBox
                     id="player-name"
                     placeholder="Your name"
-                    value={name}
-                    onChange={handleNameChange}
-                    errorCondition={hasSubmitted && !name}
+                    value={useSelector(state => state.user.name)}
+                    onChange={e => dispatch({ type: "user/setName", payload: e.target.value })}
+                    errorCondition={hasSubmitted && !user.name}
                     errorMessage="Please enter a name."
                 />
             </div>
             
             <h1 className="header-css">Choose a Deck:</h1>  
-            <select className="select-css" value={selectedDeck} onChange={handleDeckChange}>
+            <select className="select-css" value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
                 {decks.length === 0 && <option disabled>Loading decks...</option>}
-                {decks.map(deck => <option>{deck}</option>)}
+                {decks.map((deck, i) => <option key={i} selected={deck.isSelected}>{deck.name}</option>)}
             </select>
 
             <h1 className="header-css">Choose Expansion Pack(s):</h1>          
             <div className="expansion-packs">
-                {expansions.map(pack => <CheckBox label={pack.name} onChange={handlePackChange} />)}
+                {expansions.map(pack => <CheckBox label={pack.name} onChange={handlePackChange} checked={pack.isSelected} />)}
             </div>
             
-            <Button onClick={initGame}>Continue</Button> 
+            <Button onClick={handleSubmit}>Continue</Button> 
         </div>
     );
 

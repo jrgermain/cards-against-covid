@@ -5,47 +5,52 @@ import { useHistory } from 'react-router-dom';
 import Ajax from '../lib/ajax';
 import { useState } from 'react';
 import TextBox from '../components/TextBox';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Join() {
     const history = useHistory();
-    const [name, setName] = useState(localStorage.getItem("player-name"));
+    const dispatch = useDispatch();
+
     const [nameError, setNameError] = useState("");
-    const [gameCode, setGameCode] = useState("");
     const [gameCodeError, setGameCodeError] = useState("");
+
+
+    const user = useSelector(state => state.user);
+    const gameCode = useSelector(state => state.gameCode);
 
     async function joinGame() {
         setNameError("");
         setGameCodeError("");
 
-        let inputIsValid = true;
+        let passesFormCheck = true;
 
-        if (!name) {
+        if (!user.name) {
             setNameError("Please enter a name.");
-            inputIsValid = false;
+            passesFormCheck = false;
         }
 
         if (!/[a-z]{4}/i.test(gameCode)) {
             setGameCodeError("Invalid game code.");
-            inputIsValid = false;
+            passesFormCheck = false;
         }
 
-        if (!inputIsValid) {
+        if (!passesFormCheck) {
             return;
         }
 
         try {
-            await Ajax.postJson("./api/joinGame", JSON.stringify({ code: gameCode, name }));
+            await Ajax.postJson("./api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
         } catch (e) {
             if (e === "Not Found") {
                 setGameCodeError("The game you specified doesn't exist or isn't accepting players.");
             } else if (e === "Bad Request") {
-                setNameError(`There is already a player named "${name}" in game "${gameCode}".`);
+                setNameError(`There is already a player named "${user.name}" in game "${gameCode}".`);
             }
             return;
         }
 
-        localStorage.setItem("player-name", name);
-        history.push(`/waiting/${gameCode}`, { name });    
+        localStorage.setItem("player-name", user.name);
+        history.push("/waiting");    
     }
 
     function handleKeyPress(event) {
@@ -54,8 +59,6 @@ function Join() {
         }
     }
 
-    const handleNameChange = e => setName(e.target.value);
-    const handleGameCodeChange = e => setGameCode(e.target.value.toUpperCase());
     return (
         <div className="view" id="join">
             <h1>Join a game</h1>
@@ -65,8 +68,8 @@ function Join() {
                     <TextBox
                         id="player-name"
                         placeholder="Your name"
-                        value={name}
-                        onChange={handleNameChange}
+                        value={user.name}
+                        onChange={e => dispatch({ type: "user/setName", payload: e.target.value })}
                         onKeyPress={handleKeyPress}
                         errorCondition={!!nameError}
                         errorMessage={nameError}
@@ -78,7 +81,7 @@ function Join() {
                         id="game-code"
                         placeholder="Game code"
                         value={gameCode}
-                        onChange={handleGameCodeChange}
+                        onChange={e => dispatch({ type: "gameCode/set", payload: e.target.value.toUpperCase() })}
                         onKeyPress={handleKeyPress}
                         errorCondition={!!gameCodeError}
                         errorMessage={gameCodeError}
