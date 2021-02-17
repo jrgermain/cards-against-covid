@@ -4,28 +4,37 @@ class Game {
     constructor(deck) {
         this.players = [];
         this.deck = deck;
-        this.prompt = deck.prompts.pop();
+        this.prompt = "";
         this.state = Game.State.WAITING;
+        this.round = -1;
     }
 
     start() {
-        for (const player of this.players) {
-            // Transfer the first 7 cards into the player's hand
-            player.cards = this.deck.responses.splice(0,7);
-        }
-
-        const randomPlayer = this.players[Math.floor(Math.random() * this.players.length)];
-        randomPlayer.isJudge = true;
-
         this.state = Game.State.IN_PROGRESS;
     }
 
-    toClientData() {
-        return {
-            players: this.players,
-            prompt: this.prompt,
-            state: this.state.description
+    nextRound() {
+        // Deal players enough cards to have 7 each
+        for (const player of this.players) {
+            const cardsNeeded = 7 - player.cards.length;
+            if (cardsNeeded > 0) {
+                const cardsDrawn = this.deck.responses.splice(0, cardsNeeded);
+                player.cards = [...player.cards, ...cardsDrawn];
+            }
         }
+
+        // If there is currently a judge, pass role onto next player. Otherwise (e.g. first round) make first player judge.
+        const judgeIndex = this.players.findIndex(player => player.isJudge);
+        if (judgeIndex > -1) {
+            const nextJudgeIndex = (judgeIndex + 1) % this.players.length;
+            this.players[judgeIndex].isJudge = false;
+            this.players[nextJudgeIndex].isJudge = true;
+        } else {
+            this.players[0].isJudge = true;
+        }
+
+        this.round++;
+        this.prompt = this.deck.prompts.pop();
     }
 }
 

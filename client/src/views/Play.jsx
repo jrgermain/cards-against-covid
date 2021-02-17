@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { socket } from '..';
 import Card from '../components/Card';
 import CardDeck from '../components/CardDeck';
 import Chat from '../components/Chat';
@@ -36,6 +37,10 @@ function Play() {
                             ? <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} />
                             : <CardDeck>{players.filter(player => !player.isJudge).map(player => <Card>{player.response}</Card>)}</CardDeck>
                         : <CardDeck>{user.cards.map(text => <Card>{text}</Card>)}</CardDeck>}
+                    
+                    {/* Below is for testing only. Remove once player roles are implemented. */}
+                    {user.isJudge && <button onClick={() => socket.emit('test: advance game', gameCode)}>DEBUG: Skip to Next Round</button>}
+                    {!user.isJudge && <button onClick={() => socket.emit('test: pop card', gameCode, username)}>DEBUG: Pop last card</button>}
                 </div>
             </main>
             <Chat gameCode={gameCode} name={user.name}></Chat>
