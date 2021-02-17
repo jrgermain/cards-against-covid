@@ -39,7 +39,7 @@ function Join() {
         }
 
         try {
-            await Ajax.postJson("./api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
+            await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
         } catch (e) {
             if (e === "Not Found") {
                 setGameCodeError("The game you specified doesn't exist or isn't accepting players.");
