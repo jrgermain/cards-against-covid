@@ -12,12 +12,15 @@ const playersSlice = createSlice({
         },
         set(state, action) {
             return action.payload;
-        }
+        },
         // updateName(state, action) {
         //     state.find(player => player.name === action.payload.oldName).name = action.payload.newName;
         // }
+        updateScore(state,action){
+            return action.payload;
+        }
     }
 });
 
-export const { add, remove, updateName } = playersSlice.actions;
+export const { add, remove, updateName, updateScore } = playersSlice.actions;
 export default playersSlice.reducer;
