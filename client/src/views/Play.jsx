@@ -6,6 +6,7 @@ import Card from '../components/Card';
 import CardDeck from '../components/CardDeck';
 import Chat from '../components/Chat';
 import List from '../components/List';
+import './Table.css';
 import './Play.css';
 
 const NORMAL_WEIGHT = { fontWeight: "normal" };
@@ -18,6 +19,7 @@ function Play() {
     const prompt = useSelector(state => state.prompt);
     const username = useSelector(state => state.user.name);
     const user = useSelector(state => state.players.find(player => player.name === username));
+    const score = useSelector(state => state.player);
     if (!user) {
         history.push("/");
         return <></>;
@@ -26,6 +28,24 @@ function Play() {
     return (
         <div className="view" id="play">
             <main>
+            <div>
+                <table><tr>
+                    <th>Player</th>
+                    <th>Points</th>
+                    </tr></table>
+                    <table><tr>
+                        <td>Luke Skywalker</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>Michael Jordan</td>
+                        <td>500</td>
+                    </tr>
+                    <tr>
+                        <td>Joey</td>
+                        <td>250</td>
+                    </tr></table>
+                </div>
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>
                 </h1>
