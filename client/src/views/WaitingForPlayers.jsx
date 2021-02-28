@@ -21,7 +21,7 @@ function WaitingForPlayers() {
     const players = useSelector(state => state.players);
     const gameCode = useSelector(state => state.gameCode);
     const user = useSelector(state => state.user);
-    const status = useSelector(state => state.status);
+    const status = useSelector(state => state.status.name);
 
     useEffect(() => {
         socket.connect();

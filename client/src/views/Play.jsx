@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { socket } from '..';
@@ -11,7 +11,23 @@ import './Play.css';
 import Leaderboard from '../components/Leaderboard';
 
 const NORMAL_WEIGHT = { fontWeight: "normal" };
-const needsToAnswer = player => !(player.isJudge || player.response);
+const needsToAnswer = player => !(player.isJudge || player.response); 
+
+const JudgeControls = (players, gameCode) => {
+    if (players.filter(needsToAnswer).length > 0) {
+        return <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} /> 
+    } else {
+        const answerers = players.filter(player => !player.isJudge);
+        const responseCards = answerers.map(player => <Card onClick={() => socket.emit("judge select", gameCode, player.name)}>{player.response}</Card>)
+        return (
+            <div>
+                <h2>Select a winning response</h2>
+                <CardDeck>{responseCards}</CardDeck>
+            </div>
+        );
+    }
+}
+const PlayerControls = (user) => <CardDeck>{user.cards.map(text => <Card>{text}</Card>)}</CardDeck>
 
 function Play() {
     const history = useHistory();
@@ -20,7 +36,6 @@ function Play() {
     const prompt = useSelector(state => state.prompt);
     const username = useSelector(state => state.user.name);
     const user = useSelector(state => state.players.find(player => player.name === username));
-    const score = useSelector(state => state.player);
     if (!user) {
         history.push("/");
         return <></>;
@@ -36,14 +51,9 @@ function Play() {
                 <div className="game-controls">
                     <span>Your prompt:</span>
                     <Card isPrompt>{prompt}</Card>
-                    {user.isJudge 
-                        ? players.filter(needsToAnswer).length > 0
-                            ? <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} />
-                            : <CardDeck>{players.filter(player => !player.isJudge).map(player => <Card>{player.response}</Card>)}</CardDeck>
-                        : <CardDeck>{user.cards.map(text => <Card>{text}</Card>)}</CardDeck>}
+                    {user.isJudge ? JudgeControls(players, gameCode) : PlayerControls(user)}
                     
-                    {/* Below is for testing only. Remove once player roles are implemented. */}
-                    {user.isJudge && <button onClick={() => socket.emit('test: advance game', gameCode)}>DEBUG: Skip to Next Round</button>}
+                    {/* Below is for testing only. Remove once answering role is implemented. */}
                     {!user.isJudge && <button onClick={() => socket.emit('test: pop card', gameCode, username)}>DEBUG: Pop last card</button>}
                 </div>
             </main>

@@ -21,6 +21,7 @@ class Game {
                 const cardsDrawn = this.deck.responses.splice(0, cardsNeeded);
                 player.cards = [...player.cards, ...cardsDrawn];
             }
+            player.response = null; // Clear last response
         }
 
         // If there is currently a judge, pass role onto next player. Otherwise (e.g. first round) make first player judge.

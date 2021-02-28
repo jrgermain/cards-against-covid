@@ -1,9 +1,10 @@
 import React from 'react';
 import './Card.css';
 
-function Card({ isPrompt, children }) {
+function Card({ isPrompt, children, ...others }) {
     const cardType = isPrompt ? "prompt" : "response";
-    return <div className={"card " + cardType}>{children}</div>;
+    const hasClick = others.onClick ? " hasClick" : "";
+    return <div className={"card " + cardType + hasClick} {...others}>{children}</div>;
 }
 
 export default Card;

@@ -40,7 +40,7 @@ io.on('connection', socket => {
         game.nextRound();
 
         console.log(`Socket: Game "${gameCode}" has started.`);
-        reduxUpdate(gameCode)("status/set", game.state.description);
+        reduxUpdate(gameCode)("status/setName", game.state.description);
         reduxUpdate(gameCode)("players/set", game.players);
         reduxUpdate(gameCode)("prompt/set", game.prompt);
     });
@@ -71,8 +71,25 @@ io.on('connection', socket => {
         if (!user) {
             return;
         }
-        user.cards.pop();
+        
+        user.response = user.cards.pop();
         reduxUpdate(gameCode)("players/set", game.players); // Send updated card list
     });
    
+    socket.on('judge select', (gameCode, playerName) => {
+        console.log(gameCode, playerName)
+        const game = games[gameCode];
+        if (!game) {
+            return;
+        }
+        const player = game.players.find(user => user.name === playerName);
+        player.score++;
+        game.nextRound();
+
+        console.log(`Socket: Judge picked ${playerName}'s card and awarded a point. Game "${gameCode}" advanced to next round.`);
+        reduxUpdate(gameCode)("status/nextRound");
+        reduxUpdate(gameCode)("players/set", game.players); // To update points and roles
+        reduxUpdate(gameCode)("prompt/set", game.prompt);
+    });
+
 });

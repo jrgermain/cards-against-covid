@@ -4,12 +4,22 @@ const validStatusNames = new Set(["WAITING", "IN_PROGRESS", "ENDED"]);
 
 const statusSlice = createSlice({
     name: "status",
-    initialState: "",
+    initialState: {
+        name: "",
+        round: 1,
+        maxRounds: 1
+    },
     reducers: {
-        set(state, action) {
+        setName(state, action) {
             if (validStatusNames.has(action.payload)) {
-                return action.payload;
+                state.name = action.payload;
             }
+        },
+        nextRound(state) {
+            state.round++;
+        },
+        setMaxRounds(state, action) {
+            state.maxRounds = action.payload;
         }
     }
 });

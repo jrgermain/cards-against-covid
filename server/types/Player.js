@@ -4,6 +4,7 @@ class Player {
         this.isJudge = false;
         this.cards = [];
         this.response = null;
+        this.score = 0;
     }
 }
 

@@ -23,3 +23,7 @@
     background: white;
     color: black;
 }
+
+.card.hasClick {
+    cursor: pointer!important;
+}
