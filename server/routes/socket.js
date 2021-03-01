@@ -50,18 +50,7 @@ io.on('connection', socket => {
     });
 
 
-    // Below is for testing only. Remove once player roles are implemented.
-    socket.on('test: advance game', (gameCode) => {
-        const game = games[gameCode];
-        if (!game) {
-            return;
-        }
-        game.nextRound();
-
-        console.log(`Socket: Advanced game "${gameCode}" to next round.`);
-        reduxUpdate(gameCode)("players/set", game.players); // To update cards and statuses
-        reduxUpdate(gameCode)("prompt/set", game.prompt);
-    });
+    // TODO: Below is for testing only. Replace this with a method that uses a specific card instead of just picking the last one.
     socket.on('test: pop card', (gameCode, username) => {
         const game = games[gameCode];
         if (!game) {

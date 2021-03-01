@@ -13,22 +13,6 @@ import Leaderboard from '../components/Leaderboard';
 const NORMAL_WEIGHT = { fontWeight: "normal" };
 const needsToAnswer = player => !(player.isJudge || player.response); 
 
-const JudgeControls = (players, gameCode) => {
-    if (players.filter(needsToAnswer).length > 0) {
-        return <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} /> 
-    } else {
-        const answerers = players.filter(player => !player.isJudge);
-        const responseCards = answerers.map(player => <Card onClick={() => socket.emit("judge select", gameCode, player.name)}>{player.response}</Card>)
-        return (
-            <div>
-                <h2>Select a winning response</h2>
-                <CardDeck>{responseCards}</CardDeck>
-            </div>
-        );
-    }
-}
-const PlayerControls = (user) => <CardDeck>{user.cards.map(text => <Card>{text}</Card>)}</CardDeck>
-
 function Play() {
     const history = useHistory();
     const gameCode = useSelector(state => state.gameCode);
@@ -41,6 +25,21 @@ function Play() {
         return <></>;
     }
     
+    const JudgeControls = () => {
+        if (players.filter(needsToAnswer).length > 0) {
+            return <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} /> 
+        } else {
+            const responseCards = players.filter(player => !player.isJudge).map(player => <Card onClick={() => socket.emit("judge select", gameCode, player.name)}>{player.response}</Card>);
+            return (
+                <div>
+                    <h2>Select a winning response</h2>
+                    <CardDeck>{responseCards}</CardDeck>
+                </div>
+            );
+        }
+    }
+    const PlayerControls = () => <CardDeck>{user.cards.map(text => <Card>{text}</Card>)}</CardDeck>
+
     return (
         <div className="view" id="play">
             <Leaderboard />
@@ -51,7 +50,7 @@ function Play() {
                 <div className="game-controls">
                     <span>Your prompt:</span>
                     <Card isPrompt>{prompt}</Card>
-                    {user.isJudge ? JudgeControls(players, gameCode) : PlayerControls(user)}
+                    {user.isJudge ? <JudgeControls /> : <PlayerControls />}
                     
                     {/* Below is for testing only. Remove once answering role is implemented. */}
                     {!user.isJudge && <button onClick={() => socket.emit('test: pop card', gameCode, username)}>DEBUG: Pop last card</button>}
