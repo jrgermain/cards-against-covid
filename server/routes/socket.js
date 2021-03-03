@@ -24,11 +24,15 @@ io.on('connection', socket => {
         if (!game) {
             return;
         }
-        const player = new Player(name);
-        game.players.push(player);
-
-        console.log(`Socket: Player "${name}" joined game "${gameCode}". Current player list: `, game.players.map(player => player.name));
-        reduxUpdate(gameCode)("players/add", player);
+        const existingPlayer = game.players.find(player => player.name === name);
+        if (existingPlayer) {
+            console.log(`Socket: Player "${name}" rejoined game "${gameCode}".`);
+        } else {
+            const player = new Player(name);
+            game.players.push(player);
+            reduxUpdate(gameCode)("players/add", player);
+            console.log(`Socket: Player "${name}" joined game "${gameCode}". Current player list: `, game.players.map(player => player.name));
+        }
     });
 
     socket.on('start game', (gameCode) => {
@@ -46,7 +50,8 @@ io.on('connection', socket => {
     });
 
     socket.on('new message', (gameCode, sender, content) => {
-        chatUpdate(gameCode)({ sender, content });
+        const message = { sender, content };
+        reduxUpdate(gameCode)("messages/add", message);
     });
 
 
@@ -79,6 +84,18 @@ io.on('connection', socket => {
         reduxUpdate(gameCode)("status/nextRound");
         reduxUpdate(gameCode)("players/set", game.players); // To update points and roles
         reduxUpdate(gameCode)("prompt/set", game.prompt);
+    });
+
+    socket.on('client reload', (gameCode, playerName) => {
+        const game = games[gameCode];
+        if (!game) {
+            return;
+        }
+        const isValidRequest = game.players.some(user => user.name === playerName);
+        
+        if (isValidRequest && !socket.rooms.has(gameCode)) {
+            socket.join(gameCode);
+        }
     });
 
 });

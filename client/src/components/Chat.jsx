@@ -1,20 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { socket } from '../index';
+import React, { useState } from 'react';
 import ChatMessage from './ChatMessage';
 import './Chat.css';
 import ChatSubmit from './ChatSubmit';
+import { useSelector } from 'react-redux';
 
 function Chat({ gameCode, name }) {
-    const [messages, setMessages] = useState([]);
-    const messagesRef = useRef(messages);
-    const addMessage = message => {
-        const allMessages = messagesRef.current.concat(message);
-        messagesRef.current = allMessages;
-        setMessages(allMessages);
-    };
-    useEffect(() => {
-        socket.on("new message", addMessage);
-    }, []);
+    const messages = useSelector(state => state.messages);
 
     const [collapsed, setCollapsed] = useState(true);
     const toggle = () => setCollapsed(!collapsed);

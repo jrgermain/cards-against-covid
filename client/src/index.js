@@ -11,22 +11,26 @@ import WaitingForPlayers from './views/WaitingForPlayers';
 import Expansions from './views/Expansions';
 import 'normalize.css';
 import { io } from 'socket.io-client';
-import store from './redux/store';
-import {Provider} from 'react-redux';
+import { store, persistor } from './redux/store';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import * as reduxListener from './redux/socket';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/" component={Start} />
-          <Route path="/start" component={ChooseDeck} />
-          <Route path="/join" component={Join} />
-          <Route path="/waiting" component={WaitingForPlayers} />
-          <Route path="/play" component={Play} />
-          <Route path="/expansions" component={Expansions} />
-        </Switch>
-      </BrowserRouter>
+      <PersistGate persistor={persistor}>
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/" component={Start} />
+            <Route path="/start" component={ChooseDeck} />
+            <Route path="/join" component={Join} />
+            <Route path="/waiting" component={WaitingForPlayers} />
+            <Route path="/play" component={Play} />
+            <Route path="/expansions" component={Expansions} />
+          </Switch>
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
@@ -37,5 +41,7 @@ ReactDOM.render(
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
 
-const socket = io();
+const socket = io({ transports: ["websocket"] });
+reduxListener.start();
+
 export { socket };

@@ -20,6 +20,12 @@ function Play() {
     const prompt = useSelector(state => state.prompt);
     const username = useSelector(state => state.user.name);
     const user = useSelector(state => state.players.find(player => player.name === username));
+
+    useEffect(() => {
+        // The page either loaded for the first time or refreshed. If it refreshed, rejoin the room.
+        socket.emit("client reload", gameCode, username);
+    }, []);
+
     if (!user) {
         history.push("/");
         return <></>;

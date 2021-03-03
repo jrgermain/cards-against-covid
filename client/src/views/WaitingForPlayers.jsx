@@ -9,7 +9,6 @@ import { useHistory } from 'react-router-dom';
 import { socket } from '../index';
 import { showError } from '../lib/message';
 import { useDispatch, useSelector } from 'react-redux';
-import * as reduxListener from '../redux/socket';
 
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
@@ -24,18 +23,22 @@ function WaitingForPlayers() {
     const status = useSelector(state => state.status.name);
 
     useEffect(() => {
-        socket.connect();
+        // Clear player list
+        dispatch({ type: "players/set", payload: [] });
+
+        // Emit "join" event to tell the server we're joining (or rejoining)
         socket.emit('join game', gameCode, user.name);
+
+        // Get a list of players in the game and display them
         Ajax.getJson("/api/playerList?code=" + gameCode, {
             cache: false,
-            onSuccess: function (playersAlreadyHere) {
-                playersAlreadyHere.forEach(player => {
-                    dispatch({ type: "players/add", payload: player });
-                });
-                reduxListener.start();
+            onSuccess: function (playerList) {
+                dispatch({ type: "players/set", payload: playerList })
             },
             onError: function () {
-                showError("Could not find game with code " + gameCode);
+                if (gameCode) {
+                    showError("Could not find game with code " + gameCode);
+                }
                 history.push("/");
             }
         });
