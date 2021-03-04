@@ -8,6 +8,7 @@ import TextBox from '../components/TextBox';
 import CheckBox from '../components/CheckBox';
 import './ChooseDeck.css';
 import { useDispatch, useSelector } from 'react-redux';
+import { showError } from '../lib/message';
 
 function ChooseDeck() {
     const history = useHistory();
@@ -65,6 +66,10 @@ function ChooseDeck() {
         try {
             const deckName = decks.find(deck => deck.isSelected).name;
             const expansionPacks = expansions.filter(pack => pack.isSelected).map(pack => pack.name);
+            if (deckName === "None (expansion packs only)" && expansionPacks.length === 0) {
+                showError("Please choose a deck or select at least one expansion pack");
+                return;
+            }
             const gameCode = await Ajax.postJson("/api/startGame", JSON.stringify({ deckName, expansionPacks }));
             await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
             dispatch({ type: "gameCode/set", payload: gameCode });
