@@ -54,6 +54,13 @@ function WaitingForPlayers() {
         }
     }
 
+    function handleStart() {
+        if (players.length < 3) {
+            showError("Please wait for at least 3 players to join");
+        } else {
+            socket.emit('start game', gameCode);
+        }
+    }
 
     return (
         <div className="view" id="waiting-for-players">
@@ -89,7 +96,7 @@ function WaitingForPlayers() {
                     </Popup>
                 </section>
                 <section className="start-game">
-                    <Button onClick={() => socket.emit('start game', gameCode)}>Everybody's In</Button>
+                    <Button onClick={handleStart}>Everybody's In</Button>
                 </section>
                 
             </main>
