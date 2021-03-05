@@ -44,7 +44,9 @@ function Play() {
             );
         }
     }
-    const PlayerControls = () => <CardDeck>{user.cards.map(text => <Card>{text}</Card>)}</CardDeck>
+    const PlayerControls = () => <CardDeck>{user.cards.map((text, index) => <Card onClick={() => socket.emit('answer select', gameCode, username, index)}>{text}</Card>)}</CardDeck>
+      
+    
 
     return (
         <div className="view" id="play">
@@ -58,8 +60,8 @@ function Play() {
                     <Card isPrompt>{prompt}</Card>
                     {user.isJudge ? <JudgeControls /> : <PlayerControls />}
                     
-                    {/* Below is for testing only. Remove once answering role is implemented. */}
-                    {!user.isJudge && <button onClick={() => socket.emit('test: pop card', gameCode, username)}>DEBUG: Pop last card</button>}
+                    
+                    
                 </div>
             </main>
             <Chat gameCode={gameCode} name={user.name}></Chat>

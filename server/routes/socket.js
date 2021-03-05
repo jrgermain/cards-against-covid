@@ -1,3 +1,4 @@
+const { text } = require('express');
 var { games, server } = require('../app');
 var Player = require("../types/Player"); 
 var io = require('socket.io')(server);
@@ -69,6 +70,23 @@ io.on('connection', socket => {
         user.response = user.cards.pop();
         reduxUpdate(gameCode)("players/set", game.players); // Send updated card list
     });
+
+    socket.on('answer select', (gameCode, username, index) => {
+        const game = games[gameCode];
+        if (!game) {
+            return;
+        }
+        const user = game.players.find(user => user.name === username);
+        if (!user) {
+            return;
+        }
+
+        user.response = user.cards[index];
+        user.cards.splice(index, 1);
+        console.log(`Socket: Answer from ${username} submitted. Card: "${user.response}"`);
+        reduxUpdate(gameCode)("players/set", game.players); 
+    });
+
    
     socket.on('judge select', (gameCode, playerName) => {
         console.log(gameCode, playerName)
