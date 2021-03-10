@@ -37,16 +37,26 @@ function Play() {
         } else {
             const responseCards = players.filter(player => !player.isJudge).map(player => <Card onClick={() => socket.emit("judge select", gameCode, player.name)}>{player.response}</Card>);
             return (
-                <div>
+                <div className="judge-controls">
                     <h2>Select a winning response</h2>
                     <CardDeck>{responseCards}</CardDeck>
                 </div>
             );
         }
     }
-    const PlayerControls = () => <CardDeck>{user.cards.map((text, index) => <Card onClick={() => socket.emit('answer select', gameCode, username, index)}>{text}</Card>)}</CardDeck>
-      
-    
+    const PlayerControls = () => {
+        return (
+            <div className="player-controls">
+                <CardDeck>
+                    {user.cards.map((text, index) => (
+                        <Card isSelected={text === user.response} onClick={() => socket.emit('answer select', gameCode, username, index)}>
+                            {text}
+                        </Card>
+                    ))}
+                </CardDeck>
+            </div>
+        );
+    }
 
     return (
         <div className="view" id="play">
@@ -59,9 +69,6 @@ function Play() {
                     <span>Your prompt:</span>
                     <Card isPrompt>{prompt}</Card>
                     {user.isJudge ? <JudgeControls /> : <PlayerControls />}
-                    
-                    
-                    
                 </div>
             </main>
             <Chat gameCode={gameCode} name={user.name}></Chat>

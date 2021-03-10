@@ -1,4 +1,3 @@
-const { text } = require('express');
 var { games, server } = require('../app');
 var Player = require("../types/Player"); 
 var io = require('socket.io')(server);
@@ -81,10 +80,21 @@ io.on('connection', socket => {
             return;
         }
 
-        user.response = user.cards[index];
-        user.cards.splice(index, 1);
-        console.log(`Socket: Answer from ${username} submitted. Card: "${user.response}"`);
-        reduxUpdate(gameCode)("players/set", game.players); 
+        // Only allow selecting/delecting cards when players have yet to answer. Otherwise, "lock" the cards while the judge picks.
+        if (game.players.filter(player => !player.isJudge && !player.response).length > 0) {
+            const card = user.cards[index];
+
+            // Toggle selection
+            if (user.response === card) {
+                user.response = null;
+                console.log(`Socket: Answer from ${username} deselected. Card: "${card}"`);
+            } else {
+                user.response = card;
+                console.log(`Socket: Answer from ${username} selected. Card: "${card}"`);
+            }
+
+            reduxUpdate(gameCode)("players/set", game.players);
+        }
     });
 
    
@@ -96,6 +106,12 @@ io.on('connection', socket => {
         }
         const player = game.players.find(user => user.name === playerName);
         player.score++;
+
+        // Discard used responses
+        for (const player of game.players) {
+            player.cards = player.cards.filter(card => card !== player.response);
+        }
+
         game.nextRound();
 
         console.log(`Socket: Judge picked ${playerName}'s card and awarded a point. Game "${gameCode}" advanced to next round.`);

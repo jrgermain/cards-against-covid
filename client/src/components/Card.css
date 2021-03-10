@@ -27,3 +27,8 @@
 .card.hasClick {
     cursor: pointer!important;
 }
+
+.card.selected {
+    border: 3px solid #8af;
+    transform: scale(1.05);
+}
