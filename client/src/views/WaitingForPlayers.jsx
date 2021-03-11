@@ -28,20 +28,6 @@ function WaitingForPlayers() {
 
         // Emit "join" event to tell the server we're joining (or rejoining)
         socket.emit('join game', gameCode, user.name);
-
-        // Get a list of players in the game and display them
-        Ajax.getJson("/api/playerList?code=" + gameCode, {
-            cache: false,
-            onSuccess: function (playerList) {
-                dispatch({ type: "players/set", payload: playerList })
-            },
-            onError: function () {
-                if (gameCode) {
-                    showError("Could not find game with code " + gameCode);
-                }
-                history.push("/");
-            }
-        });
     }, []);
     
     if (status === "IN_PROGRESS") {

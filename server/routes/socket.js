@@ -26,11 +26,17 @@ io.on('connection', socket => {
         }
         const existingPlayer = game.players.find(player => player.name === name);
         if (existingPlayer) {
+            // Player was already in the game and reconnected
             console.log(`Socket: Player "${name}" rejoined game "${gameCode}".`);
+
+            // Make sure the player has the correct player list in case people joined while they were away
+            // Send the list to the player who rejoined, but don't send it to everyone else (since no NEW player joined)
+            reduxUpdate(socket.id)("players/set", game.players);
         } else {
+            // Add the player to the game, then update the player list for people currently connected.
             const player = new Player(name);
             game.players.push(player);
-            reduxUpdate(gameCode)("players/add", player);
+            reduxUpdate(gameCode)("players/set", game.players);
             console.log(`Socket: Player "${name}" joined game "${gameCode}". Current player list: `, game.players.map(player => player.name));
         }
     });
