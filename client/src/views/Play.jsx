@@ -11,13 +11,13 @@ import './Play.css';
 import Leaderboard from '../components/Leaderboard';
 
 const NORMAL_WEIGHT = { fontWeight: "normal" };
-const needsToAnswer = player => !(player.isJudge || player.response); 
 
 function Play() {
     const history = useHistory();
     const gameCode = useSelector(state => state.gameCode);
-    const players  = useSelector(state => state.players);
+    const players = useSelector(state => state.players);
     const prompt = useSelector(state => state.prompt);
+    const cardsRequired = useSelector(state => state.prompt.match(/_+/g)?.length ?? 1 );
     const username = useSelector(state => state.user.name);
     const user = useSelector(state => state.players.find(player => player.name === username));
 
@@ -30,12 +30,18 @@ function Play() {
         history.push("/");
         return <></>;
     }
-    
+
+    const needsToAnswer = player => !player.isJudge && player.responses.length < cardsRequired;
+
     const JudgeControls = () => {
-        if (players.filter(needsToAnswer).length > 0) {
-            return <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} /> 
+        if (players.some(needsToAnswer)) {
+            return <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} />
         } else {
-            const responseCards = players.filter(player => !player.isJudge).map(player => <Card onClick={() => socket.emit("judge select", gameCode, player.name)}>{player.response}</Card>);
+            const responsePlayers = players.filter(player => !player.isJudge);
+            const responseCards = responsePlayers.map(player => {
+                const onClick = () => socket.emit("judge select", gameCode, player.name);
+                return <Card onClick={onClick} isForJudge={true}>{player.responses}</Card>
+            });
             return (
                 <div className="judge-controls">
                     <h2>Select a winning response</h2>
@@ -45,11 +51,15 @@ function Play() {
         }
     }
     const PlayerControls = () => {
+        // Only enable controls if not all players have answered yet
+        const isEnabled = players.some(needsToAnswer);
+        const enabledClass = isEnabled ? "" : " disabled";
+        const multiSelectClass = cardsRequired > 1 ? " multi-select" : "";
         return (
-            <div className="player-controls">
+            <div className={"player-controls" + enabledClass + multiSelectClass}>
                 <CardDeck>
                     {user.cards.map((text, index) => (
-                        <Card isSelected={text === user.response} onClick={() => socket.emit('answer select', gameCode, username, index)}>
+                        <Card selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
                             {text}
                         </Card>
                     ))}

@@ -39,3 +39,26 @@
     flex-wrap: wrap;
     justify-content: center;
 }
+
+.player-controls.disabled {
+    opacity: .5;
+}
+
+.player-controls.disabled > * {
+    pointer-events: none!important;
+    cursor: not-allowed!important;
+}
+
+.player-controls:not(.multi-select) .card-selected-index {
+    display: none;
+}
+
+.player-controls {
+    margin-bottom: 2rem;
+}
+
+@media only screen and (max-width: 799px) {
+    .player-controls {
+        margin-bottom: 4rem;
+    }
+}

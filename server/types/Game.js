@@ -7,23 +7,6 @@ class Game {
         this.prompt = "";
         this.state = Game.State.WAITING;
         this.round = -1;
-
-        // TODO: Remove this when answering prompts with multiple blanks is implemented 
-        this.deck.prompts = this.deck.prompts.filter(card => {
-            // Return true IFF card requires one response. This filters out multi-response cards.
-
-            // Cards with no blanks are probably single-response, so assume they are
-            const noBlanks = /^[^_]+$/;
-            if (noBlanks.test(card)) {
-                return true;
-            }
-
-            // If there are blanks, make sure we only get cards with 1.
-            const aBlank = /_+/g; // a blank is one or more consecutive underscores.
-            const blanks = card.match(aBlank);
-            const numBlanks = blanks.length;
-            return numBlanks === 1;
-        });
     }
 
     start() {
@@ -38,7 +21,7 @@ class Game {
                 const cardsDrawn = this.deck.responses.splice(0, cardsNeeded);
                 player.cards = [...player.cards, ...cardsDrawn];
             }
-            player.response = null; // Clear last response
+            player.responses = []; // Clear last response
         }
 
         // If there is currently a judge, pass role onto next player. Otherwise (e.g. first round) make first player judge.

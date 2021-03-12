@@ -86,19 +86,40 @@ io.on('connection', socket => {
             return;
         }
 
-        // Only allow selecting/delecting cards when players have yet to answer. Otherwise, "lock" the cards while the judge picks.
-        if (game.players.filter(player => !player.isJudge && !player.response).length > 0) {
-            const card = user.cards[index];
+        // Get number of cards required to fully answer the prompt
+        const blanks = game.prompt.match(/_+/g);
+        const cardsRequired = blanks ? blanks.length : 1;
 
-            // Toggle selection
-            if (user.response === card) {
-                user.response = null;
-                console.log(`Socket: Answer from ${username} deselected. Card: "${card}"`);
+        // Only do something if there is at least one player who hasn't (fully) answered yet. Otherwise, the game is locked while the judge picks a winner.
+        if (game.players.some(player => !player.isJudge && player.responses.length < cardsRequired)) {
+            const cardText = user.cards[index];
+
+            // If the card is already selected, deselect it. Otherwise, add it.
+            if (user.responses.includes(cardText)) {
+                // Remove the selected card (use indexOf instead of filtering by text in case there are identical cards)
+                user.responses.splice(user.responses.indexOf(cardText), 1);
+                console.log(`Socket: Answer from ${username} deselected. Card: "${cardText}"`);
             } else {
-                user.response = card;
-                console.log(`Socket: Answer from ${username} selected. Card: "${card}"`);
-            }
+                // Card has not been selected yet
+                if (cardsRequired === 1) {
+                    // For a single-select prompt, selecting a new card sets the response to that card.
+                    // If another card was selected, just de-select it automatically.
+                    user.responses = [cardText];
+                } else if (user.responses.length < cardsRequired) {
+                    // For a multi-select prompt, make the user toggle a card off if they try to select more cards than the prompt specifies
+                    user.responses.push(cardText);
+                } else {
+                    /* The current round is a multi-select, and the player has already selected all their cards.
+                     * They shouldn't be able to select more because there's no clear answer as to what should
+                     * happen. If they want to amend their answer, they should de-select a card first.
+                     */
 
+                    // TODO: show an error on player's screen
+                    console.log(`Socket: ${username} tried to select a card but has already played ${user.responses.length} cards. Tell them to deselect one first!`);
+                    return;
+                }
+                console.log(`Socket: Answer from ${username} selected. Card: "${cardText}"`);
+            }
             reduxUpdate(gameCode)("players/set", game.players);
         }
     });
