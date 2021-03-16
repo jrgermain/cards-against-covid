@@ -40,7 +40,7 @@ function Play() {
             const responsePlayers = players.filter(player => !player.isJudge);
             const responseCards = responsePlayers.map(player => {
                 const onClick = () => socket.emit("judge select", gameCode, player.name);
-                return <Card onClick={onClick} isForJudge={true}>{player.responses}</Card>
+                return <Card type="response" onClick={onClick}>{player.responses}</Card>
             });
             return (
                 <div className="judge-controls">
@@ -59,7 +59,7 @@ function Play() {
             <div className={"player-controls" + enabledClass + multiSelectClass}>
                 <CardDeck>
                     {user.cards.map((text, index) => (
-                        <Card selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
+                        <Card type="response" selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
                             {text}
                         </Card>
                     ))}
@@ -77,7 +77,7 @@ function Play() {
                 </h1>
                 <div className="game-controls">
                     <span>Your prompt:</span>
-                    <Card isPrompt>{prompt}</Card>
+                    <Card type="prompt">{prompt}</Card>
                     {user.isJudge ? <JudgeControls /> : <PlayerControls />}
                 </div>
             </main>

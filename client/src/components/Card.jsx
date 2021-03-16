@@ -4,16 +4,18 @@ import CardBlank from './CardBlank';
 
 const blank = /_+/g;
 
-function Card({ isPrompt, isForJudge, children, selectedIndex, ...others }) {
-    const cardType = isPrompt ? " prompt" : " response";
+function Card({ type, children, selectedIndex, ...others }) {
+    // Build className based on card attributes
     const isSelected = selectedIndex > -1 ? " selected" : "";
     const hasClick = others.onClick ? " hasClick" : "";
- 
+    const className = "card " + type + isSelected + hasClick;
+
+    // This will be an array of JSX Elements that go inside the card 
     const content = [];
 
-    if (isPrompt) {
-        // We will replace the blanks in prompts with CardBlank elements so we can "enhance" them with number labels.
-        // The rest of the text will be put inside normal label elements.
+    if (type === "prompt") {
+        // We will replace the blanks in prompts with CardBlank elements, which are just labeled blanks.
+        // The rest of the text will be put inside <label> elements.
         const blanks = children.match(blank) || [];
 
         // Create label elements from text-- "children" should be a string containing card text
@@ -33,10 +35,9 @@ function Card({ isPrompt, isForJudge, children, selectedIndex, ...others }) {
                 j++;
             }
         }
-    } else if (isForJudge) {
-        // This is a response card being presented to the judge at the end of a round
-        // These need to be capable of showing more than one answer
-        // Children will be an array of answers a player gave
+    } else if (type === "response" && Array.isArray(children)) {
+        // This is a special response card used to show a user's response as one entity even if it contained multiple cards
+        // Notice that the "children" attribute is an array of strings
         const numSeparators = children.length - 1;
         for (let i = 0; i < children.length; i++) {
             if (children.length > 1) {
@@ -47,7 +48,7 @@ function Card({ isPrompt, isForJudge, children, selectedIndex, ...others }) {
                 content.push(<hr/>)
             }
         }
-    } else {
+    } else if (type === "response") {
         // This is a response card being shown to a player who is answering
         // Number them if there are more than 1
         if (isSelected) {
@@ -56,7 +57,7 @@ function Card({ isPrompt, isForJudge, children, selectedIndex, ...others }) {
         content.push(children);
     }
 
-    return <div className={"card" + cardType + isSelected + hasClick} {...others}>{content}</div>;
+    return <div className={className} {...others}>{content}</div>;
 }
 
 export default Card;
