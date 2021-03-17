@@ -3,7 +3,6 @@ import List from '../components/List';
 import './WaitingForPlayers.css';
 import Button from '../components/Button';
 import TextBox from '../components/TextBox';
-import Ajax from '../lib/ajax';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { socket } from '../index';
@@ -12,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
-import { setName } from '../redux/slices/user';
 
 function WaitingForPlayers() {
     const history = useHistory();
@@ -22,24 +20,21 @@ function WaitingForPlayers() {
     const user = useSelector(state => state.user);
     const status = useSelector(state => state.status.name);
 
+    /* When the page is loaded/reloaded, clear the local player list and then send a request to the socket.
+     * This request tells the socket the player is here, and the socket will respond with the correct player list.
+     * Put this in a useEffect so it doesn't happen every time we re-render the view (such as when another player joins).
+     */
     useEffect(() => {
-        // Clear player list
         dispatch({ type: "players/set", payload: [] });
-
-        // Emit "join" event to tell the server we're joining (or rejoining)
         socket.emit('join game', gameCode, user.name);
     }, []);
     
+    // If game has started, redirect to Play screen
     if (status === "IN_PROGRESS") {
         history.push("/play");
     }
 
-    function handleKeyPress(event) {
-        if (event.key === "Enter") {
-            //const player = useSelector(state => state.player.name);
-        }
-    }
-
+    // Respond to the user pressing "Everybody's In"
     function handleStart() {
         if (players.length < 3) {
             showError("Please wait for at least 3 players to join");
@@ -76,7 +71,6 @@ function WaitingForPlayers() {
                         placeholder="Your name"
                         value={useSelector(state => state.user.name)}
                         onChange={e => dispatch({ type: "user/setName", payload: e.target.value})}
-                        //onKeyPress={handleKeyPress}
                     />
                     </div>
                     </Popup>

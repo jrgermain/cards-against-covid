@@ -31,14 +31,19 @@ function Play() {
         return <></>;
     }
 
+    // Given a player, test if they need to submit at least one card. This is true if they are not a judge and they haven't selected the required number of cards.
     const needsToAnswer = player => !player.isJudge && player.responses.length < cardsRequired;
 
+    // The game controls unique to a player who is judging
     const JudgeControls = () => {
         if (players.some(needsToAnswer)) {
             return <List label="Still waiting on responses from:" items={players} filter={needsToAnswer} map={player => player.name} />
         } else {
             const responsePlayers = players.filter(player => !player.isJudge);
+
+            // Get an array of <Card> elements displaying each player's responses
             const responseCards = responsePlayers.map(player => {
+                // When a card is clicked, send a socket event saying the judge selected a card
                 const onClick = () => socket.emit("judge select", gameCode, player.name);
                 return <Card type="response" onClick={onClick}>{player.responses}</Card>
             });
@@ -50,15 +55,20 @@ function Play() {
             );
         }
     }
+
+    // The game controls unique to a player who is answering
     const PlayerControls = () => {
         // Only enable controls if not all players have answered yet
         const isEnabled = players.some(needsToAnswer);
         const enabledClass = isEnabled ? "" : " disabled";
+
+        // If more than one card is required, add a multi-select class to the element
         const multiSelectClass = cardsRequired > 1 ? " multi-select" : "";
         return (
             <div className={"player-controls" + enabledClass + multiSelectClass}>
                 <CardDeck>
                     {user.cards.map((text, index) => (
+                        // Create a <Card> element for each of the user's cards. When clicked, a socket event is sent to the server, where the selection logic takes place.
                         <Card type="response" selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
                             {text}
                         </Card>
