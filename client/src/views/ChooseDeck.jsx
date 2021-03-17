@@ -15,20 +15,22 @@ function ChooseDeck() {
     const dispatch = useDispatch();
 
     const user = useSelector(state => state.user);
+
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [decks, setDecks] = useState([]);
     const [expansions, setExpansions] = useState([]);
 
-    // On first load, get list of available cards
+    // On page load, get list of available cards. Use a useEffect so this doesn't happen every time the user selects something.
     useEffect(() => {
         Ajax.getJSON("/api/deckList").then(decks => {
-            // Select first deck
+            // Set isSelected to true for the first deck and false for the others
             decks.forEach((deck, i) => {
                 deck.isSelected = i === 0;
             });
             setDecks(decks);
         });
         Ajax.getJSON("/api/expansionList").then(expansions => {
+            // Initialize all expansion packs to not selected
             expansions.forEach(expansion => {
                 expansion.isSelected = false;
             });
@@ -38,8 +40,8 @@ function ChooseDeck() {
 
 
     const handleDeckChange = e => {
-        // Set the selected deck based on the value of the dropdown
-        setDecks(decks.map(deck => ({
+        // Set isSelected to true for the deck whose name matches e.target.value and false for the others
+        setDecks(decks.map(deck => ({            
             ...deck,
             isSelected: deck.name === e.target.value
         })));
@@ -55,30 +57,38 @@ function ChooseDeck() {
     const handleSubmit = async () => {
         setHasSubmitted(true);
 
+        // Make sure the user entered a name
         if (user.name) {
+            // Save name for future games
             localStorage.setItem("player-name", user.name);
         } else {
+            // No name was entered, so abort the process
             console.error("No player name");
             return;
         }
 
-        // Create a game, then join it
-        try {
-            const deckName = decks.find(deck => deck.isSelected).name;
-            const expansionPacks = expansions.filter(pack => pack.isSelected).map(pack => pack.name);
-            if (deckName === "None (expansion packs only)" && expansionPacks.length === 0) {
-                showError("Please choose a deck or select at least one expansion pack");
-                return;
-            }
-            const gameCode = await Ajax.postJson("/api/startGame", JSON.stringify({ deckName, expansionPacks }));
-            await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
-            dispatch({ type: "gameCode/set", payload: gameCode });
-            
-            history.push("/waiting");
-        } catch (e) {
-            console.error(e);
+        // If the user has a game where there are no cards selected, show an error and prevent them from continuing
+        const deckName = decks.find(deck => deck.isSelected).name;
+        const expansionPacks = expansions.filter(pack => pack.isSelected).map(pack => pack.name);
+        if (deckName === "None (expansion packs only)" && expansionPacks.length === 0) {
+            showError("Please choose a deck or select at least one expansion pack");
+            return;
         }
 
+        // Create a game, then join it
+        let gameCode;
+        try {
+            gameCode = await Ajax.postJson("/api/startGame", JSON.stringify({ deckName, expansionPacks }));
+            await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
+        } catch (e) {
+            showError("There was an error creating your game. Please try again later.")
+            console.error(e);
+            return;
+        }
+
+        // Everything went ok. Set the new game code, then move to the wait screen.
+        dispatch({ type: "gameCode/set", payload: gameCode });
+        history.push("/waiting");
     }
 
     return (
@@ -99,8 +109,10 @@ function ChooseDeck() {
             
             <h1 className="header-css">Choose a Deck:</h1>  
             <select className="select-css" value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
-                {decks.length === 0 && <option disabled>Loading decks...</option>}
-                {decks.map((deck, i) => <option key={i} selected={deck.isSelected}>{deck.name}</option>)}
+                {decks.length === 0 
+                    ? <option disabled>Loading decks...</option>
+                    : decks.map((deck, i) => <option key={i} selected={deck.isSelected}>{deck.name}</option>)
+                }
             </select>
 
             <h1 className="header-css">Choose Expansion Pack(s):</h1>          
