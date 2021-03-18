@@ -9,7 +9,13 @@ function Leaderboard() {
     const gameCode = useSelector(state => state.gameCode);
     const username = useSelector(state => state.user.name);
     const players  = useSelector(state => state.players);
-    const renderPlayer = player => <tr><td>{player.name}</td><td><span className="player-score">{player.score || 0}</span></td></tr>;
+    
+    const renderPlayer = player => (
+        <tr>
+            <td>{player.name}</td>
+            <td><span className="player-score">{player.score || 0}</span></td>
+        </tr>
+    );
 
     function handleNextRound() {
         // Tell the server this player is ready and show that we are waiting on the others
