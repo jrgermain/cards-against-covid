@@ -21,6 +21,8 @@ function Play() {
     const cardsRequired = useSelector(state => state.prompt.match(/_+/g)?.length ?? 1 );
     const username = useSelector(state => state.user.name);
     const user = useSelector(state => state.players.find(player => player.name === username));
+    const isLeaderboardVisible = useSelector(state => state.status.isLeaderboardVisible);
+
 
     useEffect(() => {
         // The page either loaded for the first time or refreshed. If it refreshed, rejoin the room.
@@ -86,7 +88,9 @@ function Play() {
 
     return (
         <div className="view" id="play">
-            <Leaderboard />
+            {/* Show leaderboard when all players have answered */}
+            {isLeaderboardVisible && <Leaderboard />}
+            
             <main>
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>

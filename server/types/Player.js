@@ -5,6 +5,7 @@ class Player {
         this.cards = [];
         this.responses = [];
         this.score = 0;
+        this.isReadyForNextRound = false;
     }
 }
 

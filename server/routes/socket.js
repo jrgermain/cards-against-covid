@@ -122,18 +122,37 @@ io.on('connection', socket => {
         // Award winning player a point
         winner.score++;
 
-        // Discard used responses
-        for (const player of game.players) {
-            player.cards = player.cards.filter(card => !player.responses.includes(card));
+        console.log(`Socket: Judge picked ${playerName}'s card and awarded a point.`);
+        reduxUpdate(gameCode)("players/set", game.players); // To update points
+        reduxUpdate(gameCode)("status/showLeaderboard");
+    });
+
+    socket.on('player ready', (gameCode, playerName) => {
+        const game = games[gameCode];
+        if (!game) {
+            return;
+        }
+        const player = game.players.find(user => user.name === playerName);
+        if (!player) {
+            return;
         }
 
-        game.nextRound();
+        player.isReadyForNextRound = true;
 
-        console.log(`Socket: Judge picked ${playerName}'s card and awarded a point. Game "${gameCode}" advanced to next round.`);
-        reduxUpdate(gameCode)("status/nextRound");
-        reduxUpdate(gameCode)("players/set", game.players); // To update points and roles
-        reduxUpdate(gameCode)("prompt/set", game.prompt);
+        // If all players are ready, advance the game
+        if (game.players.every(player => player.isReadyForNextRound)) {
+            // Discard used responses
+            for (const player of game.players) {
+                player.cards = player.cards.filter(card => !player.responses.includes(card));
+            }
+            console.log(`Game "${gameCode}" advanced to next round.`);
+            game.nextRound();
+            reduxUpdate(gameCode)("status/nextRound");
+            reduxUpdate(gameCode)("prompt/set", game.prompt);
+            reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards
+        }
     });
+
 
     socket.on('client reload', (gameCode, playerName) => {
         const game = games[gameCode];

@@ -7,7 +7,8 @@ const statusSlice = createSlice({
     initialState: {
         name: "",
         round: 1,
-        maxRounds: 1
+        maxRounds: 1,
+        isLeaderboardVisible: false
     },
     reducers: {
         setName(state, action) {
@@ -17,9 +18,13 @@ const statusSlice = createSlice({
         },
         nextRound(state) {
             state.round++;
+            state.isLeaderboardVisible = false;
         },
         setMaxRounds(state, action) {
             state.maxRounds = action.payload;
+        },
+        showLeaderboard(state) {
+            state.isLeaderboardVisible = true;
         }
     }
 });
