@@ -5,6 +5,7 @@ import { store } from '../redux/store';
 
 function Start() {
     useEffect(() => {
+        // When navigating to this screen, clear out app state
         store.dispatch({ type: "RESET_STATE" });
     }, []);
     return (
