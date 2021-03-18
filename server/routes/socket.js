@@ -3,13 +3,9 @@ var Player = require("../types/Player");
 var io = require('socket.io')(server);
 
 // Send state updates to be consumed by redux on the client side
+// Usage: reduxUpdate([socket id OR room code])([action type], [data])
 function reduxUpdate(gameCode) {
-    return (type, payload, { error, meta } = {}) => { io.to(gameCode).emit("redux action", { type, payload, error, meta }) };
-}
-
-// Send update to the in-game chat
-function chatUpdate(gameCode) {
-    return message => io.to(gameCode).emit('new message', message);
+    return (type, payload) => { io.to(gameCode).emit("redux action", { type, payload }) };
 }
 
 // Event handlers
