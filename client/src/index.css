@@ -90,10 +90,11 @@ main {
 }
 
 #message-banner {
+  z-index: 100;
   width: 100vw;
   background: transparent;
   color: transparent;
-  position: absolute;
+  position: fixed;
   padding: .8rem;
   font-size: .8rem;
   height: 2.4rem;
