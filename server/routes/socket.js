@@ -124,7 +124,7 @@ io.on('connection', socket => {
 
         // Discard used responses
         for (const player of game.players) {
-            player.cards = player.cards.filter(card => card !== player.response);
+            player.cards = player.cards.filter(card => !player.responses.includes(card));
         }
 
         game.nextRound();
