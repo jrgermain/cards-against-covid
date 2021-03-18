@@ -60,22 +60,6 @@ io.on('connection', socket => {
         reduxUpdate(gameCode)("messages/add", message);
     });
 
-
-    // TODO: Below is for testing only. Replace this with a method that uses a specific card instead of just picking the last one.
-    socket.on('test: pop card', (gameCode, username) => {
-        const game = games[gameCode];
-        if (!game) {
-            return;
-        }
-        const user = game.players.find(user => user.name === username);
-        if (!user) {
-            return;
-        }
-        
-        user.response = user.cards.pop();
-        reduxUpdate(gameCode)("players/set", game.players); // Send updated card list
-    });
-
     socket.on('answer select', (gameCode, username, index) => {
         const game = games[gameCode];
         if (!game) {
@@ -126,13 +110,17 @@ io.on('connection', socket => {
 
    
     socket.on('judge select', (gameCode, playerName) => {
-        console.log(gameCode, playerName)
         const game = games[gameCode];
         if (!game) {
             return;
         }
-        const player = game.players.find(user => user.name === playerName);
-        player.score++;
+        const winner = game.players.find(user => user.name === playerName);
+        if (!winner) {
+            return;
+        }
+
+        // Award winning player a point
+        winner.score++;
 
         // Discard used responses
         for (const player of game.players) {

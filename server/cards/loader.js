@@ -16,6 +16,7 @@ var builtInExpansions = require('./system-expansion-packs.json');
  * bundle, custom-cards.json should be in the same directory as the bundle.
  */
 
+// The user is running from a bundle if the current directory is in '/snapshot' or 'C:\snapshot'
 var isBundle = /^([a-z]:\\snapshot|\/snapshot).*/i.test(__dirname);
 var userExpansionFile = path.join(isBundle ? path.dirname(process.execPath) : __dirname, 'custom-cards.json');
 

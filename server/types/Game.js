@@ -15,6 +15,7 @@ class Game {
 
     nextRound() {
         // Deal players enough cards to have 7 each
+        // TODO: If there aren't enough cards, we might have to deal fewer on the first round
         for (const player of this.players) {
             const cardsNeeded = 7 - player.cards.length;
             if (cardsNeeded > 0) {
