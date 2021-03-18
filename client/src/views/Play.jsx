@@ -14,6 +14,7 @@ const NORMAL_WEIGHT = { fontWeight: "normal" };
 
 function Play() {
     const history = useHistory();
+
     const gameCode = useSelector(state => state.gameCode);
     const players = useSelector(state => state.players);
     const prompt = useSelector(state => state.prompt);
@@ -24,6 +25,11 @@ function Play() {
     useEffect(() => {
         // The page either loaded for the first time or refreshed. If it refreshed, rejoin the room.
         socket.emit("client reload", gameCode, username);
+
+        // When the client is disconnected, add a css style to show a visual hint
+        socket.on("connect", () => document.getElementById("play").classList.remove("disconnected"));
+        socket.on("reconnect", () => document.getElementById("play").classList.remove("disconnected"));
+        socket.on("disconnect", () => document.getElementById("play").classList.add("disconnected"));
     }, []);
 
     if (!user) {

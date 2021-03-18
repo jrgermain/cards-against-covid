@@ -14,9 +14,8 @@ const dispatchAction = action => {
     store.dispatch(action);
 }
 
-const handleDisconnect = () => {
-    dispatchAction({ type: "RESET_STATE" });
-    window.history.replaceState(null, "", "/");
+const handleDisconnect = (reason) => {
+    console.warn("Socket connection lost. Reason: " + reason);
     showInfo("Connection lost");
 }
 

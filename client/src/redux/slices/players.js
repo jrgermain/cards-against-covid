@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { showError, showInfo } from '../../lib/message';
 
 const playersSlice = createSlice({
     name: "players",
@@ -8,7 +9,8 @@ const playersSlice = createSlice({
             state.push(action.payload);
         },
         remove(state, action) {
-            return state.players.filter(player => player.name !== action.payload);
+            showInfo(`${action.payload} disconnected`);
+            return state.filter(player => player.name !== action.payload);
         },
         set(state, action) {
             return action.payload;

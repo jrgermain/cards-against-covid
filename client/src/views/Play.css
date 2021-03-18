@@ -4,6 +4,7 @@
     height: -webkit-fill-available;
     overflow: hidden;
     flex-direction: row;
+    transition: filter .3s linear;
 }
 
 #play main {
@@ -61,4 +62,9 @@
     .player-controls {
         margin-bottom: 4rem;
     }
+}
+
+#play.disconnected {
+    filter: opacity(.5) blur(2px);
+    pointer-events: none;
 }

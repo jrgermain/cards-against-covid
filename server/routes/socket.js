@@ -11,9 +11,13 @@ function reduxUpdate(gameCode) {
 // Event handlers
 io.on('connection', socket => {
     console.log("Socket: New connection");
+
     socket.on('join game', (gameCode, name) => {
         // Assign this player to a room based on game code
         socket.join(gameCode);
+
+        // Set data on socket instance
+        socket._gameData = { gameCode, name };
 
         // Update game state
         const game = games[gameCode];
@@ -140,6 +144,24 @@ io.on('connection', socket => {
         
         if (isValidRequest && !socket.rooms.has(gameCode)) {
             socket.join(gameCode);
+        }
+    });
+
+    socket.on('disconnect', (reason) => {
+        if (socket._gameData) {
+            const { gameCode, name } = socket._gameData;
+            console.log(`Socket: Player "${name}" disconnected from game "${gameCode}". Reason: ${reason}`);
+            const game = games[gameCode];
+            if (game) {
+                // Remove player from game
+                game.players = game.players.filter(player => player.name !== name);
+                reduxUpdate(gameCode)("players/remove", name);
+                
+                // If this was the last player, delete the game
+                if (game.players.length === 0) {
+                    delete games[gameCode];
+                }
+            }
         }
     });
 
