@@ -71,8 +71,8 @@ function Expansions() {
                 />
             </div>
             <div id="deck-maker-wrapper">
-                <DeckMaker label="Prompts" value={prompts} onChange={setPrompts} />
-                <DeckMaker label="Responses" value={responses} onChange={setResponses} />
+                <DeckMaker label="Prompts" cards={prompts} setCards={setPrompts} />
+                <DeckMaker label="Responses" cards={responses} setCards={setResponses} />
             </div>
             <Button onClick={submitPack}>Save</Button>
         </div>

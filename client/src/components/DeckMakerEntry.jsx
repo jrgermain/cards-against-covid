@@ -1,24 +1,36 @@
 import React from 'react';
 
-function DeckMakerEntry({ value, onChange }, i, src) {
+function DeckMakerEntry({ text, setCards }, index, allEntries) {
     // Called when we change the text of a card
     function update(event) {
+        // Get the updated text
         const newValue = event.target.value;
-        const copy = src.slice(0);
-        copy[i] = newValue;
-        onChange(copy);
+
+        // Get a copy of the existing card list (to void mutating state)
+        const copy = [...allEntries];
+
+        // Update the corresponding entry in the copy
+        copy[index] = newValue;
+
+        // Replace the old card list with the new one
+        setCards(copy);
     }
 
     // Called when we hit the delete button next to a card
     function remove() {
-        if (!value || window.confirm("Are you sure you want to delete this card?")) {
-            onChange(src.filter((_, index) => index !== i));
+        // If the card is not empty, confirm tht the user really wants to delete it. Otherwise, just delete.
+        if (!text || window.confirm("Are you sure you want to delete this card?")) {
+            // Create a copy of the card list that excludes the current card
+            const allCardsButThisOne = allEntries.filter((_, i) => i !== index);
+
+            // Replace the old card list with the new one
+            setCards(allCardsButThisOne);
         }
     }
 
     return (
         <li>
-            <input type="text" className="big-text" value={value} onChange={update}></input>
+            <input type="text" className="big-text" value={text} onChange={update}></input>
             <span className="delete" onClick={remove} title="Delete this card">X</span>
         </li>
     )

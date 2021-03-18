@@ -15,7 +15,7 @@ function Chat({ gameCode, name }) {
             <button className="panel-toggle" onClick={toggle}>Toggle Chat</button>
             <div className="chat-messages">
                 {messages.map(ChatMessage)}
-                </div>
+            </div>
             <ChatSubmit gameCode={gameCode} name={name}/>            
         </div>
     );
