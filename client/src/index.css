@@ -164,3 +164,7 @@ main {
     display: none;
   }
 }
+
+.view, .panel {
+  overscroll-behavior: contain;
+}
