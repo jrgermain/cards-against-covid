@@ -30,7 +30,7 @@ function Play() {
         socket.on("connect", () => document.getElementById("play").classList.remove("disconnected"));
         socket.on("reconnect", () => document.getElementById("play").classList.remove("disconnected"));
         socket.on("disconnect", () => document.getElementById("play").classList.add("disconnected"));
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!user) {
         history.push("/");

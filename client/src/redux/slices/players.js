@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { showError, showInfo } from '../../lib/message';
+import { showInfo } from '../../lib/message';
 
 const playersSlice = createSlice({
     name: "players",

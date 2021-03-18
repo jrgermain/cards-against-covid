@@ -27,7 +27,7 @@ function WaitingForPlayers() {
     useEffect(() => {
         dispatch({ type: "players/set", payload: [] });
         socket.emit('join game', gameCode, user.name);
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     
     // If game has started, redirect to Play screen
     if (status === "IN_PROGRESS") {

@@ -20,7 +20,7 @@
  */
 function request({ method, url, cache, requestHeaders, requestBody, requestType, responseType, onComplete, onSuccess, onError }) {
     if (method == null || url ==null) {
-        throw "Ajax: missing required parameter(s)";
+        throw new Error("Ajax: missing required parameter(s)");
     }
 
     return new Promise((resolve, reject) => {
@@ -109,7 +109,7 @@ const Ajax = new Proxy({ request }, {
         }
 
         // Generate an ajax function
-        const [_, method, type] = prop.match(readRequest) || prop.match(writeRequest) || [];
+        const [method, type] = (prop.match(readRequest) || prop.match(writeRequest) || []).slice(1);
         const params = { method };
 
         if (readRequests.includes(method)) {
