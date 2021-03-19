@@ -16,8 +16,16 @@ function Leaderboard() {
     const winner = useSelector(state => state.players.find(player => player.isWinner))
     
     const renderPlayer = player => (
-        <tr>
-            <td>{player.name}</td>
+        <tr className={player.isWinner ? "winner" : undefined}>
+            <td>
+                <label>{player.name}</label>
+                {player.isWinner && <label className="winner-label">Winner!</label>}
+            </td>
+            <td>
+                {player.isJudge
+                    ? <Card type="prompt">{prompt}</Card>
+                    : <Card type="response">{player.responses}</Card>}
+            </td>
             <td><span className="player-score">{player.score || 0}</span></td>
         </tr>
     );
@@ -41,6 +49,7 @@ function Leaderboard() {
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Card</th>
                             <th>Score</th>
                         </tr>
                         <tr></tr>
@@ -48,13 +57,14 @@ function Leaderboard() {
                     <tbody>
                         {players.map(renderPlayer)}
                     </tbody>
-                    <tr>
-                            <th>Winning Phrase:</th>
-                            <th>{prompt}</th>
-                            <th className="leaderboard-win"> {winner.responses}</th>
-                        </tr>
-                        
                 </table>
+                {/* <table>
+                    <tr>
+                        <td>Winning Phrase:</td>
+                        <td><Card type="prompt">{prompt}</Card></td>
+                        <td><Card type="response">{winner.responses}</Card></td>                        
+                    </tr>
+                </table> */}
                 <Button onClick={handleNextRound} disabled={isWaiting}>{isWaiting ? "Waiting for other players..." : "Next Round"}</Button>
             </div>
         </div>

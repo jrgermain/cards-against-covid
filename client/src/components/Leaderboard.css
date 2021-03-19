@@ -53,18 +53,14 @@
     padding-bottom: .25rem;
 }
 
-.leaderboard-content > table td:nth-child(1),
-.leaderboard-content > table th:nth-child(1) {
-    text-align: left;
+.leaderboard-content > table td:not(:last-child),
+.leaderboard-content > table th:not(:last-child) {
     padding-left: 1rem;
-    padding-right: .25rem;
 }
 
-.leaderboard-content > table td:nth-child(2),
-.leaderboard-content > table th:nth-child(2) {
-    text-align: right;
+.leaderboard-content > table td:not(:first-child),
+.leaderboard-content > table th:not(:first-child) {
     padding-right: 1rem;
-    padding-left: .25rem;
 }
 
 .leaderboard .player-score {
@@ -80,6 +76,26 @@
 }
 
 
-.leaderboard-win{
-    color: #2fb62f;
+.leaderboard tr.winner {
+    background: #33aa4433;
+}
+
+.leaderboard .winner .player-score {
+    background-color: #3a4;
+}
+
+.leaderboard .card {
+    height: auto;
+    width: 7rem;
+    font-size: .9rem;
+}
+
+.leaderboard td label {
+    display: block;
+}
+.winner-label {
+    color: #3a4;
+    font-size: .8rem;
+    font-weight: bold;
+    margin-top: .2rem;
 }
