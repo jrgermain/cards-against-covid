@@ -13,7 +13,6 @@ function Leaderboard() {
     const username = useSelector(state => state.user.name);
     const players  = useSelector(state => state.players);
     const prompt = useSelector(state => state.prompt); 
-    const winner = useSelector(state => state.players.find(player => player.isWinner))
 
     const renderPlayer = player => {
         const cellClass = "cell" + (player.isWinner ? " winner" : "");
