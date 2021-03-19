@@ -22,6 +22,7 @@ function Play() {
     const username = useSelector(state => state.user.name);
     const user = useSelector(state => state.players.find(player => player.name === username));
     const isLeaderboardVisible = useSelector(state => state.status.isLeaderboardVisible);
+    const judgeName = useSelector(state => state.players.find(player => player.isJudge)?.name);
    /*  const round = useSelector(state => state.game.find(game => game.round))
  */
 
@@ -98,6 +99,9 @@ function Play() {
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>
                 </h1>
+                <h2>
+                    {judgeName} <span style={NORMAL_WEIGHT}>is judging.</span>
+                </h2>
                 <div className="game-controls">
                     <span>Your prompt:</span>
                     <Card type="prompt">{prompt}</Card>
