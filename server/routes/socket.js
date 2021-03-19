@@ -119,10 +119,12 @@ io.on('connection', socket => {
             return;
         }
 
+        const winnerResponse = winner.responses; 
+        winner.isWinner = true; 
         // Award winning player a point
         winner.score++;
 
-        console.log(`Socket: Judge picked ${playerName}'s card and awarded a point.`);
+        console.log(`Socket: Judge picked ${playerName}'s card and awarded a point. "${winnerResponse}"`);
         reduxUpdate(gameCode)("players/set", game.players); // To update points
         reduxUpdate(gameCode)("status/showLeaderboard");
     });

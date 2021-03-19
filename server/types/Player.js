@@ -6,6 +6,7 @@ class Player {
         this.responses = [];
         this.score = 0;
         this.isReadyForNextRound = false;
+        this.isWinner = false; 
     }
 }
 
