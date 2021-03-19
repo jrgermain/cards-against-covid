@@ -99,9 +99,12 @@ function Play() {
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>
                 </h1>
+
+                {/* If player is not the judge, show who is */}
                 <h2>
-                    {judgeName} <span style={NORMAL_WEIGHT}>is judging.</span>
+                    {!user.isJudge && <>{judgeName}<span style={NORMAL_WEIGHT}> is judging.</span></>}
                 </h2>
+                
                 <div className="game-controls">
                     <span>Your prompt:</span>
                     <Card type="prompt">{prompt}</Card>
