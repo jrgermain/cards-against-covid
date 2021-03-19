@@ -75,11 +75,16 @@
     font-weight: bold;
     margin-top: .2rem;
 }
+.leaderboard-grid-wrapper {
+    overflow-y: hidden;
+    overflow-x: auto;
+}
 
 .leaderboard-grid-header,
 .leaderboard-grid-body {
     display: grid;
     grid-template-columns: 7rem 11rem 7rem;
+    width: 25rem;
     place-items: center;
 }
 
