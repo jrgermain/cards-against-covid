@@ -2,4 +2,16 @@
     font-style: italic;
     margin-bottom: auto;
     font-size: 4rem;
+    font-size: clamp(4rem, 10vw, 8rem);
+    position: relative;
+    bottom: 2rem;
+    bottom: calc(clamp(4rem, 10vw, 8rem) / 2);
+    margin-top: auto;
+}
+
+@media only screen and (min-width: 800px){
+    #game-logo {
+        font-size: 6rem;
+        bottom: 3rem;
+    }
 }
