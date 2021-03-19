@@ -63,16 +63,16 @@ function WaitingForPlayers() {
                     <List items={players} map={player => player.name} />
                 </section>
                 <section className="change-name">
-                <Popup trigger={<Button> Change My Name</Button>}>
-                    <div>
-                    <label htmlFor="player-name">Enter your name: </label>
-                    <TextBox
-                        id="player-name"
-                        placeholder="Your name"
-                        value={useSelector(state => state.user.name)}
-                        onChange={e => dispatch({ type: "user/setName", payload: e.target.value})}
-                    />
-                    </div>
+                    <Popup trigger={<Button disabled> Change My Name</Button>}>
+                        <div>
+                            <label htmlFor="player-name">Enter your name: </label>
+                            <TextBox
+                                id="player-name"
+                                placeholder="Your name"
+                                value={useSelector(state => state.user.name)}
+                                onChange={e => dispatch({ type: "user/setName", payload: e.target.value })}
+                            />
+                        </div>
                     </Popup>
                 </section>
                 <section className="start-game">
