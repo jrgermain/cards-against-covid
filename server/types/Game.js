@@ -35,8 +35,8 @@ class Game {
             this.players[0].isJudge = true;
         }
 
-        // Reset 'ready for next round'
-        this.players.forEach(player => player.isReadyForNextRound = false);
+        // Reset 'ready for next round' and 'is winner'
+        this.players.forEach(player => player.isReadyForNextRound = player.isWinner = false);
 
         this.round++;
         this.prompt = this.deck.prompts.pop();

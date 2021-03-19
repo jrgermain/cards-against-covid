@@ -14,21 +14,26 @@ function Leaderboard() {
     const players  = useSelector(state => state.players);
     const prompt = useSelector(state => state.prompt); 
     const winner = useSelector(state => state.players.find(player => player.isWinner))
-    
-    const renderPlayer = player => (
-        <tr className={player.isWinner ? "winner" : undefined}>
-            <td>
-                <label>{player.name}</label>
+
+    const renderPlayer = player => {
+        const cellClass = "cell" + (player.isWinner ? " winner" : "");
+        return (
+            <>
+            <span className={cellClass}>
+                <label className="player-name">{player.name}</label>
                 {player.isWinner && <label className="winner-label">Winner!</label>}
-            </td>
-            <td>
+            </span>
+            <span className={cellClass}>
                 {player.isJudge
                     ? <Card type="prompt">{prompt}</Card>
                     : <Card type="response">{player.responses}</Card>}
-            </td>
-            <td><span className="player-score">{player.score || 0}</span></td>
-        </tr>
-    );
+            </span>
+            <span className={cellClass}>
+                <span className="player-score">{player.score || 0}</span>
+            </span>
+            </>
+        );
+    }
 
     function handleNextRound() {
         // Tell the server this player is ready and show that we are waiting on the others
@@ -45,26 +50,17 @@ function Leaderboard() {
         <div className="leaderboard">
             <div className="leaderboard-content">
                 <label>Leaderboard</label>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Card</th>
-                            <th>Score</th>
-                        </tr>
-                        <tr></tr>
-                    </thead>
-                    <tbody>
+
+                <div className="leaderboard-grid-wrapper">
+                    <div className="leaderboard-grid-header">
+                        <span className="cell">Name</span>
+                        <span className="cell">Card</span>
+                        <span className="cell">Score</span>
+                    </div>
+                    <div className="leaderboard-grid-body">
                         {players.map(renderPlayer)}
-                    </tbody>
-                </table>
-                {/* <table>
-                    <tr>
-                        <td>Winning Phrase:</td>
-                        <td><Card type="prompt">{prompt}</Card></td>
-                        <td><Card type="response">{winner.responses}</Card></td>                        
-                    </tr>
-                </table> */}
+                    </div>
+                </div>
                 <Button onClick={handleNextRound} disabled={isWaiting}>{isWaiting ? "Waiting for other players..." : "Next Round"}</Button>
             </div>
         </div>
