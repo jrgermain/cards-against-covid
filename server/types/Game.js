@@ -7,17 +7,24 @@ class Game {
         this.prompt = "";
         this.state = Game.State.WAITING;
         this.round = -1;
+        this.cardsPerPlayer = 0;
     }
 
     start() {
         this.state = Game.State.IN_PROGRESS;
+
+        /* By default, players get 7 response cards each. Every player should start off with the same number of cards.
+         * If there aren't enough cards for everyone to get 7, lower this size so everyone can start with the same number. 
+         * Enforce a maximum of 7 cards per player.
+         */
+        const totalCardsPerPlayer = Math.floor(this.deck.responses.length / this.players.length);
+        this.cardsPerPlayer = Math.min(7, totalCardsPerPlayer);
     }
 
     nextRound() {
-        // Deal players enough cards to have 7 each
-        // TODO: If there aren't enough cards, we might have to deal fewer on the first round
+        // Deal players enough cards to have a full hand
         for (const player of this.players) {
-            const cardsNeeded = 7 - player.cards.length;
+            const cardsNeeded = this.cardsPerPlayer - player.cards.length;
             if (cardsNeeded > 0) {
                 const cardsDrawn = this.deck.responses.splice(0, cardsNeeded);
                 player.cards = [...player.cards, ...cardsDrawn];
