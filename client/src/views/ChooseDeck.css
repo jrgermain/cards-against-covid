@@ -1,15 +1,32 @@
 .expansion-packs {
     display: grid;
-    margin: 0 auto;
-    gap: 5px;
-    text-align: left;
-}
-
-.expansion-packs input {
-    grid-column: 1;
-    margin-right: 3px;
+    grid-template-columns: auto auto auto auto;
+    margin: 10px auto;
+    gap: 1rem;
+    place-items: center;
 }
 
 .expansion-packs label {
-    grid-column: 2;
+    width: 100%;
+    text-align: left;
+}
+
+.pack-num-prompts,
+.pack-num-responses {
+    font-size: .9rem;
+    font-weight: bold;
+    box-shadow: 0 0 4px rgb(106, 106, 106);
+    padding: .4rem;
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+.pack-num-prompts {
+    background-color: black;
+    color: white;
+}
+
+.pack-num-responses {
+    background-color: white;
+    color: black;
 }

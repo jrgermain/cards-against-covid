@@ -46,12 +46,11 @@ function ChooseDeck() {
             isSelected: deck.name === e.target.value
         })));
     }
-    const handlePackChange = e => {
-        // Change the value of the input that was clicked
-        // TODO: clean this up
+    const handlePackChange = selectedPack => {
+        // Toggle the value of the input that was clicked, leaving others as-is
         setExpansions(expansions.map(pack => ({
             ...pack,
-            isSelected: pack.name === e.target.labels[0].textContent ? e.target.checked : pack.isSelected
+            isSelected: pack === selectedPack ? !pack.isSelected : pack.isSelected
         })));
     }
     const handleSubmit = async () => {
@@ -117,9 +116,22 @@ function ChooseDeck() {
 
             <h1 className="header-css">Choose Expansion Pack(s):</h1>          
             <div className="expansion-packs">
-                {expansions.map(pack => <CheckBox label={pack.name} onChange={handlePackChange} checked={pack.isSelected} />)}
+                {/* Header */}
+                <strong>Select</strong>
+                <strong>Name</strong>
+                <strong>Prompts</strong>
+                <strong>Responses</strong>
+
+                {/* Content */}
+                {expansions.map(pack => (
+                    <>
+                    <CheckBox label={pack.name} onChange={() => handlePackChange(pack)} checked={pack.isSelected} />
+                    <span className="pack-num-prompts" title="Prompt cards">{pack.numPrompts}</span>
+                    <span className="pack-num-responses" title="Response cards">{pack.numResponses}</span>
+                    </>
+                ))}
             </div>
-            
+
             <Button onClick={handleSubmit}>Continue</Button> 
         </div>
     );
