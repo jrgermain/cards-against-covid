@@ -22,6 +22,11 @@ class Game {
     }
 
     nextRound() {
+        // Discard used responses
+        for (const player of this.players) {
+            player.cards = player.cards.filter(card => !player.responses.includes(card));
+        }
+
         // Deal players enough cards to have a full hand
         for (const player of this.players) {
             const cardsNeeded = this.cardsPerPlayer - player.cards.length;

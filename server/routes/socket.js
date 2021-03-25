@@ -143,10 +143,6 @@ io.on('connection', socket => {
 
         // If all players are ready, advance the game
         if (game.players.every(player => player.isReadyForNextRound)) {
-            // Discard used responses
-            for (const player of game.players) {
-                player.cards = player.cards.filter(card => !player.responses.includes(card));
-            }
             console.log(`Game "${gameCode}" advanced to next round.`);
             game.nextRound();
             reduxUpdate(gameCode)("status/nextRound");
@@ -181,6 +177,17 @@ io.on('connection', socket => {
                 // If this was the last player, delete the game
                 if (game.players.length === 0) {
                     delete games[gameCode];
+                    console.log(`Socket: All players left game "${gameCode}". Game deleted.`);
+                } else {
+                    // If everyone is waiting for the next round and a player leaves instead of accepting, make sure the game advances
+                    // TODO: This is an exact copy of code in the "player ready" handler. Refactor this so we don't repeat ourselves!
+                    if (game.players.every(player => player.isReadyForNextRound)) {
+                        console.log(`Game "${gameCode}" advanced to next round.`);
+                        game.nextRound();
+                        reduxUpdate(gameCode)("status/nextRound");
+                        reduxUpdate(gameCode)("prompt/set", game.prompt);
+                        reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards
+                    }
                 }
             }
         }
