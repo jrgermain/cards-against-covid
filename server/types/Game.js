@@ -50,8 +50,35 @@ class Game {
         // Reset 'ready for next round' and 'is winner'
         this.players.forEach(player => player.isReadyForNextRound = player.isWinner = false);
 
+        // Select new prompt
+        if (this.deck.prompts.length > 0) {
+            // If there are prompts left, remove the last one from the deck and use it
+            this.prompt = this.deck.prompts.pop();
+        } else {
+            // All prompts have been exhausted
+            this.end();
+            return;
+        }
+
+        // Make sure we have enough response cards
+        const numCardsRequired = this.prompt.match(/_+/g)?.length ?? 1;
+        const allPlayersCanAnswer = this.players.filter(player => !player.isJudge).every(player => player.cards.length >= numCardsRequired);
+        if (!allPlayersCanAnswer) {
+            this.end();
+            return;
+        }
+
         this.round++;
-        this.prompt = this.deck.prompts.pop();
+    }
+
+    end() {
+        // Set state
+        this.state = Game.State.ENDED;
+        
+        // Sort players by score
+        this.players.sort((a,b) => b.score - a.score);
+        const topScore = this.players[0].score;
+        this.players.forEach(player => player.isWinner = (player.score === topScore));
     }
 }
 

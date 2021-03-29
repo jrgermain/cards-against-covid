@@ -178,7 +178,13 @@ io.on('connection', socket => {
                 if (game.players.length === 0) {
                     delete games[gameCode];
                     console.log(`Socket: All players left game "${gameCode}". Game deleted.`);
-                } else {
+                } else if (game.players.length < 3) {
+                    console.log(`Socket: A player left game "${gameCode}", which now has fewer than 3 players. Game ending.`);
+                    game.end();
+                    reduxUpdate(gameCode)("status/setName", game.state.description);
+                    reduxUpdate(gameCode)("players/set", game.players); // To update who the winner is
+                }
+                else {
                     // If everyone is waiting for the next round and a player leaves instead of accepting, make sure the game advances
                     // TODO: This is an exact copy of code in the "player ready" handler. Refactor this so we don't repeat ourselves!
                     if (game.players.every(player => player.isReadyForNextRound)) {

@@ -15,6 +15,7 @@ import { store, persistor } from './redux/store';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import * as reduxListener from './redux/socket';
+import GameOver from './views/GameOver';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -28,6 +29,7 @@ ReactDOM.render(
             <Route path="/waiting" component={WaitingForPlayers} />
             <Route path="/play" component={Play} />
             <Route path="/expansions" component={Expansions} />
+            <Route path="/game-over" component={GameOver} />
           </Switch>
         </BrowserRouter>
       </PersistGate>

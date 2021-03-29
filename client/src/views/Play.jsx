@@ -23,6 +23,7 @@ function Play() {
     const user = useSelector(state => state.players.find(player => player.name === username));
     const isLeaderboardVisible = useSelector(state => state.status.isLeaderboardVisible);
     const judgeName = useSelector(state => state.players.find(player => player.isJudge)?.name);
+    const status = useSelector(state => state.status.name);
    /*  const round = useSelector(state => state.game.find(game => game.round))
  */
 
@@ -36,6 +37,12 @@ function Play() {
         socket.on("reconnect", () => document.getElementById("play").classList.remove("disconnected"));
         socket.on("disconnect", () => document.getElementById("play").classList.add("disconnected"));
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (status === "ENDED") {
+            history.replace("/game-over");
+        }
+    }, [status]);
 
     if (!user) {
         history.push("/");
