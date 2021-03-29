@@ -23,9 +23,7 @@ function Play() {
     const user = useSelector(state => state.players.find(player => player.name === username));
     const isLeaderboardVisible = useSelector(state => state.status.isLeaderboardVisible);
     const judgeName = useSelector(state => state.players.find(player => player.isJudge)?.name);
-    const status = useSelector(state => state.status.name);
-   /*  const round = useSelector(state => state.game.find(game => game.round))
- */
+   const round = useSelector(state => state.status.round); 
 
 
     useEffect(() => {
@@ -102,10 +100,10 @@ function Play() {
             {isLeaderboardVisible && <Leaderboard />}
             
             <main>
-                {/* <head> <span style= {NORMAL_WEIGHT}> Round: </span> {round}  </head> */}
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>
                 </h1>
+                <h1>Round: {round}</h1>
 
                 {/* If player is not the judge, show who is */}
                 <h2>
