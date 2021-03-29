@@ -23,7 +23,8 @@ function Play() {
     const user = useSelector(state => state.players.find(player => player.name === username));
     const isLeaderboardVisible = useSelector(state => state.status.isLeaderboardVisible);
     const judgeName = useSelector(state => state.players.find(player => player.isJudge)?.name);
-   const round = useSelector(state => state.status.round); 
+    const status = useSelector(state => state.status.name);
+    const round = useSelector(state => state.status.round); 
 
 
     useEffect(() => {
