@@ -83,13 +83,13 @@
 .leaderboard-grid-header,
 .leaderboard-grid-body {
     display: grid;
-    grid-template-columns: 7rem 11rem 7rem;
-    width: 25rem;
+    grid-template-columns: 7fr 11fr 7fr;
+    max-width: 25rem;
     place-items: center;
 }
 
 .leaderboard-grid-body {
-    max-height: 75vh;
+    max-height: calc(100vh - 12rem);
     overflow-y: auto;
     padding-bottom: 1rem;
 }
