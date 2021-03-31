@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom';
 import { socket } from '../index';
 import { showError } from '../lib/message';
 import { useDispatch, useSelector } from 'react-redux';
+import * as socketListener from '../redux/socket';
 
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
@@ -25,13 +26,19 @@ function WaitingForPlayers() {
      * Put this in a useEffect so it doesn't happen every time we re-render the view (such as when another player joins).
      */
     useEffect(() => {
+        socketListener.start();
         dispatch({ type: "players/set", payload: [] });
         socket.emit('join game', gameCode, user.name);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
     
     // If game has started, redirect to Play screen
     if (status === "IN_PROGRESS") {
-        history.push("/play");
+        history.replace("/play");
+    }
+
+    // If user loaded this page directly without actually joining a game, kick them out
+    if (!gameCode) {
+        history.replace("/");
     }
 
     // Respond to the user pressing "Everybody's In"

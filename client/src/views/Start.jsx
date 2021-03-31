@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import './Start.css';
 import Button from '../components/Button';
-import { store } from '../redux/store';
+import * as socketListener from '../redux/socket';
 
 function Start() {
     useEffect(() => {
-        // When navigating to this screen, clear out app state
-        store.dispatch({ type: "RESET_STATE" });
+        // If a user leaves a game, they are brought here. This means we should reset the app.
+        socketListener.stop(); // Stop listening for state updates
+        socketListener.resetState(); // Clear local app state
+        socketListener.resetConnection(); // Close and reopen the socket to trigger the disconnect handler on the server
     }, []);
     return (
         <div className="view" id="start">

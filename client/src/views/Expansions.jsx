@@ -52,7 +52,7 @@ function Expansions() {
 
         // We got a success response, so the pack must have been saved. Bring the user back to the previous page.
         showSuccess("Successfully saved expansion pack: " + name);
-        history.goBack();
+        history.push("/");
     }
 
     const handleNameChange = e => setName(e.target.value);

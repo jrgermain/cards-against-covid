@@ -44,6 +44,6 @@ ReactDOM.render(
 serviceWorker.unregister();
 
 const socket = io({ transports: ["websocket"] });
-reduxListener.start();
+reduxListener.initialize();
 
 export { socket };

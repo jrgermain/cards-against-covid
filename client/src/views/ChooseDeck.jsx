@@ -87,7 +87,7 @@ function ChooseDeck() {
 
         // Everything went ok. Set the new game code, then move to the wait screen.
         dispatch({ type: "gameCode/set", payload: gameCode });
-        history.push("/waiting");
+        history.replace("/waiting");
     }
 
     return (

@@ -57,7 +57,7 @@ function Join() {
 
         // We had a success response, so the player must have joined. Save their name (for future games) and move on to the wait screen
         localStorage.setItem("player-name", user.name);
-        history.push("/waiting");    
+        history.replace("/waiting");    
     }
 
     function handleKeyPress(event) {

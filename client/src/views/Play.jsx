@@ -32,9 +32,9 @@ function Play() {
         socket.emit("client reload", gameCode, username);
 
         // When the client is disconnected, add a css style to show a visual hint
-        socket.on("connect", () => document.getElementById("play").classList.remove("disconnected"));
-        socket.on("reconnect", () => document.getElementById("play").classList.remove("disconnected"));
-        socket.on("disconnect", () => document.getElementById("play").classList.add("disconnected"));
+        socket.on("connect", () => document.getElementById("play")?.classList.remove("disconnected"));
+        socket.on("reconnect", () => document.getElementById("play")?.classList.remove("disconnected"));
+        socket.on("disconnect", () => document.getElementById("play")?.classList.add("disconnected"));
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
@@ -44,7 +44,7 @@ function Play() {
     }, [status]);
 
     if (!user) {
-        history.push("/");
+        history.replace("/");
         return <></>;
     }
 

@@ -10,29 +10,37 @@ import { store } from './store';
 
 let isListening = false;
 
-const dispatchAction = action => {
-    store.dispatch(action);
-}
-
-const handleDisconnect = (reason) => {
-    console.warn("Socket connection lost. Reason: " + reason);
-    showInfo("Connection lost");
+function initialize() {
+    socket.on("redux action", action => {
+        if (isListening) {
+            store.dispatch(action);
+        }
+    });
+    socket.on("disconnect", reason => {
+        if (isListening) {
+            console.warn("Socket connection lost. Reason: " + reason);
+            showInfo("Connection lost");
+        }
+    });
 }
 
 function start() {
-    if (!isListening) {
-        socket.on("redux action", dispatchAction);
-        socket.on("disconnect", handleDisconnect);
-        isListening = true;
-    }
+    isListening = true;
 }
 
 function stop() {
-    if (isListening) {
-        socket.off("redux action", dispatchAction);
-        socket.off("disconnect", handleDisconnect);
-        isListening = false;
-    }
+    isListening = false;
 }
 
-export { start, stop };
+function resetConnection() {
+    if (socket.connected) {
+        socket.close();
+    }
+    socket.open();
+}
+
+function resetState() {
+    store.dispatch({ type: "RESET_STATE" });
+}
+
+export { initialize, start, stop, resetConnection, resetState };
