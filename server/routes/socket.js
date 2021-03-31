@@ -8,9 +8,27 @@ function reduxUpdate(gameCode) {
     return (type, payload) => { io.to(gameCode).emit("redux action", { type, payload }) };
 }
 
-// Event handlers
+// Socket functionality (applied to each indiviudal connection)
 io.on('connection', socket => {
     console.log("Socket: New connection");
+
+    /********************
+     * Common functions *
+     ********************/
+
+    // Move a game to the next round
+    const nextRound = (gameCode) => {
+        const game = games[gameCode];
+        game.nextRound();
+        reduxUpdate(gameCode)("status/nextRound");
+        reduxUpdate(gameCode)("prompt/set", game.prompt);
+        reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards
+    }
+
+    
+    /******************
+     * Event handlers *
+     ******************/
 
     socket.on('join game', (gameCode, name) => {
         // Assign this player to a room based on game code
@@ -144,10 +162,7 @@ io.on('connection', socket => {
         // If all players are ready, advance the game
         if (game.players.every(player => player.isReadyForNextRound)) {
             console.log(`Game "${gameCode}" advanced to next round.`);
-            game.nextRound();
-            reduxUpdate(gameCode)("status/nextRound");
-            reduxUpdate(gameCode)("prompt/set", game.prompt);
-            reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards
+            nextRound(gameCode);
         }
     });
 
@@ -170,29 +185,41 @@ io.on('connection', socket => {
             console.log(`Socket: Player "${name}" disconnected from game "${gameCode}". Reason: ${reason}`);
             const game = games[gameCode];
             if (game) {
-                // Remove player from game
-                game.players = game.players.filter(player => player.name !== name);
+                const playerWhoLeft = game.players.find(player => player.name === name);
+                const playerWhoLeftIndex = game.players.indexOf(playerWhoLeft);
+
+                // Remove player from the game on the server
+                game.players = game.players.filter(player => player !== playerWhoLeft);
+
+                // Show everyone in the game that the player left
                 reduxUpdate(gameCode)("players/remove", name);
                 
                 // If this was the last player, delete the game
                 if (game.players.length === 0) {
                     delete games[gameCode];
                     console.log(`Socket: All players left game "${gameCode}". Game deleted.`);
-                } else if (game.players.length < 3) {
+                } 
+                // If the number of players is now below 3, end the game
+                else if (game.players.length < 3) {
                     console.log(`Socket: A player left game "${gameCode}", which now has fewer than 3 players. Game ending.`);
                     game.end();
                     reduxUpdate(gameCode)("status/setName", game.state.description);
                     reduxUpdate(gameCode)("players/set", game.players); // To update who the winner is
                 }
+                //  We still have a valid number of players
                 else {
+                    // If the player who left was a judge, have the next player judge
+                    if (playerWhoLeft.isJudge) {
+                        const nextJudgeIndex = playerWhoLeftIndex % game.players.length;
+                        const nextJudge = game.players[nextJudgeIndex];
+                        nextJudge.isJudge = true;
+                        console.log(`The judge, "${playerWhoLeft.name}", left game "${gameCode}", so the judging role was transferred to "${nextJudge.name}".`);
+                        reduxUpdate(gameCode)("players/set", game.players)    
+                    }
                     // If everyone is waiting for the next round and a player leaves instead of accepting, make sure the game advances
-                    // TODO: This is an exact copy of code in the "player ready" handler. Refactor this so we don't repeat ourselves!
-                    if (game.players.every(player => player.isReadyForNextRound)) {
+                    else if (game.players.every(player => player.isReadyForNextRound)) {
                         console.log(`Game "${gameCode}" advanced to next round.`);
-                        game.nextRound();
-                        reduxUpdate(gameCode)("status/nextRound");
-                        reduxUpdate(gameCode)("prompt/set", game.prompt);
-                        reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards
+                        nextRound(gameCode);
                     }
                 }
             }
