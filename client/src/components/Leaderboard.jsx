@@ -13,12 +13,13 @@ function Leaderboard() {
     const prompt = useSelector(state => state.prompt); 
 
     const renderPlayer = player => {
-        const cellClass = "cell" + (player.isWinner ? " winner" : "");
+        const cellClass = "cell" + (player.isWinner ? " winner" : "") + (!player.isConnected ? " inactive" : "");
         return (
             <>
             <span className={cellClass}>
                 <label className="player-name">{player.name}</label>
                 {player.isWinner && <label className="winner-label">Winner!</label>}
+                {!player.isConnected && <label className="inactive-label">Inactive</label>}
             </span>
             <span className={cellClass}>
                 {player.isJudge

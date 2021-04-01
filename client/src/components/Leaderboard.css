@@ -63,18 +63,28 @@
 }
 
 .leaderboard .player-name,
-.leaderboard .winner-label {
+.leaderboard .winner-label,
+.leaderboard .inactive-label {
     display: block;
     word-wrap: break-word;
     max-width: 6rem;
 }
 
-.winner-label {
-    color: #3a4;
+.winner-label,
+.inactive-label {
     font-size: .8rem;
     font-weight: bold;
     margin-top: .2rem;
 }
+
+.winner-label {
+    color: #3a4;
+}
+
+.inactive-label {
+    color: #777;
+}
+
 .leaderboard-grid-wrapper {
     overflow-y: hidden;
     overflow-x: auto;
@@ -111,4 +121,8 @@
 
 .leaderboard-grid-body .cell.winner {
     background: #33aa4433;
+}
+
+.leaderboard-grid-body .cell.inactive {
+    opacity: 0.5;
 }
