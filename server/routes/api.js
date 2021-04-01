@@ -26,6 +26,11 @@ router.get('/expansionList', async function(req, res) {
     res.send(packInfo);
 });
 
+router.get('/doesGameExist', async function(req, res) { 
+    const gameCode = req.query.code;
+    res.status(200).send(gameCode in games);
+})
+
 router.post('/startGame', async function(req, res) {
     const { deckName, expansionPacks } = req.body;
 

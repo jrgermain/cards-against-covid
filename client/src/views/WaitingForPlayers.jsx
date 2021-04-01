@@ -9,6 +9,7 @@ import { socket } from '../index';
 import { showError } from '../lib/message';
 import { useDispatch, useSelector } from 'react-redux';
 import * as socketListener from '../redux/socket';
+import Ajax from '../lib/ajax';
 
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
@@ -26,6 +27,12 @@ function WaitingForPlayers() {
      * Put this in a useEffect so it doesn't happen every time we re-render the view (such as when another player joins).
      */
     useEffect(() => {
+        // Check that the game exists first
+        Ajax.get('/api/doesGameExist?code=' + gameCode).then(exists => {
+            if (exists !== "true") {
+                history.replace("/");
+            }
+        });
         socketListener.start();
         dispatch({ type: "players/set", payload: [] });
         socket.emit('join game', gameCode, user.name);
