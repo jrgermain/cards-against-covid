@@ -236,6 +236,11 @@ io.on('connection', socket => {
                                     nextRound(gameCode);
                                 }
                             }
+                            // The player left before the game started
+                            else if (game.state === Game.State.WAITING) {
+                                // Completely remove the player from the game (instead of only marking them as inactive)
+                                game.players = game.players.filter(player => player.name !== name);
+                            }
                         }
                     }
                 }, 2000);
