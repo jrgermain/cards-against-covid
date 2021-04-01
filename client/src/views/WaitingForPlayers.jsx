@@ -16,7 +16,7 @@ import 'reactjs-popup/dist/index.css';
 function WaitingForPlayers() {
     const history = useHistory();
     const dispatch = useDispatch();
-    const players = useSelector(state => state.players);
+    const players = useSelector(state => state.players.filter(player => player.isConnected));
     const gameCode = useSelector(state => state.gameCode);
     const user = useSelector(state => state.user);
     const status = useSelector(state => state.status.name);
@@ -29,6 +29,7 @@ function WaitingForPlayers() {
         socketListener.start();
         dispatch({ type: "players/set", payload: [] });
         socket.emit('join game', gameCode, user.name);
+        socket.emit("client reload", gameCode, user.name);    
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
     
     // If game has started, redirect to Play screen

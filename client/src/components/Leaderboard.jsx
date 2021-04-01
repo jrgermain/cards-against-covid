@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import { socket } from '..';
 import Button from './Button';
 import Card from './Card';
-import CardDeck from '../components/CardDeck';
 import './Leaderboard.css'
 
 function Leaderboard() {
@@ -36,11 +34,9 @@ function Leaderboard() {
 
     function handleNextRound() {
         // Tell the server this player is ready and show that we are waiting on the others
-        const round = 0; 
         if (!isWaiting) {
             socket.emit("player ready", gameCode, username);
             setWaiting(true);
-            round ++; 
         }
     }
  

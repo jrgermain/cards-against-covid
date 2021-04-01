@@ -7,6 +7,7 @@ class Player {
         this.score = 0;
         this.isReadyForNextRound = false;
         this.isWinner = false; 
+        this.isConnected = true;
     }
 }
 

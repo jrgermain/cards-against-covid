@@ -1,4 +1,5 @@
 var { games, server } = require('../app');
+const Game = require('../types/Game');
 var Player = require("../types/Player"); 
 var io = require('socket.io')(server);
 
@@ -25,7 +26,7 @@ io.on('connection', socket => {
         reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards
     }
 
-    
+
     /******************
      * Event handlers *
      ******************/
@@ -46,6 +47,7 @@ io.on('connection', socket => {
         if (existingPlayer) {
             // Player was already in the game and reconnected
             console.log(`Socket: Player "${name}" rejoined game "${gameCode}".`);
+            existingPlayer.isConnected = true;
 
             // Make sure the player has the correct player list in case people joined while they were away
             // Send the list to the player who rejoined, but don't send it to everyone else (since no NEW player joined)
@@ -160,7 +162,7 @@ io.on('connection', socket => {
         player.isReadyForNextRound = true;
 
         // If all players are ready, advance the game
-        if (game.players.every(player => player.isReadyForNextRound)) {
+        if (game.players.every(player => player.isReadyForNextRound || !player.isConnected)) {
             console.log(`Game "${gameCode}" advanced to next round.`);
             nextRound(gameCode);
         }
@@ -172,10 +174,14 @@ io.on('connection', socket => {
         if (!game) {
             return;
         }
-        const isValidRequest = game.players.some(user => user.name === playerName);
-        
-        if (isValidRequest && !socket.rooms.has(gameCode)) {
+
+        // Look for the player -- must match game code and name and be disconnected
+        const player = game.players.find(user => !user.isConnected && user.name === playerName);
+        if (player) {
+            console.log(`Player "${player.name}" reconnected`);
+            player.isConnected = true;
             socket.join(gameCode);
+            socket._gameData = { gameCode, name: playerName }
         }
     });
 
@@ -188,40 +194,51 @@ io.on('connection', socket => {
                 const playerWhoLeft = game.players.find(player => player.name === name);
                 const playerWhoLeftIndex = game.players.indexOf(playerWhoLeft);
 
-                // Remove player from the game on the server
-                game.players = game.players.filter(player => player !== playerWhoLeft);
+                // Set player as inactive
+                playerWhoLeft.isConnected = false;
 
-                // Show everyone in the game that the player left
-                reduxUpdate(gameCode)("players/remove", name);
-                
-                // If this was the last player, delete the game
-                if (game.players.length === 0) {
-                    delete games[gameCode];
-                    console.log(`Socket: All players left game "${gameCode}". Game deleted.`);
-                } 
-                // If the number of players is now below 3, end the game
-                else if (game.players.length < 3) {
-                    console.log(`Socket: A player left game "${gameCode}", which now has fewer than 3 players. Game ending.`);
-                    game.end();
-                    reduxUpdate(gameCode)("status/setName", game.state.description);
-                    reduxUpdate(gameCode)("players/set", game.players); // To update who the winner is
-                }
-                //  We still have a valid number of players
-                else {
-                    // If the player who left was a judge, have the next player judge
-                    if (playerWhoLeft.isJudge) {
-                        const nextJudgeIndex = playerWhoLeftIndex % game.players.length;
-                        const nextJudge = game.players[nextJudgeIndex];
-                        nextJudge.isJudge = true;
-                        console.log(`The judge, "${playerWhoLeft.name}", left game "${gameCode}", so the judging role was transferred to "${nextJudge.name}".`);
-                        reduxUpdate(gameCode)("players/set", game.players)    
+                // Get number of active players
+                const numConnectedPlayers = game.players.filter(player => player.isConnected).length;
+
+                // Give the players 2 seconds to reconnect before treating it as "leaving" so refreshing the page doesn't cause an issue
+                setTimeout(() => {
+                    if (game) {
+                        const playerIsConnected = game.players.some(player => player.name === name && player.isConnected);
+                        if (!playerIsConnected) {
+                            // Update other players' screens to show that the player left
+                            reduxUpdate(gameCode)("players/remove", name);
+    
+                            // If this was the last player, delete the game
+                            if (numConnectedPlayers === 0) {
+                                delete games[gameCode];
+                                console.log(`Socket: All players left game "${gameCode}". Game deleted.`);
+                            }
+                            // If the number of players is now below 3, end the game if it is in progress
+                            else if (game.state === Game.State.IN_PROGRESS && numConnectedPlayers < 3) {
+                                console.log(`Socket: A player left game "${gameCode}", which now has fewer than 3 players. Game ending.`);
+                                game.end();
+                                reduxUpdate(gameCode)("status/setName", game.state.description);
+                                reduxUpdate(gameCode)("players/set", game.players); // To update who the winner is
+                            }
+                            //  We still have a valid number of players
+                            else if (game.state === Game.State.IN_PROGRESS) {
+                                // If the player who left was a judge, have the next player judge
+                                if (playerWhoLeft.isJudge) {
+                                    const nextJudgeIndex = (playerWhoLeftIndex + 1) % game.players.length;
+                                    const nextJudge = game.players[nextJudgeIndex];
+                                    nextJudge.isJudge = true;
+                                    console.log(`The judge, "${playerWhoLeft.name}", left game "${gameCode}", so the judging role was transferred to "${nextJudge.name}".`);
+                                    reduxUpdate(gameCode)("players/set", game.players)    
+                                }
+                                // If everyone is waiting for the next round and a player leaves instead of accepting, make sure the game advances
+                                else if (game.players.every(player => player.isReadyForNextRound || !player.isConnected)) {
+                                    console.log(`Game "${gameCode}" advanced to next round.`);
+                                    nextRound(gameCode);
+                                }
+                            }
+                        }
                     }
-                    // If everyone is waiting for the next round and a player leaves instead of accepting, make sure the game advances
-                    else if (game.players.every(player => player.isReadyForNextRound)) {
-                        console.log(`Game "${gameCode}" advanced to next round.`);
-                        nextRound(gameCode);
-                    }
-                }
+                }, 2000);
             }
         }
     });

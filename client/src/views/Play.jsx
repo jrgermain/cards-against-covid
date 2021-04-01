@@ -9,6 +9,7 @@ import List from '../components/List';
 import './Table.css';
 import './Play.css';
 import Leaderboard from '../components/Leaderboard';
+import * as socketListener from '../redux/socket';
 
 const NORMAL_WEIGHT = { fontWeight: "normal" };
 
@@ -16,7 +17,7 @@ function Play() {
     const history = useHistory();
 
     const gameCode = useSelector(state => state.gameCode);
-    const players = useSelector(state => state.players);
+    const players = useSelector(state => state.players.filter(player => player.isConnected));
     const prompt = useSelector(state => state.prompt);
     const cardsRequired = useSelector(state => state.prompt.match(/_+/g)?.length ?? 1 );
     const username = useSelector(state => state.user.name);
@@ -28,6 +29,9 @@ function Play() {
 
 
     useEffect(() => {
+        // Make sure we are listening for state updates
+        socketListener.start();
+        
         // The page either loaded for the first time or refreshed. If it refreshed, rejoin the room.
         socket.emit("client reload", gameCode, username);
 

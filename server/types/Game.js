@@ -37,15 +37,20 @@ class Game {
             player.responses = []; // Clear last response
         }
 
-        // If there is currently a judge, pass role onto next player. Otherwise (e.g. first round) make first player judge.
+        // Update player roles. In the first round, this makes first player judge (since judgeIndex is -1).
         const judgeIndex = this.players.findIndex(player => player.isJudge);
+            
+        // Make sure to skip over disconnected players
+        let nextJudgeIndex;
+        do {
+            nextJudgeIndex = (judgeIndex + 1) % this.players.length;
+        } while (!this.players[nextJudgeIndex].isConnected);
+
+        // Pass on role
         if (judgeIndex > -1) {
-            const nextJudgeIndex = (judgeIndex + 1) % this.players.length;
             this.players[judgeIndex].isJudge = false;
-            this.players[nextJudgeIndex].isJudge = true;
-        } else {
-            this.players[0].isJudge = true;
         }
+        this.players[nextJudgeIndex].isJudge = true;
 
         // Reset 'ready for next round' and 'is winner'
         this.players.forEach(player => player.isReadyForNextRound = player.isWinner = false);
