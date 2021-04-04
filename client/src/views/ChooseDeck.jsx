@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Button from '../components/Button';
 import '../components/Dropdown.css';
 import Ajax from '../lib/ajax';
@@ -41,7 +41,7 @@ function ChooseDeck() {
 
     const handleDeckChange = e => {
         // Set isSelected to true for the deck whose name matches e.target.value and false for the others
-        setDecks(decks.map(deck => ({            
+        setDecks(decks.map(deck => ({
             ...deck,
             isSelected: deck.name === e.target.value
         })));
@@ -92,47 +92,48 @@ function ChooseDeck() {
 
     return (
         <div className="view" id="choose-deck">
-            <h1>Start a game</h1>
-            
-            <div>
-                <label htmlFor="player-name">Enter your name: </label>                
-                <TextBox
-                    id="player-name"
-                    placeholder="Your name"
-                    value={useSelector(state => state.user.name)}
-                    onChange={e => dispatch({ type: "user/setName", payload: e.target.value })}
-                    errorCondition={hasSubmitted && !user.name}
-                    errorMessage="Please enter a name."
-                />
+            <div className="view-content">
+                <h1>Start a game</h1>
+
+                <div>
+                    <label htmlFor="player-name">Enter your name: </label>
+                    <TextBox
+                        id="player-name"
+                        placeholder="Your name"
+                        value={useSelector(state => state.user.name)}
+                        onChange={e => dispatch({ type: "user/setName", payload: e.target.value })}
+                        errorCondition={hasSubmitted && !user.name}
+                        errorMessage="Please enter a name."
+                    />
+                </div>
+
+                <h1 className="header-css">Choose a Deck:</h1>
+                <select className="select-css" value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
+                    {decks.length === 0
+                        ? <option disabled>Loading decks...</option>
+                        : decks.map((deck, i) => <option key={i} selected={deck.isSelected}>{deck.name}</option>)
+                    }
+                </select>
+
+                <h1 className="header-css">Choose Expansion Pack(s):</h1>
+                <div className="expansion-packs">
+                    {/* Header */}
+                    <strong>Select</strong>
+                    <strong>Name</strong>
+                    <strong>Prompts</strong>
+                    <strong>Responses</strong>
+
+                    {/* Content */}
+                    {expansions.map(pack => (
+                        <>
+                            <CheckBox label={pack.name} onChange={() => handlePackChange(pack)} checked={pack.isSelected} />
+                            <span className="pack-num-prompts" title="Prompt cards">{pack.numPrompts}</span>
+                            <span className="pack-num-responses" title="Response cards">{pack.numResponses}</span>
+                        </>
+                    ))}
+                </div>
             </div>
-            
-            <h1 className="header-css">Choose a Deck:</h1>  
-            <select className="select-css" value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
-                {decks.length === 0 
-                    ? <option disabled>Loading decks...</option>
-                    : decks.map((deck, i) => <option key={i} selected={deck.isSelected}>{deck.name}</option>)
-                }
-            </select>
-
-            <h1 className="header-css">Choose Expansion Pack(s):</h1>          
-            <div className="expansion-packs">
-                {/* Header */}
-                <strong>Select</strong>
-                <strong>Name</strong>
-                <strong>Prompts</strong>
-                <strong>Responses</strong>
-
-                {/* Content */}
-                {expansions.map(pack => (
-                    <>
-                    <CheckBox label={pack.name} onChange={() => handlePackChange(pack)} checked={pack.isSelected} />
-                    <span className="pack-num-prompts" title="Prompt cards">{pack.numPrompts}</span>
-                    <span className="pack-num-responses" title="Response cards">{pack.numResponses}</span>
-                    </>
-                ))}
-            </div>
-
-            <Button onClick={handleSubmit}>Continue</Button> 
+            <Button onClick={handleSubmit}>Continue</Button>
         </div>
     );
 

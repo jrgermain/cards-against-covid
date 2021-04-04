@@ -30,3 +30,7 @@
     background-color: white;
     color: black;
 }
+
+#choose-deck .view-content {
+    margin: 0 auto;
+}
