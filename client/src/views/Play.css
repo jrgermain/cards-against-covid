@@ -20,6 +20,19 @@
     }
 }
 
+.round{
+    display: block;
+    align-items: right;
+    align-content: right;
+    text-align: right;
+    margin-top: 1%;
+    margin-bottom: 0%;
+    margin-right: .5%;
+    font-size: medium;
+    padding: 0%;
+    color: #666;
+}
+
 .game-controls {
     display: flex;
     flex-direction: column;
@@ -32,7 +45,8 @@
 }
 
 #play h1 {
-    margin-top: 2rem;
+    /* margin-top: 2rem; */
+    margin-top: .5%;
     margin-bottom: 0;
 }
 

@@ -106,10 +106,12 @@ function Play() {
             {isLeaderboardVisible && <Leaderboard />}
             
             <main>
+                <div>  <span className = "round">Round: {round}/{roundMax}</span> </div>
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>
+                   
                 </h1>
-                <h1>Round: {round}/{roundMax}</h1>
+                {/* <h1>Round: {round}/{roundMax}</h1> */}
 
                 {/* If player is not the judge, show who is */}
                 <h2>
