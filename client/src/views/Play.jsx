@@ -26,6 +26,7 @@ function Play() {
     const judgeName = useSelector(state => state.players.find(player => player.isJudge)?.name);
     const status = useSelector(state => state.status.name);
     const round = useSelector(state => state.status.round); 
+    const roundMax = 10; 
 
 
     useEffect(() => {
@@ -108,7 +109,7 @@ function Play() {
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>
                 </h1>
-                <h1>Round: {round}</h1>
+                <h1>Round: {round}/{roundMax}</h1>
 
                 {/* If player is not the judge, show who is */}
                 <h2>
