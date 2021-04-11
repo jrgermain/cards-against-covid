@@ -37,20 +37,13 @@ class Game {
             player.responses = []; // Clear last response
         }
 
-        // Update player roles. In the first round, this makes first player judge (since judgeIndex is -1).
-        const judgeIndex = this.players.findIndex(player => player.isJudge);
-            
-        // Make sure to skip over disconnected players
-        let nextJudgeIndex;
-        do {
-            nextJudgeIndex = (judgeIndex + 1) % this.players.length;
-        } while (!this.players[nextJudgeIndex].isConnected);
-
-        // Pass on role
-        if (judgeIndex > -1) {
-            this.players[judgeIndex].isJudge = false;
+        // Update player roles
+        const judge = this.players.find(player => player.isJudge);
+        const nextJudge = this.getNextJudge();
+        if (judge) {
+            judge.isJudge = false;
         }
-        this.players[nextJudgeIndex].isJudge = true;
+        nextJudge.isJudge = true;
 
         // Reset 'ready for next round' and 'is winner'
         this.players.forEach(player => player.isReadyForNextRound = player.isWinner = false);
@@ -67,7 +60,7 @@ class Game {
 
         // Make sure we have enough response cards
         const numCardsRequired = this.prompt.match(/_+/g)?.length ?? 1;
-        const allPlayersCanAnswer = this.players.filter(player => !player.isJudge).every(player => player.cards.length >= numCardsRequired);
+        const allPlayersCanAnswer = this.players.filter(player => !player.isJudge && player.isConnected).every(player => player.cards.length >= numCardsRequired);
         if (!allPlayersCanAnswer) {
             this.end();
             return;
@@ -84,6 +77,68 @@ class Game {
         this.players.sort((a,b) => b.score - a.score);
         const topScore = this.players[0].score;
         this.players.forEach(player => player.isWinner = (player.score === topScore));
+    }
+
+    getNextJudge() {
+        // Index of current judge in players array
+        const judgeIndex = this.players.findIndex(player => player.isJudge);
+        
+        // Make sure there are players connected to avoid an infinite loop
+        if (this.players.every(player => !player.isConnected)) {
+            return null;
+        }
+
+        // Get the next connected player
+        let nextJudgeIndex = judgeIndex;
+        do {
+            nextJudgeIndex = (nextJudgeIndex + 1) % this.players.length;
+        } while (!this.players[nextJudgeIndex].isConnected)
+
+        return this.players[nextJudgeIndex];
+    }
+
+    // Call this after the game has started and nextRound has been called at least once
+    calculateRoundsLeft() {
+        // Simulate playing multiple rounds until we run out of cards. Record how many rounds we were able to play.
+        const activePlayers = this.players.filter(player => player.isConnected);
+        const playerCards = activePlayers.map(player => player.cards.length);
+        const prompts = [...this.deck.prompts, this.prompt];
+        let numResponses = this.deck.responses.length;
+        let judgeIndex = activePlayers.findIndex(player => player.isJudge);
+        let round = 0;
+        while (prompts.length > 0) {
+            // Simulate playing the required number of cards
+            const numBlanks = prompts.pop().match(/_+/g)?.length ?? 1;
+            for (let i = 0; i < activePlayers.length; i++) {
+                // Skip over judge
+                if (i !== judgeIndex) {
+                    // If there are 2 blanks, subtract 2 cards from all players who are answering
+                    playerCards[i] -= numBlanks;
+                }
+            }
+
+            // If a player would be at a negative card count after this round, we know we can't advance any further
+            if (playerCards.some(count => count < 0)) {
+                break;
+            }
+
+            // Simulate replenishing cards at the end of the round
+            for (let i = 0; i < activePlayers.length; i++) {
+                // Skip over judge, and don't try to replenish more cards than are available
+                if (numResponses > 0 && i !== judgeIndex) {
+                    const cardsToReplenish = Math.min(this.cardsPerPlayer - playerCards[i], numResponses);
+                    playerCards[i] += cardsToReplenish;
+                    numResponses -= cardsToReplenish;
+                }
+            }
+             
+            // All players currently have enough cards to keep playing. Increment round count and keep going
+            round++;
+            judgeIndex = (judgeIndex + 1) % activePlayers.length;
+        }
+
+        console.log("Game.calculateRoundsLeft: Can do " + round + " more round(s)")
+        return round;        
     }
 }
 

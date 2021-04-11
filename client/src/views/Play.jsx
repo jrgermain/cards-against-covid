@@ -26,7 +26,7 @@ function Play() {
     const judgeName = useSelector(state => state.players.find(player => player.isJudge)?.name);
     const status = useSelector(state => state.status.name);
     const round = useSelector(state => state.status.round); 
-    const roundMax = 10; 
+    const roundMax = useSelector(state => state.status.maxRounds); 
 
 
     useEffect(() => {
