@@ -185,6 +185,18 @@ io.on('connection', socket => {
         }
     });
 
+    socket.on('change name', (gameCode, oldName, newName )=> {
+        const game = games[gameCode];
+        const existingPlayer = game.players.find(player => player.name === oldName);
+        
+
+
+            existingPlayer.name = newName;
+            reduxUpdate(gameCode)("players/set", game.players);
+            reduxUpdate(socket.id)("user/setName", newName);
+            console.log(`Socket: Name Change . Current player list: `, game.players.map(player => player.name));
+    }); 
+
     socket.on('disconnect', (reason) => {
         if (socket._gameData) {
             const { gameCode, name } = socket._gameData;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import List from '../components/List';
 import './WaitingForPlayers.css';
 import Button from '../components/Button';
@@ -21,6 +21,7 @@ function WaitingForPlayers() {
     const gameCode = useSelector(state => state.gameCode);
     const user = useSelector(state => state.user);
     const status = useSelector(state => state.status.name);
+    const [textName, setTextName] = useState(user.name);
 
     /* When the page is loaded/reloaded, clear the local player list and then send a request to the socket.
      * This request tells the socket the player is here, and the socket will respond with the correct player list.
@@ -78,15 +79,16 @@ function WaitingForPlayers() {
                     <List items={players} map={player => player.name} />
                 </section>
                 <section className="change-name">
-                    <Popup trigger={<Button disabled> Change My Name</Button>}>
+                    <Popup trigger={<Button> Change My Name</Button>}>
                         <div>
                             <label htmlFor="player-name">Enter your name: </label>
                             <TextBox
                                 id="player-name"
                                 placeholder="Your name"
-                                value={useSelector(state => state.user.name)}
-                                onChange={e => dispatch({ type: "user/setName", payload: e.target.value })}
+                                value={textName}
+                                onChange={e => setTextName(e.target.value)}
                             />
+                            <Button type="submit" onClick= {e => socket.emit('change name', gameCode, user.name, textName )}> Submit </Button> 
                         </div>
                     </Popup>
                 </section>
