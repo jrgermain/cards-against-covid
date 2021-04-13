@@ -20,10 +20,13 @@ io.on('connection', socket => {
     // Move a game to the next round
     const nextRound = (gameCode) => {
         const game = games[gameCode];
-        game.nextRound();
-        reduxUpdate(gameCode)("status/nextRound");
-        reduxUpdate(gameCode)("prompt/set", game.prompt);
-        reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards
+        if (game) {
+            game.nextRound();
+            reduxUpdate(gameCode)("status/setName", game.state.description);
+            reduxUpdate(gameCode)("status/nextRound");
+            reduxUpdate(gameCode)("prompt/set", game.prompt);
+            reduxUpdate(gameCode)("players/set", game.players); // To update roles and cards    
+        }
     }
 
 
@@ -71,6 +74,7 @@ io.on('connection', socket => {
 
         console.log(`Socket: Game "${gameCode}" has started.`);
         reduxUpdate(gameCode)("status/setName", game.state.description);
+        reduxUpdate(gameCode)("status/setMaxRounds", game.round + game.calculateRoundsLeft());
         reduxUpdate(gameCode)("players/set", game.players);
         reduxUpdate(gameCode)("prompt/set", game.prompt);
     });
@@ -209,9 +213,6 @@ io.on('connection', socket => {
                 // Set player as inactive
                 playerWhoLeft.isConnected = false;
 
-                // Get number of active players
-                const numConnectedPlayers = game.players.filter(player => player.isConnected).length;
-
                 // Give the players 2 seconds to reconnect before treating it as "leaving" so refreshing the page doesn't cause an issue
                 setTimeout(() => {
                     if (game) {
@@ -220,6 +221,9 @@ io.on('connection', socket => {
                             // Update other players' screens to show that the player left
                             reduxUpdate(gameCode)("players/remove", name);
     
+                            // Get number of active players
+                            const numConnectedPlayers = game.players.filter(player => player.isConnected).length;
+
                             // If this was the last player, delete the game
                             if (numConnectedPlayers === 0) {
                                 delete games[gameCode];
@@ -234,19 +238,22 @@ io.on('connection', socket => {
                             }
                             //  We still have a valid number of players
                             else if (game.state === Game.State.IN_PROGRESS) {
-                                // If the player who left was a judge, have the next player judge
-                                if (playerWhoLeft.isJudge) {
-                                    const nextJudgeIndex = (playerWhoLeftIndex + 1) % game.players.length;
-                                    const nextJudge = game.players[nextJudgeIndex];
-                                    nextJudge.isJudge = true;
-                                    console.log(`The judge, "${playerWhoLeft.name}", left game "${gameCode}", so the judging role was transferred to "${nextJudge.name}".`);
-                                    reduxUpdate(gameCode)("players/set", game.players)    
-                                }
                                 // If everyone is waiting for the next round and a player leaves instead of accepting, make sure the game advances
-                                else if (game.players.every(player => player.isReadyForNextRound || !player.isConnected)) {
+                                if (game.players.every(player => player.isReadyForNextRound || !player.isConnected)) {
                                     console.log(`Game "${gameCode}" advanced to next round.`);
                                     nextRound(gameCode);
                                 }
+                                // If the player who left was a judge, have the next player judge
+                                else if (playerWhoLeft.isJudge) {
+                                    const nextJudge = game.getNextJudge();
+                                    nextJudge.isJudge = true;
+                                    playerWhoLeft.isJudge = false;
+                                    console.log(`The judge, "${playerWhoLeft.name}", left game "${gameCode}", so the judging role was transferred to "${nextJudge.name}".`);
+                                    reduxUpdate(gameCode)("players/set", game.players)    
+                                }
+
+                                // Update maximum number of rounds on players' screens, since it might increase
+                                reduxUpdate(gameCode)("status/setMaxRounds", game.round + game.calculateRoundsLeft());
                             }
                             // The player left before the game started
                             else if (game.state === Game.State.WAITING) {
