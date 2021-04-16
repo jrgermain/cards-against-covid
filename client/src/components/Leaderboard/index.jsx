@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { socket } from '../..';
 import Button from '../Button';
@@ -15,27 +15,27 @@ function Leaderboard() {
 
     const renderPlayer = player => {
         // Figure out which css classes to give the card
-        const cellClass = classNames(["cell", {
+        const rowClass = classNames({
             winner: player.isWinner,
             inactive: !player.isConnected
-        }]);
+        });
 
         return (
-            <>
-            <span className={cellClass}>
-                <label className="player-name">{player.name}</label>
-                {player.isWinner && <label className="winner-label">Winner!</label>}
-                {!player.isConnected && <label className="inactive-label">Inactive</label>}
-            </span>
-            <span className={cellClass}>
-                {player.isJudge
-                    ? <Card type="prompt">{prompt}</Card>
-                    : <Card type="response">{player.responses}</Card>}
-            </span>
-            <span className={cellClass}>
-                <span className="player-score">{player.score || 0}</span>
-            </span>
-            </>
+            <div role="row" className={rowClass}>
+                <span className="cell" role="gridcell">
+                    <label className="player-name">{player.name}</label>
+                    {player.isWinner && <label className="winner-label">Winner!</label>}
+                    {!player.isConnected && <label className="inactive-label">Inactive</label>}
+                </span>
+                <span className="cell" role="gridcell">
+                    {player.isJudge
+                        ? <Card type="prompt">{prompt}</Card>
+                        : <Card type="response">{player.responses}</Card>}
+                </span>
+                <span className="cell" role="gridcell">
+                    <span className="player-score">{player.score || 0}</span>
+                </span>
+            </div>
         );
     }
 
@@ -49,21 +49,23 @@ function Leaderboard() {
  
 
     return (
-        <div className="leaderboard">
+        <div className="leaderboard" role="dialog" aria-modal="true">
             <div className="leaderboard-content">
                 <label>Leaderboard</label>
 
-                <div className="leaderboard-grid-wrapper">
-                    <div className="leaderboard-grid-header">
-                        <span className="cell">Name</span>
-                        <span className="cell">Card</span>
-                        <span className="cell">Score</span>
+                <div className="leaderboard-grid-wrapper" role="grid">
+                    <div className="leaderboard-grid-header" role="rowgroup">
+                        <div role="row">
+                            <span className="cell" role="columnheader">Name</span>
+                            <span className="cell" role="columnheader">Card</span>
+                            <span className="cell" role="columnheader">Score</span>
+                        </div>
                     </div>
-                    <div className="leaderboard-grid-body">
+                    <div className="leaderboard-grid-body" role="rowgroup">
                         {players.map(renderPlayer)}
                     </div>
                 </div>
-                <Button onClick={handleNextRound} disabled={isWaiting}>{isWaiting ? "Waiting for other players..." : "Next Round"}</Button>
+                <Button onClick={handleNextRound} aria-pressed={isWaiting} disabled={isWaiting}>{isWaiting ? "Waiting for other players..." : "Next Round"}</Button>
             </div>
         </div>
     );

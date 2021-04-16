@@ -65,12 +65,12 @@ function Play() {
             const responseCards = responsePlayers.map(player => {
                 // When a card is clicked, send a socket event saying the judge selected a card
                 const onClick = () => socket.emit("judge select", gameCode, player.name);
-                return <Card type="response" onClick={onClick}>{player.responses}</Card>
+                return <Card type="response" onClick={onClick} role="listitem">{player.responses}</Card>
             });
             return (
                 <div className="judge-controls">
                     <h2>Select a winning response</h2>
-                    <div className="deck">{responseCards}</div>
+                    <div className="deck" role="list">{responseCards}</div>
                 </div>
             );
         }
@@ -85,10 +85,10 @@ function Play() {
         // If more than one card is required, add a multi-select class to the element
         return (
             <div className={"player-controls" + enabledClass}>
-                <div className="deck">
+                <div className="deck" role="list">
                     {user.cards.map((text, index) => (
                         // Create a <Card> element for each of the user's cards. When clicked, a socket event is sent to the server, where the selection logic takes place.
-                        <Card type="response" showIndex={cardsRequired > 1} selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
+                        <Card type="response" showIndex={cardsRequired > 1} selectedIndex={user.responses.indexOf(text)} role="listitem" onClick={() => socket.emit('answer select', gameCode, username, index)}>
                             {text}
                         </Card>
                     ))}

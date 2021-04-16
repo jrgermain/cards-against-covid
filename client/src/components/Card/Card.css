@@ -34,6 +34,10 @@
     transform: scale(1.05);
 }
 
+.card.clickable:focus {
+    outline: 3px dashed #8af;
+}
+
 .card-selected-index,
 .card-blank-index,
 .card-response-index {

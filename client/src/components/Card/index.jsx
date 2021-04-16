@@ -5,12 +5,11 @@ import './Card.css';
 
 const blank = /_+/g;
 
-function Card({ type, children, selectedIndex, showIndex, ...others }) {
-    // Figure out which css classes to give the card
-    const className = classNames(["card", type, {
-        selected: selectedIndex > -1,
-        clickable: typeof others.onClick === "function"
-    }]);
+function Card({ type, children, selectedIndex, showIndex, onClick, ...others }) {
+    // Figure out which css classes to give the card. It always has 'card', will have exactly one of [prompt, response], and 0 or more of [clickable, selected] 
+    const clickable = typeof onClick === "function";
+    const selected = selectedIndex > -1;
+    const className = classNames(["card", type, { clickable, selected }]);
 
     // This will be an array of JSX Elements that go inside the card 
     const content = [];
@@ -59,8 +58,27 @@ function Card({ type, children, selectedIndex, showIndex, ...others }) {
         content.push(children);
     }
 
+    // Add a few extra props for accessibility reasons (e.g. no mouse, screen readers)
+    let a11yProps;
+    if (clickable) {
+        a11yProps = {
+            role: "button",
+            tabindex: 0,
+            "aria-pressed": selected,
+            onKeyPress: function (event) {
+                if (event.key === "Enter") {
+                    onClick(event);
+                }
+            }
+        }
+    } else {
+        a11yProps = {
+            tabindex: -1
+        }
+    }
+
     return (
-        <div className={className} {...others}>
+        <div {...{className, onClick, ...a11yProps, ...others}}>
             <div className="card-content">{content}</div>
         </div>
     );

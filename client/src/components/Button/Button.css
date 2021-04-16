@@ -21,7 +21,12 @@
     background: #222;
 }
 
+.button-wrapper button:focus {
+    outline: 2px solid #8af;
+}
+
 .button-wrapper button[disabled] {
     background: #666;
     color: #ccc;
+    cursor: default;
 }

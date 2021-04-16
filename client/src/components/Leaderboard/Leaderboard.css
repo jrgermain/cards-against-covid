@@ -90,8 +90,7 @@
     overflow-x: auto;
 }
 
-.leaderboard-grid-header,
-.leaderboard-grid-body {
+.leaderboard-grid-wrapper [role="row"] {
     display: grid;
     grid-template-columns: 7fr 11fr 7fr;
     max-width: 25rem;
@@ -119,10 +118,10 @@
     justify-content: center;
 }
 
-.leaderboard-grid-body .cell.winner {
+.leaderboard-grid-body .winner {
     background: #33aa4433;
 }
 
-.leaderboard-grid-body .cell.inactive {
+.leaderboard-grid-body .inactive {
     opacity: 0.5;
 }
