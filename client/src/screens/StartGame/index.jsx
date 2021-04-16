@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
-import Button from '../components/Button';
-import '../components/Dropdown.css';
-import Ajax from '../lib/ajax';
+import Button from '../../components/Button';
+import Ajax from '../../lib/ajax';
 import { useHistory } from "react-router-dom";
 import { useState } from 'react';
-import TextBox from '../components/TextBox';
-import CheckBox from '../components/CheckBox';
-import './ChooseDeck.css';
+import TextBox from '../../components/TextBox';
+import CheckBox from '../../components/CheckBox';
+import './StartGame.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { showError } from '../lib/message';
+import { showError } from '../../lib/message';
+import Dropdown from '../../components/Dropdown';
 
 function ChooseDeck() {
     const history = useHistory();
@@ -108,12 +108,12 @@ function ChooseDeck() {
                 </div>
 
                 <h1 className="header-css">Choose a Deck:</h1>
-                <select className="select-css" value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
+                <Dropdown value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
                     {decks.length === 0
                         ? <option disabled>Loading decks...</option>
                         : decks.map((deck, i) => <option key={i} selected={deck.isSelected}>{deck.name}</option>)
                     }
-                </select>
+                </Dropdown>
 
                 <h1 className="header-css">Choose Expansion Pack(s):</h1>
                 <div className="expansion-packs">

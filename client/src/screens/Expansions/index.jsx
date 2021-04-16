@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import Button from '../components/Button';
-import DeckMaker from '../components/DeckMaker';
-import TextBox from '../components/TextBox';
-import Ajax from '../lib/ajax';
+import Button from '../../components/Button';
+import DeckMaker from '../../components/DeckMaker';
+import TextBox from '../../components/TextBox';
+import Ajax from '../../lib/ajax';
 import './Expansions.css';
-import { showSuccess, showError } from '../lib/message';
+import { showSuccess, showError } from '../../lib/message';
 
 function Expansions() {
     const history = useHistory();

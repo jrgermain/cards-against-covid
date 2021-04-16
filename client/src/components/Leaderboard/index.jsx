@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { socket } from '..';
-import Button from './Button';
-import Card from './Card';
-import './Leaderboard.css'
+import { socket } from '../..';
+import Button from '../Button';
+import Card from '../Card';
+import './Leaderboard.css';
+import classNames from 'classnames';
 
 function Leaderboard() {
     const [isWaiting, setWaiting] = useState(false);
@@ -13,7 +14,12 @@ function Leaderboard() {
     const prompt = useSelector(state => state.prompt); 
 
     const renderPlayer = player => {
-        const cellClass = "cell" + (player.isWinner ? " winner" : "") + (!player.isConnected ? " inactive" : "");
+        // Figure out which css classes to give the card
+        const cellClass = classNames(["cell", {
+            winner: player.isWinner,
+            inactive: !player.isConnected
+        }]);
+
         return (
             <>
             <span className={cellClass}>

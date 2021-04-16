@@ -2,7 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Button.css';
 
-function Button({ link, onClick, children, ...others }) {
+function Button({ link, onClick, children, disabled, ...others }) {
+    if (disabled) {
+        link = onClick = undefined;
+    }
+
     if (link) {
         return (
             <Link to={link} className="button-wrapper" {...others}>
@@ -12,7 +16,7 @@ function Button({ link, onClick, children, ...others }) {
     } else {
         return (
             <span className="button-wrapper" {...others}>
-                <button onClick={onClick}>{children}</button>
+                <button disabled={disabled} onClick={onClick}>{children}</button>
             </span>
         )
     }

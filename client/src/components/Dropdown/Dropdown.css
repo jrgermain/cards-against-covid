@@ -1,4 +1,4 @@
-.select-css {
+.dropdown {
     width: 100%;
     font-size: 1rem;
     font-weight: bold;
@@ -16,15 +16,17 @@
     box-shadow: none;
 }
 
-.select-css:focus, .select-css:hover, .select-css:active{
-        background-color: #2b579e;
+.dropdown:focus,
+.dropdown:hover,
+.dropdown:active{
+    background-color: #2b579e;
 }
 
-.header-css{
+.header-css {
     font-size: 150%;
     padding-top: 50px;
 }
-.header{
+.header {
     font-size: 150%;
 }
 

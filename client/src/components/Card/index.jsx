@@ -1,14 +1,16 @@
 import React from 'react';
-import './Card.css';
 import CardBlank from './CardBlank';
+import classNames from 'classnames';
+import './Card.css';
 
 const blank = /_+/g;
 
-function Card({ type, children, selectedIndex, ...others }) {
-    // Build className based on card attributes
-    const isSelected = selectedIndex > -1 ? " selected" : "";
-    const hasClick = others.onClick ? " hasClick" : "";
-    const className = "card " + type + isSelected + hasClick;
+function Card({ type, children, selectedIndex, showIndex, ...others }) {
+    // Figure out which css classes to give the card
+    const className = classNames(["card", type, {
+        selected: selectedIndex > -1,
+        clickable: typeof others.onClick === "function"
+    }]);
 
     // This will be an array of JSX Elements that go inside the card 
     const content = [];
@@ -51,13 +53,17 @@ function Card({ type, children, selectedIndex, ...others }) {
     } else if (type === "response") {
         // This is a response card being shown to a player who is answering
         // Number them if there are more than 1
-        if (isSelected) {
+        if (showIndex && selectedIndex > -1) {
             content.push(<label className="card-selected-index">{selectedIndex + 1}</label>)
         }
         content.push(children);
     }
 
-    return <div className={className} {...others}>{content}</div>;
+    return (
+        <div className={className} {...others}>
+            <div className="card-content">{content}</div>
+        </div>
+    );
 }
 
 export default Card;

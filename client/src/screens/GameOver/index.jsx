@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 import './GameOver.css';
-import * as socketListener from '../redux/socket';
+import * as socketListener from '../../redux/socket';
+import Table from '../../components/Table';
 
 function GameOver() {
     const history = useHistory();
@@ -25,7 +26,8 @@ function GameOver() {
             <h1>Game Over</h1>
             <div className="final-score-wrapper">
                 <h2>Final score</h2>
-                <table>
+                <Table head={["Player", "Points"]} body={players.map(player => [player.name, player.score])} />
+                {/* <table>
                     <thead>
                         <tr>
                             <th>Player</th>
@@ -40,7 +42,7 @@ function GameOver() {
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </table> */}
             </div>
             <Button link="/">Back to Home</Button>
         </div>

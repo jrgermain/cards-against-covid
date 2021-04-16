@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import './Start.css';
-import Button from '../components/Button';
-import * as socketListener from '../redux/socket';
+import './Home.css';
+import Button from '../../components/Button';
+import * as socketListener from '../../redux/socket';
 
-function Start() {
+function Home() {
     useEffect(() => {
         // If a user leaves a game, they are brought here. This means we should reset the app.
         socketListener.stop(); // Stop listening for state updates
@@ -22,4 +22,4 @@ function Start() {
     );
 }
 
-export default Start;
+export default Home;

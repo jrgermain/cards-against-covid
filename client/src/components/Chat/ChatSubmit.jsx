@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { socket } from '../index';
-import Button from './Button';
-import TextBox from './TextBox';
+import { socket } from '../..';
+import Button from '../Button';
+import TextBox from '../TextBox';
 
 function ChatSubmit({ gameCode, name }) {
     const [value, setValue] = useState("");

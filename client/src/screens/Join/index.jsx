@@ -1,10 +1,10 @@
 import React from 'react';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 import './Join.css';
 import { useHistory } from 'react-router-dom';
-import Ajax from '../lib/ajax';
+import Ajax from '../../lib/ajax';
 import { useState } from 'react';
-import TextBox from '../components/TextBox';
+import TextBox from '../../components/TextBox';
 import { useDispatch, useSelector } from 'react-redux';
 
 function Join() {

@@ -69,9 +69,9 @@
     cursor: not-allowed!important;
 }
 
-.player-controls:not(.multi-select) .card-selected-index {
+/* .player-controls:not(.multi-select) .card-selected-index {
     display: none;
-}
+} */
 
 .player-controls {
     margin-bottom: 2rem;
@@ -93,6 +93,5 @@
 #play .card {
     max-width: calc(50vw - 3.5rem);
     max-height: calc(1.5 * (50vw - 3.5rem));
-    overflow-y: auto;
     font-size: min(1.2rem, 5vw);
 }

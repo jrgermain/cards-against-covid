@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import List from '../components/List';
+import List from '../../components/List';
 import './WaitingForPlayers.css';
-import Button from '../components/Button';
-import TextBox from '../components/TextBox';
+import Button from '../../components/Button';
+import TextBox from '../../components/TextBox';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { socket } from '../index';
-import { showError } from '../lib/message';
+import { socket } from '../..';
+import { showError } from '../../lib/message';
 import { useDispatch, useSelector } from 'react-redux';
-import * as socketListener from '../redux/socket';
-import Ajax from '../lib/ajax';
+import * as socketListener from '../../redux/socket';
+import Ajax from '../../lib/ajax';
 
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';

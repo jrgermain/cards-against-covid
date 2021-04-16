@@ -1,15 +1,13 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { socket } from '..';
-import Card from '../components/Card';
-import CardDeck from '../components/CardDeck';
-import Chat from '../components/Chat';
-import List from '../components/List';
-import './Table.css';
+import { socket } from '../..';
+import Card from '../../components/Card';
+import Chat from '../../components/Chat';
+import List from '../../components/List';
 import './Play.css';
-import Leaderboard from '../components/Leaderboard';
-import * as socketListener from '../redux/socket';
+import Leaderboard from '../../components/Leaderboard';
+import * as socketListener from '../../redux/socket';
 
 const NORMAL_WEIGHT = { fontWeight: "normal" };
 
@@ -72,7 +70,7 @@ function Play() {
             return (
                 <div className="judge-controls">
                     <h2>Select a winning response</h2>
-                    <CardDeck>{responseCards}</CardDeck>
+                    <div className="deck">{responseCards}</div>
                 </div>
             );
         }
@@ -85,17 +83,16 @@ function Play() {
         const enabledClass = isEnabled ? "" : " disabled";
 
         // If more than one card is required, add a multi-select class to the element
-        const multiSelectClass = cardsRequired > 1 ? " multi-select" : "";
         return (
-            <div className={"player-controls" + enabledClass + multiSelectClass}>
-                <CardDeck>
+            <div className={"player-controls" + enabledClass}>
+                <div className="deck">
                     {user.cards.map((text, index) => (
                         // Create a <Card> element for each of the user's cards. When clicked, a socket event is sent to the server, where the selection logic takes place.
-                        <Card type="response" selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
+                        <Card type="response" showIndex={cardsRequired > 1} selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
                             {text}
                         </Card>
                     ))}
-                </CardDeck>
+                </div>
             </div>
         );
     }

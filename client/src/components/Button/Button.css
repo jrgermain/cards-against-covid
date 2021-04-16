@@ -21,8 +21,7 @@
     background: #222;
 }
 
-.button-wrapper[disabled] button {
+.button-wrapper button[disabled] {
     background: #666;
     color: #ccc;
-    pointer-events: none;
 }
