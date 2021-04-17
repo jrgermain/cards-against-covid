@@ -25,7 +25,7 @@
     width: stretch;
 }
 
-.deck-maker .button-wrapper {
+.deck-maker .Button {
     display: inline-block;
     transform: scale(.8);
 }

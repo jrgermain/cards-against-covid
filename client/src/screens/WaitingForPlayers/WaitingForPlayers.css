@@ -1,46 +1,75 @@
 @media only screen and (max-width: 799px) {
-    .user-info {
+    h1 {
         grid-row: 1;
         grid-column: 1;
     }
-    
-    .currently-joined {
-        grid-row: 3;
+    .user-info {
+        grid-row: 2;
         grid-column: 1;
     }
-    
-    
+        
     .change-name {
-        grid-row: 2;
+        grid-row: 3;
         grid-column: 1;
         margin-bottom: 2rem;
     }
+
+    .currently-joined {
+        grid-row: 4;
+        grid-column: 1;
+    }
     
     .start-game {
-        grid-row: 4;
+        grid-row: 5;
         grid-column: 1;
     }
 }
 
 @media only screen and (min-width: 800px) {
-    .user-info {
+    h1 {
         grid-row: 1;
+        grid-column: 1 / span 2;
+    }
+
+    .user-info {
+        grid-row: 2;
         grid-column: 1;
     }
     
     .currently-joined {
-        grid-row: 1;
+        grid-row: 2;
         grid-column: 2;
     }
     
     
     .change-name {
-        grid-row: 2;
+        grid-row: 3;
         grid-column: 1;
     }
     
     .start-game {
-        grid-row: 2;
+        grid-row: 3;
         grid-column: 2;
     }
+}
+
+
+.change-name-popup {
+    display: flex;
+    flex-direction: column;
+    margin: .5rem;
+}
+
+.change-name-popup label {
+    margin-bottom: .5rem;
+}
+
+.change-name-popup .big-text {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: .5rem;
+}
+
+.change-name-popup .Button {
+    padding: .5rem;
 }

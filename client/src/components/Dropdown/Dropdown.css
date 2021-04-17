@@ -1,12 +1,12 @@
-.dropdown {
+.Dropdown {
     width: 100%;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    border-radius: 0;
-    background-color: #238ce8;
+    border-radius: 0;   
+    background-color: #26b;
     border: none;
-    outline: none;
+    outline: none;  
     color: white;
     appearance: none;
     -webkit-appearance: none;
@@ -16,10 +16,22 @@
     box-shadow: none;
 }
 
-.dropdown:focus,
-.dropdown:hover,
-.dropdown:active{
+/* .Dropdown:focus,
+.Dropdown:hover,
+.Dropdown:active{
     background-color: #2b579e;
+} */
+
+.Dropdown:hover {
+    background: #37c;
+}
+
+.Dropdown:active {
+    background: #15a;
+}
+
+.Dropdown:focus {
+    outline: 2px solid #8af;
 }
 
 .header-css {

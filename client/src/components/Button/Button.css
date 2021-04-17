@@ -1,6 +1,4 @@
-.button-wrapper button {
-    height: 100%;
-    width: 100%;
+.Button {
     padding: 1.2rem;
     font-size: 1rem;
     color: white;
@@ -11,21 +9,22 @@
     outline: none;
     transition: background .3s linear;
     cursor: pointer;
+    text-decoration: none;
 }
 
-.button-wrapper button:hover {
+.Button:hover {
     background: #666;
 }
 
-.button-wrapper button:active {
+.Button:active {
     background: #222;
 }
 
-.button-wrapper button:focus {
+.Button:focus {
     outline: 2px solid #8af;
 }
 
-.button-wrapper button[disabled] {
+.Button[disabled] {
     background: #666;
     color: #ccc;
     cursor: default;

@@ -11,8 +11,8 @@ function Home() {
         socketListener.resetConnection(); // Close and reopen the socket to trigger the disconnect handler on the server
     }, []);
     return (
-        <div className="view" id="start">
-            <h1 id="game-logo" role="img" aria-label="Cards Against COVID">Cards<br/>Against<br/>COVID</h1>
+        <div className="view" id="start" role="main">
+            <div id="game-logo" role="img" aria-label="Cards Against COVID">Cards<br/>Against<br/>COVID</div>
             <nav className="button-group">
                 <Button link="/start">Start New Game</Button>
                 <Button link="/join">Join Existing Game</Button>

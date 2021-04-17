@@ -91,7 +91,7 @@ function ChooseDeck() {
     }
 
     return (
-        <div className="view" id="choose-deck">
+        <main className="view" id="start-game">
             <div className="view-content">
                 <h1>Start a game</h1>
 
@@ -107,15 +107,15 @@ function ChooseDeck() {
                     />
                 </div>
 
-                <h1 className="header-css">Choose a Deck:</h1>
-                <Dropdown value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
+                <h2 className="header-css" id="choose-deck">Choose a Deck:</h2>
+                <Dropdown aria-labelledby="choose-deck" value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
                     {decks.length === 0
                         ? <option disabled>Loading decks...</option>
                         : decks.map((deck, i) => <option key={i} selected={deck.isSelected}>{deck.name}</option>)
                     }
                 </Dropdown>
 
-                <h1 className="header-css">Choose Expansion Pack(s):</h1>
+                <h2 className="header-css" id="choose-expansion-pack">Choose Expansion Pack(s):</h2>
                 <div className="expansion-packs">
                     {/* Header */}
                     <strong>Select</strong>
@@ -134,7 +134,7 @@ function ChooseDeck() {
                 </div>
             </div>
             <Button onClick={handleSubmit}>Continue</Button>
-        </div>
+        </main>
     );
 
 }

@@ -59,10 +59,27 @@ function WaitingForPlayers() {
         }
     }
 
+    // Respond to the user pressing "Submit" within the "Change Name" popup
+    const handleChangeName = () => {
+        socket.emit('change name', gameCode, user.name, textName);
+        
+        // Close the window by simulating esc key
+        document.dispatchEvent(new KeyboardEvent("keyup", { key: 'Escape' }));
+    }
+
+    const handlePopupOpen = () => {
+        const popup = document.querySelector(".popup-content");
+        if (popup) {
+            popup.setAttribute("role", "dialog");
+            popup.setAttribute("aria-label", "Please enter a new name");
+            
+        }
+    }
+
     return (
         <div className="view" id="waiting-for-players">
-            <h1>Waiting for players...</h1>
             <main>
+                <h1>Waiting for players...</h1>
                 <section className="user-info">
                     <h2>About you</h2>
                     <div>
@@ -79,18 +96,23 @@ function WaitingForPlayers() {
                     <List items={players} map={player => player.name} />
                 </section>
                 <section className="change-name">
-                    <Popup trigger={<Button> Change My Name</Button>}>
-                        <div>
-                            <label htmlFor="player-name">Enter your name: </label>
+                    <Popup trigger={<button className="Button"> Change My Name</button>} position="bottom center" arrow>
+                        <div className="change-name-popup" role="">
+                            <label id="player-name-label" htmlFor="player-name">Enter a new name:</label>
                             <TextBox
                                 id="player-name"
                                 placeholder="Your name"
                                 value={textName}
                                 onChange={e => setTextName(e.target.value)}
+                                onKeyPress={e => e.key === "Enter" && handleChangeName() }
                             />
-                            <Button type="submit" onClick= {e => socket.emit('change name', gameCode, user.name, textName )}> Submit </Button> 
+                            <Button onClick={handleChangeName}>Submit</Button> 
                         </div>
                     </Popup>
+                    {/* <Popup trigger={<Button>Trigger</Button>} position="right center">
+                        <div>Popup content here !!</div>
+                    </Popup> */}
+
                 </section>
                 <section className="start-game">
                     <Button onClick={handleStart}>Everybody's In</Button>

@@ -38,7 +38,7 @@ h1, h2, h3 {
   flex-direction: column;
 }
 
-.view > .button-wrapper:last-child {
+.view > .Button:last-child {
   margin-top: auto;
 }
 
@@ -47,7 +47,7 @@ input.big-text {
   padding: .5rem;
 }
 
-input.big-text[data-error=true] {
+input.big-text[aria-invalid="true"] {
   outline: 2px solid #d33;
 }
 

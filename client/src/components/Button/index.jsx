@@ -9,15 +9,15 @@ function Button({ link, onClick, children, disabled, ...others }) {
 
     if (link) {
         return (
-            <Link to={link} className="button-wrapper" role="presentation" {...others}>
-                <button onClick={onClick}>{children}</button>
+            <Link to={link} className="Button" {...{ onClick, children, disabled, ...others }}>
+                {/* <button aria-hidden="true" onClick={onClick}>{children}</button> */}
             </Link>
         )
     } else {
         return (
-            <span className="button-wrapper" role="presentation">
-                <button {...{ disabled, onClick, ...others }}>{children}</button>
-            </span>
+            // <span className="button-wrapper" role="button">
+                <button className="Button" {...{ disabled, onClick, ...others }}>{children}</button>
+            // </span>
         )
     }
 }
