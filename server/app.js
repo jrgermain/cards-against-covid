@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var ip = require('ip');
 var chalk = require('chalk');
-var apiRouter = require('./routes/api');
+var apiRouter = require('./logic/api');
 var stoppable = require('stoppable');
 
 var app = express();
@@ -38,7 +38,7 @@ app.use('*', (req, res) => {
 });
 
 // Setup socket.io
-require('./routes/socket');
+require('./logic/socket');
 
 // Print welcome message to users
 console.log('Join the game at ' + chalk.bold('http://' + ip.address() + ":3001"));
