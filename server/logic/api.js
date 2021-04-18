@@ -38,7 +38,10 @@ router.post('/startGame', async function(req, res) {
     const allPacks = await cards.getExpansionPacks();
     const selectedDeck = allDecks.find(deck => deck.name === deckName);
     const filteredPacks = allPacks.filter(pack => expansionPacks.includes(pack.name));
-    const combinedCards = [selectedDeck, ...filteredPacks].map(cards => new Deck(cards)).reduce(Deck.combine).shuffle();
+    const combinedCards = [selectedDeck, ...filteredPacks]
+            .map(cards => new Deck(cards)) // Get an array of Deck objects
+            .reduce(Deck.combine)          // Flatten into one deck
+            .shuffle();                    // Shuffle the cards into a random order
 
     const code = Game.Code.generate(games);
     games[code] = new Game(combinedCards);
@@ -59,18 +62,6 @@ router.post('/joinGame', async function(req, res) {
         res.sendStatus(400);
     } else {
         res.sendStatus(200);
-    }
-});
-
-router.get('/playerList', async function(req, res) {
-    const code = (req.query.code || "").toUpperCase();
-    const game = games[code];
-
-    if (game) {
-        res.send(game.players);
-    } else {
-        console.warn(`Game "${code}" was not found.`);
-        res.sendStatus(404);
     }
 });
 
