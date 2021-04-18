@@ -26,9 +26,9 @@ router.get('/expansionList', async function(req, res) {
     res.send(packInfo);
 });
 
-router.get('/doesGameExist', async function(req, res) { 
+router.get('/gameState', async function(req, res) { 
     const gameCode = req.query.code;
-    res.status(200).send(gameCode in games);
+    res.status(200).send(gameCode in games ? games[gameCode].state.description : "INVALID");
 })
 
 router.post('/startGame', async function(req, res) {
@@ -57,11 +57,30 @@ router.post('/joinGame', async function(req, res) {
     if (!game) {
         console.warn(`Game "${code}" was not found.`);
         res.sendStatus(404);
-    } else if (game.players.some(player => player.name === name)) {
-        console.warn(`Player "${name}" already exists in game "${code}".`);
-        res.sendStatus(400);
-    } else {
-        res.sendStatus(200);
+        return;
+    } 
+    
+    switch (game.state) {
+        case Game.State.WAITING:
+            if (game.players.some(player => player.name === name)) {
+                // Game is on lobby screen and player chooses the name of someone in the lobby
+                res.sendStatus(400);
+            } else {
+                // Game is on lobby screen and player chooses a unique name
+                res.sendStatus(200);
+            }
+            break;
+        case Game.State.IN_PROGRESS:
+            if (game.players.some(player => player.name === name && !player.isConnected)) {
+                // Game is in progress and the player chooses the name of a disconnected player
+                res.sendStatus(200);
+            } else {
+                // Player tries to join a game they weren't previously a part of 
+                res.sendStatus(404);
+            }
+            break;
+        default:
+            res.sendStatus(404);  
     }
 });
 

@@ -48,15 +48,28 @@ io.on('connection', socket => {
         }
         const existingPlayer = game.players.find(player => player.name === name);
         if (existingPlayer) {
-            // Player was already in the game and reconnected
-            console.log(`Socket: Player "${name}" rejoined game "${gameCode}".`);
+            /* This player was already in the game. Since players who leave before the game starts are 
+             * removed from the game, this case should only happen when the player leaves an in-progress
+             * game. Update everyone with the new player list (to reflect that this player is connected),
+             * then send the full game state to the player who rejoined
+             */
+            // Make sure the player is marked as connected
             existingPlayer.isConnected = true;
 
-            // Make sure the player has the correct player list in case people joined while they were away
-            // Send the list to the player who rejoined, but don't send it to everyone else (since no NEW player joined)
-            reduxUpdate(socket.id)("players/set", game.players);
+            // Make sure everyone is aware that the player rejoined (and that that player gets the player list)
+            reduxUpdate(gameCode)("players/set", game.players);
+
+            // Send the player the game state
+            reduxUpdate(socket.id)("status/setName", game.state.description);
+            reduxUpdate(socket.id)("status/setMaxRounds", game.round + game.calculateRoundsLeft());
+            reduxUpdate(socket.id)("prompt/set", game.prompt);
+            
+            console.log(`Socket: Player "${name}" rejoined game "${gameCode}".`);
         } else {
-            // Add the player to the game, then update the player list for people currently connected.
+            /* Add the player to the game, then update the player list for people currently connected.
+             * Note that unlike with re-joining, the game is only open to new players when it is on the 
+             * Waiting for Players screen, so the only part of game state we care about is the player list.
+             */
             const player = new Player(name);
             game.players.push(player);
             reduxUpdate(gameCode)("players/set", game.players);
@@ -192,7 +205,7 @@ io.on('connection', socket => {
     socket.on('change name', (gameCode, oldName, newName) => {
         const game = games[gameCode];
         const player = game.players.find(player => player.name === oldName);
-        if (player) {
+        if (game && player) {
             player.name = newName;
             socket._gameData.name = newName;
             reduxUpdate(gameCode)("players/set", game.players);
@@ -236,7 +249,7 @@ io.on('connection', socket => {
                                 reduxUpdate(gameCode)("status/setName", game.state.description);
                                 reduxUpdate(gameCode)("players/set", game.players); // To update who the winner is
                             }
-                            //  We still have a valid number of players
+                            // We still have a valid number of players
                             else if (game.state === Game.State.IN_PROGRESS) {
                                 // If everyone is waiting for the next round and a player leaves instead of accepting, make sure the game advances
                                 if (game.players.every(player => player.isReadyForNextRound || !player.isConnected)) {
@@ -249,7 +262,8 @@ io.on('connection', socket => {
                                     nextJudge.isJudge = true;
                                     playerWhoLeft.isJudge = false;
                                     console.log(`The judge, "${playerWhoLeft.name}", left game "${gameCode}", so the judging role was transferred to "${nextJudge.name}".`);
-                                    reduxUpdate(gameCode)("players/set", game.players)    
+                                    reduxUpdate(gameCode)("players/set", game.players);
+                                    // TODO: toast notification saying new judge
                                 }
 
                                 // Update maximum number of rounds on players' screens, since it might increase

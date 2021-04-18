@@ -28,10 +28,14 @@ function WaitingForPlayers() {
      * Put this in a useEffect so it doesn't happen every time we re-render the view (such as when another player joins).
      */
     useEffect(() => {
-        // Check that the game exists first
-        Ajax.get('/api/doesGameExist?code=' + gameCode).then(exists => {
-            if (exists !== "true") {
+        // Check that the game exists first and make sure it hasn't already started
+        Ajax.get('/api/gameState?code=' + gameCode).then(statusText => {
+            if (statusText === "INVALID") {
+                console.error("Game does not exist");
                 history.replace("/");
+            } else if (statusText === "IN_PROGRESS") {
+                console.log("Game in progress. Moving to play screen.");
+                history.replace("/play");
             }
         });
         socketListener.start();
@@ -47,11 +51,12 @@ function WaitingForPlayers() {
 
     // If user loaded this page directly without actually joining a game, kick them out
     if (!gameCode) {
+        console.error("No game code");
         history.replace("/");
     }
 
     // Respond to the user pressing "Everybody's In"
-    function handleStart() {
+    const handleStart = () => {
         if (players.length < 3) {
             showError("Please wait for at least 3 players to join");
         } else {

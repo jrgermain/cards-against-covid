@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from '../../components/Button';
 import './Join.css';
 import { useHistory } from 'react-router-dom';
@@ -6,6 +6,7 @@ import Ajax from '../../lib/ajax';
 import { useState } from 'react';
 import TextBox from '../../components/TextBox';
 import { useDispatch, useSelector } from 'react-redux';
+import * as socketListener from '../../redux/socket';
 
 function Join() {
     const history = useHistory();
@@ -14,9 +15,14 @@ function Join() {
     const [nameError, setNameError] = useState("");
     const [gameCodeError, setGameCodeError] = useState("");
 
-
     const user = useSelector(state => state.user);
     const gameCode = useSelector(state => state.gameCode);
+
+    useEffect(() => {
+        // If a user leaves a game, they might be brought here. This means we should reset the app.
+        socketListener.stop(); // Stop listening for state updates
+        socketListener.reset(); // Clear local app state and trigger a disconnect on the server
+    }, []);
 
     async function joinGame() {
         // Clear any error messages currently displayed
@@ -57,7 +63,7 @@ function Join() {
 
         // We had a success response, so the player must have joined. Save their name (for future games) and move on to the wait screen
         localStorage.setItem("player-name", user.name);
-        history.replace("/waiting");    
+        history.push("/waiting");    
     }
 
     function handleKeyPress(event) {

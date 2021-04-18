@@ -5,10 +5,9 @@ import * as socketListener from '../../redux/socket';
 
 function Home() {
     useEffect(() => {
-        // If a user leaves a game, they are brought here. This means we should reset the app.
+        // If a user leaves a game, they might be brought here. This means we should reset the app.
         socketListener.stop(); // Stop listening for state updates
-        socketListener.resetState(); // Clear local app state
-        socketListener.resetConnection(); // Close and reopen the socket to trigger the disconnect handler on the server
+        socketListener.reset(); // Clear local app state and trigger a disconnect on the server
     }, []);
     return (
         <div className="view" id="start" role="main">

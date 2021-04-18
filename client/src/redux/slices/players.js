@@ -15,6 +15,9 @@ const playersSlice = createSlice({
         set(state, action) {
             return action.payload;
         },
+        clear() {
+            return [];
+        },
         // updateName(state, action) {
         //     state.find(player => player.name === action.payload.oldName).name = action.payload.newName;
         // }

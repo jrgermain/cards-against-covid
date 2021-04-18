@@ -43,4 +43,9 @@ function resetState() {
     store.dispatch({ type: "RESET_STATE" });
 }
 
-export { initialize, start, stop, resetConnection, resetState };
+function reset() {
+    resetState();
+    resetConnection();
+}
+
+export { initialize, start, stop, resetConnection, resetState, reset };
