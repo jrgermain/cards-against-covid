@@ -12,7 +12,7 @@ function DeckMaker({ label, cards, setCards }) {
     return (
         <div className="deck-maker">
             <h2>{label}</h2>
-            <ul>
+            <ul aria-label="Cards in this set">
                 {cards.map((text, index, cards) => DeckMakerEntry({ text, setCards }, index, cards))}
             </ul>
             <Button onClick={addCard}>Add Card</Button>

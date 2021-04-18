@@ -65,12 +65,12 @@ function Play() {
             const responseCards = responsePlayers.map(player => {
                 // When a card is clicked, send a socket event saying the judge selected a card
                 const onClick = () => socket.emit("judge select", gameCode, player.name);
-                return <Card type="response" onClick={onClick} role="listitem">{player.responses}</Card>
+                return <Card type="response" onClick={onClick}>{player.responses}</Card>
             });
             return (
                 <div className="judge-controls">
                     <h2>Select a winning response</h2>
-                    <div className="deck" role="list">{responseCards}</div>
+                    <div className="deck" aria-label="Player responses; select a favorite">{responseCards}</div>
                 </div>
             );
         }
@@ -84,11 +84,11 @@ function Play() {
 
         // If more than one card is required, add a multi-select class to the element
         return (
-            <div className={"player-controls" + enabledClass}>
-                <div className="deck" role="list">
+            <div className={"player-controls" + enabledClass} aria-disabled={!isEnabled}>
+                <div className="deck" aria-label={`Your response cards; select ${cardsRequired}`}>
                     {user.cards.map((text, index) => (
                         // Create a <Card> element for each of the user's cards. When clicked, a socket event is sent to the server, where the selection logic takes place.
-                        <Card type="response" showIndex={cardsRequired > 1} selectedIndex={user.responses.indexOf(text)} role="listitem" onClick={() => socket.emit('answer select', gameCode, username, index)}>
+                        <Card type="response" showIndex={cardsRequired > 1} selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
                             {text}
                         </Card>
                     ))}
@@ -103,20 +103,15 @@ function Play() {
             {isLeaderboardVisible && <Leaderboard />}
             
             <main>
-                <div>  <span className = "round">Round: {round}/{roundMax}</span> </div>
+                <div className="round" aria-label={`Round ${round} of ${roundMax}`}>Round {round}/{roundMax}</div>
                 <h1>
                     {username}<span style={NORMAL_WEIGHT}>, you are </span>{user.isJudge ? "judging" : "answering"}<span style={NORMAL_WEIGHT}>.</span>
-                   
                 </h1>
-                {/* <h1>Round: {round}/{roundMax}</h1> */}
-
                 {/* If player is not the judge, show who is */}
-                <h2>
-                    {!user.isJudge && <>{judgeName}<span style={NORMAL_WEIGHT}> is judging.</span></>}
-                </h2>
+                {!user.isJudge && <div className="judge-name"><strong>{judgeName}</strong> is judging.</div>}
                 
                 <div className="game-controls">
-                    <span>Your prompt:</span>
+                    <h2>Your prompt:</h2>
                     <Card type="prompt">{prompt}</Card>
                     {user.isJudge ? <JudgeControls /> : <PlayerControls />}
                 </div>

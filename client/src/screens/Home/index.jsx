@@ -12,7 +12,7 @@ function Home() {
     }, []);
     return (
         <div className="view" id="start" role="main">
-            <div id="game-logo" role="img" aria-label="Cards Against COVID">Cards<br/>Against<br/>COVID</div>
+            <h1 id="game-logo">Cards<br/>Against<br/>COVID</h1>
             <nav className="button-group">
                 <Button link="/start">Start New Game</Button>
                 <Button link="/join">Join Existing Game</Button>

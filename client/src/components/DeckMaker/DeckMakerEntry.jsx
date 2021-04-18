@@ -30,10 +30,10 @@ function DeckMakerEntry({ text, setCards }, index, allEntries) {
 
     return (
         <li>
-            <input type="text" className="big-text" value={text} onChange={update}></input>
-            <span className="delete" onClick={remove} title="Delete this card">X</span>
+            <input type="text" className="big-text" value={text} onChange={update} aria-label="Card text" />
+            <span className="delete" onClick={remove} title="Delete this card" aria-label="Delete">X</span>
         </li>
-    )
+    );
 }
 
 export default DeckMakerEntry;

@@ -71,8 +71,10 @@ function WaitingForPlayers() {
         const popup = document.querySelector(".popup-content");
         if (popup) {
             popup.setAttribute("role", "dialog");
-            popup.setAttribute("aria-label", "Please enter a new name");
+            popup.setAttribute("aria-labelledby", "player-name-label");
             
+        } else {
+            console.log("Huh?")
         }
     }
 
@@ -81,7 +83,7 @@ function WaitingForPlayers() {
             <main>
                 <h1>Waiting for players...</h1>
                 <section className="user-info">
-                    <h2>About you</h2>
+                    <h2>About you:</h2>
                     <div>
                         <span>Your game code: </span>
                         <strong className="game-code">{gameCode}</strong>
@@ -96,8 +98,8 @@ function WaitingForPlayers() {
                     <List items={players} map={player => player.name} />
                 </section>
                 <section className="change-name">
-                    <Popup trigger={<button className="Button"> Change My Name</button>} position="bottom center" arrow>
-                        <div className="change-name-popup" role="">
+                    <Popup trigger={<button className="Button"> Change My Name</button>} position="bottom center" arrow onOpen={handlePopupOpen}>
+                        <div className="change-name-popup">
                             <label id="player-name-label" htmlFor="player-name">Enter a new name:</label>
                             <TextBox
                                 id="player-name"

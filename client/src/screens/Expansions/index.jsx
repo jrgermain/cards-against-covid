@@ -57,9 +57,9 @@ function Expansions() {
 
     const handleNameChange = e => setName(e.target.value);
     return (
-        <div className="view" id="expansions">
+        <main className="view" id="expansions">
             <h1>Build an expansion pack</h1>
-            <div>
+            <section aria-label="Name your expansion pack">
                 <label htmlFor="pack-name">Name: </label>
                 <TextBox
                     id="pack-name"
@@ -69,13 +69,17 @@ function Expansions() {
                     errorCondition={!name}
                     errorMessage="Please enter a name."
                 />
-            </div>
-            <div id="deck-maker-wrapper">
-                <DeckMaker label="Prompts" cards={prompts} setCards={setPrompts} />
-                <DeckMaker label="Responses" cards={responses} setCards={setResponses} />
+            </section>
+            <div className="deck-maker-wrapper">
+                <section aria-label="Add prompt cards">
+                    <DeckMaker label="Prompts" cards={prompts} setCards={setPrompts} />
+                </section>
+                <section aria-label="Add response cards">
+                    <DeckMaker label="Responses" cards={responses} setCards={setResponses} />
+                </section>
             </div>
             <Button onClick={submitPack}>Save</Button>
-        </div>
+        </main>
     );
 }
 

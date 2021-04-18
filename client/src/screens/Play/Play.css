@@ -38,10 +38,15 @@
     flex-direction: column;
     align-items: center;
     overflow: scroll;
+    margin-top: 1rem;
 }
 
 .game-controls > * {
     flex-shrink: 0;
+}
+
+.game-controls > h2 {
+    margin: 0;
 }
 
 #play h1 {
@@ -50,8 +55,9 @@
     margin-bottom: 0;
 }
 
-#play h2 {
+.judge-name {
     color: #666;
+    font-size: 1.5rem;
 }
 
 .deck {

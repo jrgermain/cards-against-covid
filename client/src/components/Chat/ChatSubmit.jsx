@@ -13,13 +13,14 @@ function ChatSubmit({ gameCode, name }) {
     }
     return (
         <div className="chat-submit">
-            <TextBox 
+            <TextBox
+                aria-label="Type a message"
                 placeholder="Type a message"
                 value={value}
                 onChange={event => setValue(event.target.value)}
                 onKeyPress={event => event.key === "Enter" && submit()} 
-                />
-            <Button onClick={submit}>Send</Button>
+            />
+            <Button onClick={submit} aria-label="Send message">Send</Button>
         </div>
     )
 }

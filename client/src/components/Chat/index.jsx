@@ -11,13 +11,13 @@ function Chat({ gameCode, name }) {
     const toggle = () => setCollapsed(!collapsed);
 
     return (
-        <div className="panel chat" data-collapsed={+collapsed}>
-            <button className="panel-toggle" onClick={toggle}>Toggle Chat</button>
-            <div className="chat-messages">
+        <aside className="panel chat" data-collapsed={collapsed}>
+            <button className="panel-toggle" onClick={toggle} aria-label={collapsed ? "Open chat" : "Dismiss chat"}>Toggle Chat</button>
+            <div className="chat-messages" aria-live="polite">
                 {messages.map(ChatMessage)}
             </div>
             <ChatSubmit gameCode={gameCode} name={name}/>            
-        </div>
+        </aside>
     );
 }
 

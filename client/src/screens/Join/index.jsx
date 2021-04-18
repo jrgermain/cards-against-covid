@@ -67,7 +67,7 @@ function Join() {
     }
 
     return (
-        <div className="view" id="join">
+        <main className="view" id="join">
             <h1>Join a game</h1>
             <section className="user-info">
                 <div>
@@ -97,7 +97,7 @@ function Join() {
                 </div>
             </section>
             <Button onClick={joinGame}>Join</Button>
-        </div>
+        </main>
     );
 }
 
