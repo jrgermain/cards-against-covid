@@ -79,7 +79,7 @@ function Card({ type, children, selectedIndex, showIndex, onClick, ...others }) 
 
     return (
         <div {...{className, onClick, ...a11yProps, ...others}}>
-            <div className="card-content">{content}</div>
+            <div className="card-content" tabindex="-1">{content}</div>
         </div>
     );
 }

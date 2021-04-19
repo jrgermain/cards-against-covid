@@ -64,7 +64,7 @@ function Play() {
             // Get an array of <Card> elements displaying each player's responses
             const responseCards = responsePlayers.map(player => {
                 // When a card is clicked, send a socket event saying the judge selected a card
-                const onClick = () => socket.emit("judge select", gameCode, player.name);
+                const onClick = !isLeaderboardVisible && (() => socket.emit("judge select", gameCode, player.name));
                 return <Card type="response" onClick={onClick}>{player.responses}</Card>
             });
             return (
@@ -88,7 +88,7 @@ function Play() {
                 <div className="deck" aria-label={`Your response cards; select ${cardsRequired}`}>
                     {user.cards.map((text, index) => (
                         // Create a <Card> element for each of the user's cards. When clicked, a socket event is sent to the server, where the selection logic takes place.
-                        <Card type="response" showIndex={cardsRequired > 1} selectedIndex={user.responses.indexOf(text)} onClick={() => socket.emit('answer select', gameCode, username, index)}>
+                        <Card type="response" showIndex={cardsRequired > 1} selectedIndex={user.responses.indexOf(text)} onClick={!isLeaderboardVisible && (() => socket.emit('answer select', gameCode, username, index))}>
                             {text}
                         </Card>
                     ))}

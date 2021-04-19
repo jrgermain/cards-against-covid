@@ -47,7 +47,6 @@ function Leaderboard() {
         }
     }
  
-
     return (
         <div className="leaderboard" role="dialog" aria-modal="true">
             <div className="leaderboard-content">
