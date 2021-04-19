@@ -89,6 +89,10 @@ main {
   background: #999;
 }
 
+.panel button.panel-toggle:focus {
+  outline: 2px solid #8af;
+}
+
 #message-banner {
   z-index: 100;
   width: 100vw;

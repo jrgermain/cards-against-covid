@@ -8,17 +8,10 @@ function Button({ link, onClick, children, disabled, ...others }) {
     }
 
     if (link) {
-        return (
-            <Link to={link} className="Button" {...{ onClick, children, disabled, ...others }}>
-                {/* <button aria-hidden="true" onClick={onClick}>{children}</button> */}
-            </Link>
-        )
+        // Note that button can't be disabled because link would be undefined
+        return <Link to={link} className="Button" tabIndex="0" {...{ onClick, children, ...others }} />
     } else {
-        return (
-            // <span className="button-wrapper" role="button">
-                <button className="Button" {...{ disabled, onClick, ...others }}>{children}</button>
-            // </span>
-        )
+        return <button className="Button" tabIndex={disabled ? "-1" : "0"} {...{ onClick, children, disabled, ...others }} />
     }
 }
 
