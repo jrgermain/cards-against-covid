@@ -44,7 +44,7 @@ function Play() {
         if (status === "ENDED") {
             history.replace("/game-over");
         }
-    }, [status]);
+    }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!user) {
         history.replace("/");
