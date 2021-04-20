@@ -27,22 +27,6 @@ function GameOver() {
             <div className="final-score-wrapper">
                 <h2>Final score</h2>
                 <Table head={["Player", "Points"]} body={players.map(player => [player.name, player.score])} />
-                {/* <table>
-                    <thead>
-                        <tr>
-                            <th>Player</th>
-                            <th>Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {players.map(player => (
-                            <tr>
-                                <td>{player.name}</td>
-                                <td>{player.score}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table> */}
             </div>
             <Button link="/">Back to Home</Button>
         </div>
