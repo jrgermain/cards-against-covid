@@ -12,11 +12,13 @@
     flex-direction: column;
     height: inherit;
     width: 100vw;
+    padding-bottom: 3.2rem;
 }
 
 @media only screen and (min-width: 800px) {
     #play main {
         width: calc(100vw - 20rem);
+        padding-bottom: 0;
     }
 }
 
@@ -94,10 +96,8 @@
     pointer-events: none;
 }
 
-
-
-#play .card {
-    max-width: calc(50vw - 3.5rem);
-    max-height: calc(1.5 * (50vw - 3.5rem));
-    font-size: min(1.2rem, 5vw);
+#play main .card {
+    max-width: calc(50vw - 2rem);
+    max-height: calc(75vw - 3rem);
+    font-size: 1.2rem;
 }

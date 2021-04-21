@@ -23,9 +23,9 @@
     background: white;
     border-radius: 5px;
     margin: auto;
-    width: auto;
-    min-width: 300px;
-    max-width: 80%;
+    min-width: min(300px, 100vw);
+    max-width: 750px;
+    width: 75%;
     overflow: hidden;
     box-shadow: 0 0 100px 0 rgba(0, 0, 0, 0.2);
     display: flex;
@@ -58,8 +58,8 @@
 
 .leaderboard .card {
     height: auto;
-    width: 7rem;
-    font-size: .9rem;
+    width: auto;
+    font-size: 1rem;
 }
 
 .leaderboard .player-name,
@@ -93,7 +93,6 @@
 .leaderboard-grid-wrapper [role="row"] {
     display: grid;
     grid-template-columns: 7fr 11fr 7fr;
-    max-width: 25rem;
     place-items: center;
 }
 
