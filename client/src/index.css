@@ -146,7 +146,8 @@ main {
     transform: translateY(0);
   }
 
-  .panel[data-collapsed="true"] > *:not(.panel-toggle) {
+  .panel[data-collapsed="true"] > .chat-messages,
+  .panel[data-collapsed="true"] > .chat-submit {
     display: none;
   }
 
@@ -165,8 +166,9 @@ main {
     height: 100vh;
     width: 20rem;
   }
-  .panel-toggle {
-    display: none;
+  .panel-toggle,
+  .unread-count {
+    display: none!important;
   }
 }
 
