@@ -6,7 +6,7 @@ import TextBox from '../../components/TextBox';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { socket } from '../..';
-import { showError } from '../../lib/message';
+import { showError, showSuccess } from '../../lib/message';
 import { useDispatch, useSelector } from 'react-redux';
 import * as socketListener from '../../redux/socket';
 import Ajax from '../../lib/ajax';
@@ -67,19 +67,30 @@ function WaitingForPlayers() {
     // Respond to the user pressing "Submit" within the "Change Name" popup
     const handleChangeName = () => {
         socket.emit('change name', gameCode, user.name, textName);
-        
+        closePopup();
+    }
+
+    const handleCopy = () => {
+        const link = document.getElementById("invite-link");
+        link.select();
+        if (document.execCommand("copy")) {
+            showSuccess("Link copied to clipboard");
+            closePopup();
+        } else {
+            showError("Could not copy link");
+        }
+    }
+
+    const closePopup = () => {
         // Close the window by simulating esc key
         document.dispatchEvent(new KeyboardEvent("keyup", { key: 'Escape' }));
     }
 
-    const handlePopupOpen = () => {
+    const handlePopupOpen = (ariaLabel) => {
         const popup = document.querySelector(".popup-content");
         if (popup) {
             popup.setAttribute("role", "dialog");
-            popup.setAttribute("aria-labelledby", "player-name-label");
-            
-        } else {
-            console.log("Huh?")
+            popup.setAttribute("aria-label", ariaLabel);
         }
     }
 
@@ -103,7 +114,7 @@ function WaitingForPlayers() {
                     <List items={players} map={player => player.name} />
                 </section>
                 <section className="change-name">
-                    <Popup trigger={<button className="Button"> Change My Name</button>} position="bottom center" arrow onOpen={handlePopupOpen}>
+                    <Popup trigger={<button className="Button">Change My Name</button>} position="bottom center" arrow onOpen={() => handlePopupOpen("Enter a new name")}>
                         <div className="change-name-popup">
                             <label id="player-name-label" htmlFor="player-name">Enter a new name:</label>
                             <TextBox
@@ -116,12 +127,16 @@ function WaitingForPlayers() {
                             <Button onClick={handleChangeName}>Submit</Button> 
                         </div>
                     </Popup>
-                    {/* <Popup trigger={<Button>Trigger</Button>} position="right center">
-                        <div>Popup content here !!</div>
-                    </Popup> */}
-
                 </section>
                 <section className="start-game">
+                    <Popup trigger={<button className="Button">Invite Others</button>} position="bottom center" arrow onOpen={() => handlePopupOpen("Copy invite link")}>
+                            <span className="invite-popup">
+                                <label>Friends can use the link below to join this game:</label>
+                                <TextBox disabled value={window.location.origin + "/join/" + gameCode} id="invite-link" />
+                                <Button onClick={handleCopy}>Copy</Button>
+                            </span>
+                    </Popup>
+
                     <Button onClick={handleStart}>Everybody's In</Button>
                 </section>
                 

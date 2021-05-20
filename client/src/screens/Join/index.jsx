@@ -7,6 +7,9 @@ import { useState } from 'react';
 import TextBox from '../../components/TextBox';
 import { useDispatch, useSelector } from 'react-redux';
 import * as socketListener from '../../redux/socket';
+import { showError } from '../../lib/message';
+
+const gameCodeRegex = /^[a-z]{4}$/i;
 
 function Join() {
     const history = useHistory();
@@ -22,6 +25,18 @@ function Join() {
         // If a user leaves a game, they might be brought here. This means we should reset the app.
         socketListener.stop(); // Stop listening for state updates
         socketListener.reset(); // Clear local app state and trigger a disconnect on the server
+
+        // If the user came from a join link, populate the game code, then set the URL to the 'normal' join url
+        const params = new URLSearchParams(history.location.search);
+        if (params.has("code")) {
+            const code = params.get("code");
+            if (gameCodeRegex.test(code)) {
+                dispatch({ type: "gameCode/set", payload: code.toUpperCase() });
+            } else {
+                showError("Invalid join link");
+            }
+            history.replace({ search: "" });
+        }
     }, []);
 
     async function joinGame() {
@@ -39,7 +54,7 @@ function Join() {
             passesFormCheck = false;
         }
 
-        if (!/[a-z]{4}/i.test(gameCode)) {
+        if (!gameCodeRegex.test(gameCode)) {
             setGameCodeError("Invalid game code.");
             passesFormCheck = false;
         }

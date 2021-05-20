@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Home from './screens/Home'
 import StartGame from './screens/StartGame';
 import Join from './screens/Join';
@@ -25,6 +25,7 @@ ReactDOM.render(
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/start" component={StartGame} />
+            <Redirect from="/join/:code" to="/join?code=:code" />
             <Route path="/join" component={Join} />
             <Route path="/waiting" component={WaitingForPlayers} />
             <Route path="/play" component={Play} />

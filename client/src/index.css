@@ -175,3 +175,7 @@ main {
 .view, .panel {
   overscroll-behavior: contain;
 }
+
+.popup-content {
+  width: auto;
+}
