@@ -19,6 +19,8 @@ function ChooseDeck() {
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [decks, setDecks] = useState([]);
     const [expansions, setExpansions] = useState([]);
+    const [isRoundLimitEnabled, setRoundLimitEnabled] = useState(false);
+    const [roundLimit, setRoundLimit] = useState(1);
 
     // On page load, get list of available cards. Use a useEffect so this doesn't happen every time the user selects something.
     useEffect(() => {
@@ -53,6 +55,17 @@ function ChooseDeck() {
             isSelected: pack === selectedPack ? !pack.isSelected : pack.isSelected
         })));
     }
+    const handleToggleRoundLimit = event => {
+        setRoundLimitEnabled(event.target.checked);
+    }
+    const handleChangeNumRounds = event => {
+        setRoundLimit(event.target.value);
+    }
+    const handleBlurNumRounds = () => {
+        // Make sure number is a positive integer, in case the user typed in a bad value
+        setRoundLimit(Math.max(Math.floor(roundLimit), 1));
+    }
+
     const handleSubmit = async () => {
         setHasSubmitted(true);
 
@@ -77,7 +90,11 @@ function ChooseDeck() {
         // Create a game, then join it
         let gameCode;
         try {
-            gameCode = await Ajax.postJson("/api/startGame", JSON.stringify({ deckName, expansionPacks }));
+            const gameDetails = { deckName, expansionPacks };
+            if (isRoundLimitEnabled) {
+                gameDetails.roundLimit = roundLimit;
+            }
+            gameCode = await Ajax.postJson("/api/startGame", JSON.stringify(gameDetails));
             await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
         } catch (e) {
             showError("There was an error creating your game. Please try again later.")
@@ -107,7 +124,7 @@ function ChooseDeck() {
                     />
                 </div>
 
-                <h2 className="header-css" id="choose-deck">Choose a Deck:</h2>
+                <h2 className="header-css" id="choose-deck">Choose a deck:</h2>
                 <Dropdown aria-labelledby="choose-deck" value={decks.find(deck => deck.isSelected)?.name} onChange={handleDeckChange}>
                     {decks.length === 0
                         ? <option disabled>Loading decks...</option>
@@ -115,7 +132,7 @@ function ChooseDeck() {
                     }
                 </Dropdown>
 
-                <h2 className="header-css" id="choose-expansion-pack">Choose Expansion Pack(s):</h2>
+                <h2 className="header-css" id="choose-expansion-pack">Choose expansion pack(s):</h2>
                 <div className="expansion-packs">
                     {/* Header */}
                     <strong>Select</strong>
@@ -131,6 +148,29 @@ function ChooseDeck() {
                             <span className="pack-num-responses" title="Response cards">{pack.numResponses}</span>
                         </>
                     ))}
+                </div>
+
+                <h2 className="header-css" id="choose-game-settings">Choose game settings:</h2>
+                <div className="game-settings">
+                    <CheckBox label="Limit the number of rounds" checked={isRoundLimitEnabled} onChange={handleToggleRoundLimit} />
+                    {isRoundLimitEnabled &&
+                        (
+                            <>
+                                <input
+                                    className="round-limit"
+                                    type="number"
+                                    min="1"
+                                    max="999"
+                                    step="1"
+                                    value={roundLimit}
+                                    onChange={handleChangeNumRounds}
+                                    onBlur={handleBlurNumRounds}
+                                />
+                                <div className="round-limit-disclaimer">
+                                    NOTE: if there are not enough cards to play this many rounds, this value is ignored
+                                </div>
+                            </>
+                        )}
                 </div>
             </div>
             <Button onClick={handleSubmit}>Continue</Button>

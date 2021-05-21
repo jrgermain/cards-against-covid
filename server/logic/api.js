@@ -32,7 +32,7 @@ router.get('/gameState', async function(req, res) {
 })
 
 router.post('/startGame', async function(req, res) {
-    const { deckName, expansionPacks } = req.body;
+    const { deckName, expansionPacks, roundLimit } = req.body;
 
     const allDecks = await cards.getDecks();
     const allPacks = await cards.getExpansionPacks();
@@ -44,7 +44,7 @@ router.post('/startGame', async function(req, res) {
             .shuffle();                    // Shuffle the cards into a random order
 
     const code = Game.Code.generate(games);
-    games[code] = new Game(combinedCards);
+    games[code] = new Game(combinedCards, roundLimit);
     console.log(`Started new game with code "${code}"`);
     res.send(code);
 });

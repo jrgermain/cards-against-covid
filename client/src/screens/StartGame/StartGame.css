@@ -34,3 +34,19 @@
 #start-game .view-content {
     margin: 0 auto;
 }
+
+.game-settings {
+    text-align: left;
+}
+
+.game-settings input[type="checkbox"] + label,
+.round-limit {
+    margin-left: 5px;
+}
+
+.round-limit-disclaimer {
+    font-size: .9rem;
+    font-style: italic;
+    color: #888;
+    margin-top: 5px;
+}

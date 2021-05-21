@@ -1,13 +1,14 @@
 var Enum = require("./Enum");
 
 class Game {
-    constructor(deck) {
+    constructor(deck, roundLimit) {
         this.players = [];
         this.deck = deck;
         this.prompt = "";
         this.state = Game.State.WAITING;
         this.round = -1;
         this.cardsPerPlayer = 0;
+        this.roundLimit = roundLimit ?? Infinity;
     }
 
     start() {
@@ -22,6 +23,12 @@ class Game {
     }
 
     nextRound() {
+        // If we reached the user-defined round limit, end the game
+        if (this.round + 1 >= this.roundLimit) {
+            this.end();
+            return;
+        }
+
         // Discard used responses
         for (const player of this.players) {
             player.cards = player.cards.filter(card => !player.responses.includes(card));
@@ -135,6 +142,11 @@ class Game {
             // All players currently have enough cards to keep playing. Increment round count and keep going
             round++;
             judgeIndex = (judgeIndex + 1) % activePlayers.length;
+
+            // If there is a user-defined limit for the number of rounds, make sure we don't exceed it
+            if (round >= this.roundLimit) {
+                break;
+            }
         }
 
         console.log("Game.calculateRoundsLeft: Can do " + round + " more round(s)")
