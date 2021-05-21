@@ -48,9 +48,9 @@ function Leaderboard() {
     }
  
     return (
-        <div className="leaderboard" role="dialog" aria-modal="true">
+        <div className="leaderboard" role="dialog" aria-modal="true" aria-labelledby="leaderboard-label">
             <div className="leaderboard-content">
-                <label>Leaderboard</label>
+                <label id="leaderboard-label">Leaderboard</label>
 
                 <div className="leaderboard-grid-wrapper" role="grid">
                     <div className="leaderboard-grid-header" role="rowgroup">
