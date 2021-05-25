@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const gameCodeSlice = createSlice({
     name: "gameCode",
-    initialState: "",
+    initialState: localStorage.getItem("last-game-code") || "",
     reducers: {
         set(state, action) {
             return action.payload;

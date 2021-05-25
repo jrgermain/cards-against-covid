@@ -76,8 +76,11 @@ function Join() {
             return;
         }
 
-        // We had a success response, so the player must have joined. Save their name (for future games) and move on to the wait screen
-        localStorage.setItem("player-name", user.name);
+        // Save the last good game code and name for future games (or if the user gets disconnected)
+        localStorage.setItem("last-username", user.name);
+        localStorage.setItem("last-game-code", gameCode);        
+        
+        // We had a success response, so the player must have joined. Move on to the wait screen
         history.push("/waiting");    
     }
 

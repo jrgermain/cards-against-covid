@@ -70,10 +70,7 @@ function ChooseDeck() {
         setHasSubmitted(true);
 
         // Make sure the user entered a name
-        if (user.name) {
-            // Save name for future games
-            localStorage.setItem("player-name", user.name);
-        } else {
+        if (!user.name) {
             // No name was entered, so abort the process
             console.error("No player name");
             return;
@@ -102,6 +99,10 @@ function ChooseDeck() {
             return;
         }
 
+        // Save the last good game code and name for future games (or if user gets disconnected)
+        localStorage.setItem("last-username", user.name);
+        localStorage.setItem("last-game-code", gameCode);
+        
         // Everything went ok. Set the new game code, then move to the wait screen.
         dispatch({ type: "gameCode/set", payload: gameCode });
         history.replace("/waiting");

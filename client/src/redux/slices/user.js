@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const userSlice = createSlice({
     name: "user",
     initialState: {
-        name: localStorage.getItem("player-name") || ""
+        name: localStorage.getItem("last-username") || ""
     },
     reducers: {
         setName(state, action) {
