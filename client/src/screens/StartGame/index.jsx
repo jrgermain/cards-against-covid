@@ -76,18 +76,26 @@ function ChooseDeck() {
             return;
         }
 
-        // If the user has a game where there are no cards selected, show an error and prevent them from continuing
+        // If the user has a game where there are not enough cards selected, show an error and prevent them from continuing
         const deckName = decks.find(deck => deck.isSelected).name;
-        const expansionPacks = expansions.filter(pack => pack.isSelected).map(pack => pack.name);
+        const expansionPacks = expansions.filter(pack => pack.isSelected);
         if (deckName === "None (expansion packs only)" && expansionPacks.length === 0) {
             toast.error("Please choose a deck or select at least one expansion pack");
             return;
+        } else if (deckName === "None (expansion packs only)") {
+            // Make sure there's a reasonable number of cards selected
+            const numPrompts = expansionPacks.reduce((acc, curr) => acc + curr.numPrompts, 0);
+            const numResponses = expansionPacks.reduce((acc, curr) => acc + curr.numResponses, 0);
+            if (numPrompts < 7 || numResponses < 21) {
+                toast.error("Please include at least 7 prompt and 21 response cards");
+                return;
+            }
         }
 
         // Create a game, then join it
         let gameCode;
         try {
-            const gameDetails = { deckName, expansionPacks };
+            const gameDetails = { deckName, expansionPacks: expansionPacks.map(pack => pack.name) };
             if (isRoundLimitEnabled) {
                 gameDetails.roundLimit = roundLimit;
             }

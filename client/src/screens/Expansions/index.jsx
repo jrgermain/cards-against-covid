@@ -29,12 +29,7 @@ function Expansions() {
         if (filteredPrompts.length === 0 && filteredResponses.length === 0) {
             toast.error("Please add at least one non-empty card");
             return;
-        }  
-
-        if (filteredPrompts.length < 7 || filteredResponses.length < 21) {
-            toast.error("Please add at least 7 prompt and 21 response cards");
-            return;
-        }  
+        }
 
         const pack = { name, prompts: filteredPrompts, responses: filteredResponses }
         try {
