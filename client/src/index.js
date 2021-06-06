@@ -16,12 +16,15 @@ import { store, persistor } from './redux/store';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import * as reduxListener from './redux/socket';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <BrowserRouter>
+          <ToastContainer position="top-center" />
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/start" component={StartGame} />

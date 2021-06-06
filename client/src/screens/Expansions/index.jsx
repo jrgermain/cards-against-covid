@@ -5,7 +5,7 @@ import DeckMaker from '../../components/DeckMaker';
 import TextBox from '../../components/TextBox';
 import Ajax from '../../lib/ajax';
 import './Expansions.css';
-import { showSuccess, showError } from '../../lib/message';
+import { toast } from 'react-toastify';
 
 function Expansions() {
     const history = useHistory();
@@ -27,12 +27,12 @@ function Expansions() {
 
         // Validate pack size
         if (filteredPrompts.length === 0 && filteredResponses.length === 0) {
-            showError("Please add at least one non-empty card");
+            toast.error("Please add at least one non-empty card");
             return;
         }  
 
         if (filteredPrompts.length < 7 || filteredResponses.length < 21) {
-            showError("Please add at least 7 prompt and 21 response cards");
+            toast.error("Please add at least 7 prompt and 21 response cards");
             return;
         }  
 
@@ -42,16 +42,16 @@ function Expansions() {
         } catch (e) {
             // An error response was received. If it was a known error, display it. Otherwise, log it and display a generic message.
             if (e === "Bad Request") {
-                showError("A pack with this name already exists. Please choose a new name.");
+                toast.error("A pack with this name already exists. Please choose a new name.");
             } else {
-                showError("An unexpected error occurred.");
+                toast.error("An unexpected error occurred.");
                 console.error("Error saving expansion pack: ", e);
             }
             return;
         }
 
         // We got a success response, so the pack must have been saved. Bring the user back to the previous page.
-        showSuccess("Successfully saved expansion pack: " + name);
+        toast.success("Successfully saved expansion pack: " + name);
         history.push("/");
     }
 

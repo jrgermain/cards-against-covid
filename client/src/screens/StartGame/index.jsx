@@ -7,8 +7,8 @@ import TextBox from '../../components/TextBox';
 import CheckBox from '../../components/CheckBox';
 import './StartGame.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { showError } from '../../lib/message';
 import Dropdown from '../../components/Dropdown';
+import { toast } from 'react-toastify';
 
 function ChooseDeck() {
     const history = useHistory();
@@ -80,7 +80,7 @@ function ChooseDeck() {
         const deckName = decks.find(deck => deck.isSelected).name;
         const expansionPacks = expansions.filter(pack => pack.isSelected).map(pack => pack.name);
         if (deckName === "None (expansion packs only)" && expansionPacks.length === 0) {
-            showError("Please choose a deck or select at least one expansion pack");
+            toast.error("Please choose a deck or select at least one expansion pack");
             return;
         }
 
@@ -94,7 +94,7 @@ function ChooseDeck() {
             gameCode = await Ajax.postJson("/api/startGame", JSON.stringify(gameDetails));
             await Ajax.postJson("/api/joinGame", JSON.stringify({ code: gameCode, name: user.name }));
         } catch (e) {
-            showError("There was an error creating your game. Please try again later.")
+            toast.error("There was an error creating your game. Please try again later.")
             console.error(e);
             return;
         }

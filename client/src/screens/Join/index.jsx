@@ -7,7 +7,7 @@ import { useState } from 'react';
 import TextBox from '../../components/TextBox';
 import { useDispatch, useSelector } from 'react-redux';
 import * as socketListener from '../../redux/socket';
-import { showError } from '../../lib/message';
+import { toast } from 'react-toastify';
 
 const gameCodeRegex = /^[a-z]{4}$/i;
 
@@ -33,7 +33,7 @@ function Join() {
             if (gameCodeRegex.test(code)) {
                 dispatch({ type: "gameCode/set", payload: code.toUpperCase() });
             } else {
-                showError("Invalid join link");
+                toast.warn("Invalid join link");
             }
             history.replace({ search: "" });
         }

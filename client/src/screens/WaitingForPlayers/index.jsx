@@ -6,13 +6,13 @@ import TextBox from '../../components/TextBox';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { socket } from '../..';
-import { showError, showSuccess } from '../../lib/message';
 import { useDispatch, useSelector } from 'react-redux';
 import * as socketListener from '../../redux/socket';
 import Ajax from '../../lib/ajax';
 
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
+import { toast } from 'react-toastify';
 
 function WaitingForPlayers() {
     const history = useHistory();
@@ -58,7 +58,7 @@ function WaitingForPlayers() {
     // Respond to the user pressing "Everybody's In"
     const handleStart = () => {
         if (players.length < 3) {
-            showError("Please wait for at least 3 players to join");
+            toast.error("Please wait for at least 3 players to join");
         } else {
             socket.emit('start game', gameCode);
         }
@@ -74,10 +74,10 @@ function WaitingForPlayers() {
         const link = document.getElementById("invite-link");
         link.select();
         if (document.execCommand("copy")) {
-            showSuccess("Link copied to clipboard");
+            toast.success("Link copied to clipboard");
             closePopup();
         } else {
-            showError("Could not copy link");
+            toast.error("Could not copy link");
         }
     }
 

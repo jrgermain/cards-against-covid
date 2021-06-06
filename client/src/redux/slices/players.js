@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { showInfo } from '../../lib/message';
+import { toast } from 'react-toastify';
 
 const playersSlice = createSlice({
     name: "players",
@@ -9,7 +9,7 @@ const playersSlice = createSlice({
             state.push(action.payload);
         },
         remove(state, action) {
-            showInfo(`${action.payload} disconnected`);
+            toast.info(`${action.payload} disconnected`);
             return state.filter(player => player.name !== action.payload);
         },
         set(state, action) {
