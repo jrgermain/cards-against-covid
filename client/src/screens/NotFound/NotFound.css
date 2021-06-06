@@ -1,0 +1,24 @@
+.not-found {
+    border: 1px solid #ccc;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    margin: auto;
+    text-align: left;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: #f8f6f4;
+    color: #333;
+    box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, 0.4);
+    border-radius: 1px;
+}
+
+.not-found h1 {
+    text-align: center;
+    border-top: 3px double #333;
+    border-bottom: 3px double #333;
+}
+.not-found .continued-text {
+    text-align: right;
+    font-weight: bold;
+}

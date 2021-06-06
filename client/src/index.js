@@ -18,6 +18,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import * as reduxListener from './redux/socket';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import NotFound from './screens/NotFound';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -34,6 +35,7 @@ ReactDOM.render(
             <Route path="/play" component={Play} />
             <Route path="/expansions" component={Expansions} />
             <Route path="/game-over" component={GameOver} />
+            <Route path="/" component={NotFound} />
           </Switch>
         </BrowserRouter>
       </PersistGate>
