@@ -56,10 +56,11 @@ io.on('connection', socket => {
             // Make sure the player is marked as connected
             existingPlayer.isConnected = true;
 
-            // Make sure everyone is aware that the player rejoined (and that that player gets the player list)
-            reduxUpdate(gameCode)("players/set", game.players);
+            // Make sure everyone is aware that the player rejoined
+            reduxUpdate(gameCode)("players/rejoin", name);
 
             // Send the player the game state
+            reduxUpdate(socket.id)("players/set", game.players);
             reduxUpdate(socket.id)("status/setName", game.state.description);
             reduxUpdate(socket.id)("status/setMaxRounds", game.round + game.calculateRoundsLeft());
             reduxUpdate(socket.id)("prompt/set", game.prompt);
@@ -221,7 +222,6 @@ io.on('connection', socket => {
             const game = games[gameCode];
             if (game) {
                 const playerWhoLeft = game.players.find(player => player.name === name);
-                const playerWhoLeftIndex = game.players.indexOf(playerWhoLeft);
 
                 // Set player as inactive
                 playerWhoLeft.isConnected = false;
@@ -232,7 +232,7 @@ io.on('connection', socket => {
                         const playerIsConnected = game.players.some(player => player.name === name && player.isConnected);
                         if (!playerIsConnected) {
                             // Update other players' screens to show that the player left
-                            reduxUpdate(gameCode)("players/remove", name);
+                            reduxUpdate(gameCode)("players/leave", name);
     
                             // Get number of active players
                             const numConnectedPlayers = game.players.filter(player => player.isConnected).length;

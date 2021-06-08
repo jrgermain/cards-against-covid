@@ -39,7 +39,7 @@ function WaitingForPlayers() {
             }
         });
         socketListener.start();
-        dispatch({ type: "players/set", payload: [] });
+        dispatch({ type: "players/clear" });
         socket.emit('join game', gameCode, user.name);
         socket.emit("client reload", gameCode, user.name);    
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
