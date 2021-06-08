@@ -29,3 +29,15 @@
     color: #ccc;
     cursor: default;
 }
+
+.Button.primary {
+    background: #286;
+}
+
+.Button.primary:hover {
+    background: #4a8;
+}
+
+.Button.primary:active {
+    background: #064;
+}

@@ -92,14 +92,19 @@ function WaitingForPlayers() {
             popup.setAttribute("role", "dialog");
             popup.setAttribute("aria-label", ariaLabel);
         }
+
+        // Force the popup to reposition itself (workaround for the popup's initial position being too far right)
+        window.setTimeout(() => {
+            window.dispatchEvent(new Event("resize"));
+        }, 100);
     }
 
     return (
         <div className="view" id="waiting-for-players">
             <main>
                 <h1>Waiting for players...</h1>
-                <section className="user-info">
-                    <h2>About you:</h2>
+                <section className="game-info">
+                    <h2>Game info:</h2>
                     <div>
                         <span>Your game code: </span>
                         <strong className="game-code">{gameCode}</strong>
@@ -113,8 +118,8 @@ function WaitingForPlayers() {
                     <h2>Currently joined:</h2>
                     <List items={players} map={player => player.name} />
                 </section>
-                <section className="change-name">
-                    <Popup trigger={<button className="Button">Change My Name</button>} position="bottom center" arrow onOpen={() => handlePopupOpen("Enter a new name")}>
+                <section className="button-group">
+                    <Popup trigger={<button className="Button">Change My Name</button>} position="top center" arrow onOpen={() => handlePopupOpen("Enter a new name")}>
                         <div className="change-name-popup">
                             <label id="player-name-label" htmlFor="player-name">Enter a new name:</label>
                             <TextBox
@@ -127,19 +132,15 @@ function WaitingForPlayers() {
                             <Button onClick={handleChangeName}>Submit</Button> 
                         </div>
                     </Popup>
-                </section>
-                <section className="start-game">
-                    <Popup trigger={<button className="Button">Invite Others</button>} position="bottom center" arrow onOpen={() => handlePopupOpen("Copy invite link")}>
-                            <span className="invite-popup">
-                                <label>Friends can use the link below to join this game:</label>
-                                <TextBox disabled value={window.location.origin + "/join/" + gameCode} id="invite-link" />
-                                <Button onClick={handleCopy}>Copy</Button>
-                            </span>
+                    <Popup trigger={<button className="Button">Invite Others</button>} position="top center" arrow onOpen={() => handlePopupOpen("Copy invite link")}>
+                        <span className="invite-popup">
+                            <label>Friends can use the link below to join this game:</label>
+                            <TextBox disabled value={window.location.origin + "/join/" + gameCode} id="invite-link" />
+                            <Button onClick={handleCopy}>Copy</Button>
+                        </span>
                     </Popup>
-
-                    <Button onClick={handleStart}>Everybody's In</Button>
+                    <Button primary onClick={handleStart}>Everybody's In</Button>
                 </section>
-                
             </main>
         </div>
     );

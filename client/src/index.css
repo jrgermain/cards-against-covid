@@ -177,5 +177,20 @@ main {
 }
 
 .popup-content {
+  opacity: 0;
   width: auto;
+}
+
+@keyframes show-popup {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.popup-content {
+  animation: show-popup .2s ease .2s forwards;
 }
