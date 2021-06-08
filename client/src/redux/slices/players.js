@@ -13,13 +13,17 @@ const playersSlice = createSlice({
         },
         leave(state, action) {
             const player = state.find(player => player.name === action.payload);
-            toast.info(`${action.payload} disconnected`);
-            player.isConnected = false;
+            if (player.isConnected) {
+                toast.info(`${action.payload} disconnected`);
+                player.isConnected = false;
+            }
         },
         rejoin(state, action) {
             const player = state.find(player => player.name === action.payload);
-            toast.info(`${action.payload} reconnected`);
-            player.isConnected = true;
+            if (!player.isConnected) {
+                toast.info(`${action.payload} reconnected`);
+                player.isConnected = true;    
+            }
         }
     }
 });
