@@ -3,14 +3,4 @@
 **/build
 
 dist
-
-client/coverage
-client/.env.local
-client/.env.development.local
-client/.env.test.local
-client/.env.production.local
-client/npm-debug.log*
-client/yarn-debug.log*
-client/yarn-error.log*
-
-server/cards/custom-cards.json
+cards-against-covid-server/cards/custom-cards.json

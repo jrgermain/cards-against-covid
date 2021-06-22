@@ -1,0 +1,126 @@
+.leaderboard {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+@media only screen and (min-width: 800px) {
+    .leaderboard {
+        width: calc(100% - 20rem);
+    }
+}
+
+.leaderboard-content {
+    background: white;
+    border-radius: 5px;
+    margin: auto;
+    min-width: min(300px, 100vw);
+    max-width: 750px;
+    width: 75%;
+    overflow: hidden;
+    box-shadow: 0 0 100px 0 rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.leaderboard #leaderboard-label {
+    font-weight: bold;
+    font-size: 1.8rem;
+    display: block;
+    margin: 1rem;
+}
+
+.leaderboard .player-score {
+    margin: auto;
+    font-weight: bold;
+    color: white;
+    background-color: black;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    min-width: 1em;
+    padding: .2em;
+    display: inline-block;
+    text-align: center;
+}
+
+.leaderboard .winner .player-score {
+    background-color: #3a4;
+}
+
+.leaderboard .card {
+    height: auto;
+    width: auto;
+    font-size: 1rem;
+}
+
+.leaderboard .player-name,
+.leaderboard .winner-label,
+.leaderboard .inactive-label {
+    display: block;
+    word-wrap: break-word;
+    max-width: 6rem;
+}
+
+.winner-label,
+.inactive-label {
+    font-size: .8rem;
+    font-weight: bold;
+    margin-top: .2rem;
+}
+
+.winner-label {
+    color: #3a4;
+}
+
+.inactive-label {
+    color: #777;
+}
+
+.leaderboard-grid-wrapper {
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.leaderboard-grid-wrapper [role="row"] {
+    display: grid;
+    grid-template-columns: 7fr 11fr 7fr;
+    place-items: center;
+}
+
+.leaderboard-grid-body {
+    max-height: calc(100vh - 12rem);
+    overflow-y: auto;
+    padding-bottom: 1rem;
+}
+
+.leaderboard-grid-header .cell {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+.leaderboard-grid-body .cell {
+    padding: .5rem;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: grid;
+    align-content: center;
+    /* justify-items: center; */
+    justify-content: center;
+}
+
+.leaderboard-grid-body .winner {
+    background: #33aa4433;
+}
+
+.leaderboard-grid-body .inactive {
+    opacity: 0.5;
+}
