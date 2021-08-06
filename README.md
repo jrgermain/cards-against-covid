@@ -9,6 +9,9 @@ We have decided to make a webapp that adapts the gameplay of Cards Against Human
 ## Project architecture
 The game has two main components: a React-based frontend (cards-against-covid-client) and a Node-based backend (cards-against-covid-server). The two pieces work together to form a client-server application in which clients connect through a web browser.
 
+## Project status
+The game is still being maintained, but development is moving slower now that I graduated and am working full time. To track development progress, check out the Projects link at the top of the repository.
+
 ## Building and running the server
 ### Prerequisites
 1. You must have Node.js (version 14.17 or later) and npm (included with Node.js) installed. For directions, see [How to install Node.js](https://nodejs.dev/learn/how-to-install-nodejs).
@@ -22,6 +25,8 @@ This mode allows you to run the game using your local copy of the source code. O
     - A web browser window should open automatically
 
 ### Building executables (production mode)
+*NOTE: This is currently broken. See here: https://github.com/jrgermain/cards-against-covid/projects/6#card-66348514*
+
 This mode bundles everything needed to run the game into a single executable file. On the client side, the production version of React is used and the code is compiled to plain HTML, JavaScript, and CSS (instead of running as a separate server). On the server side, fewer messages are logged. In production mode, both the client code and the server code are served at port 8080 (port 3000 is not used).
 
 1. Navigate to the root project directory (the folder named 'cards-against-covid').
