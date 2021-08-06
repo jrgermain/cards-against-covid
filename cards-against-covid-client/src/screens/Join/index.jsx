@@ -1,31 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-
 import Button from "../../components/Button";
 import "./Join.css";
-import * as api from "../../lib/api";
+import { useApi, send } from "../../lib/api";
 import TextBox from "../../components/TextBox";
-import * as socketListener from "../../redux/socket";
 
 const gameCodeRegex = /^[a-z]{4}$/i;
 
 function Join() {
     const history = useHistory();
-    const dispatch = useDispatch();
-
-    const [nameError, setNameError] = useState("");
+    const [username, setUsername] = useState(localStorage.getItem("last-username") ?? "");
+    const [gameCode, setGameCode] = useState("");
     const [gameCodeError, setGameCodeError] = useState("");
-
-    const user = useSelector((state) => state.user);
-    const gameCode = useSelector((state) => state.gameCode);
+    const [usernameError, setUsernameError] = useState("");
 
     useEffect(() => {
-        // If a user leaves a game, they might be brought here. This means we should reset the app.
-        socketListener.stop(); // Stop listening for state updates
-        socketListener.reset(); // Clear local app state and trigger a disconnect on the server
-
         /* If the user came from a join link, populate the game code, then set the URL to the
          * 'normal' join url
          */
@@ -33,7 +23,7 @@ function Join() {
         if (params.has("code")) {
             const code = params.get("code");
             if (gameCodeRegex.test(code)) {
-                dispatch({ type: "gameCode/set", payload: code.toUpperCase() });
+                setGameCode(code.toUpperCase());
             } else {
                 toast.warn("Invalid join link");
             }
@@ -41,9 +31,22 @@ function Join() {
         }
     }, []);
 
+    // When the user successfully joins a game, move on to the wait screen
+    useApi("joinedGame", ({ playerList }) => {
+        // Save the last successfully used name for future games
+        try {
+            localStorage.setItem("last-username", username);
+        } catch (e) {
+            // Not allowed, but that's ok
+        }
+
+        // Navigate to the wait screen
+        history.push("/waiting", { username, gameCode, playerList });
+    }, [username, gameCode]);
+
     async function joinGame() {
         // Clear any error messages currently displayed
-        setNameError("");
+        setUsernameError("");
         setGameCodeError("");
 
         /* Perform a form check to make sure name and game code are in the correct format. This
@@ -51,8 +54,8 @@ function Join() {
          */
         let passesFormCheck = true;
 
-        if (!user.name) {
-            setNameError("Please enter a name.");
+        if (!username) {
+            setUsernameError("Please enter a name.");
             passesFormCheck = false;
         }
 
@@ -66,24 +69,7 @@ function Join() {
         }
 
         // The data is in the right format, so try to join a game
-        try {
-            await api.post("joinGame", { code: gameCode, name: user.name.trim() });
-        } catch (e) {
-            // We got a response other than a success
-            if (e === "Not Found") {
-                setGameCodeError("The game you specified doesn't exist or isn't accepting players.");
-            } else if (e === "Bad Request") {
-                setNameError(`There is already a player named "${user.name}" in game "${gameCode}".`);
-            }
-            return;
-        }
-
-        // Save the last good game code and name for future games (or if the user gets disconnected)
-        localStorage.setItem("last-username", user.name);
-        localStorage.setItem("last-game-code", gameCode);
-
-        // We had a success response, so the player must have joined. Move on to the wait screen
-        history.push("/waiting");
+        send("joinGame", { gameCode, playerName: username });
     }
 
     function handleKeyPress(event) {
@@ -101,11 +87,11 @@ function Join() {
                     <TextBox
                         id="player-name"
                         placeholder="Your name"
-                        value={user.name}
-                        onChange={(e) => dispatch({ type: "user/setName", payload: e.target.value })}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        errorCondition={!!nameError}
-                        errorMessage={nameError}
+                        errorCondition={!!usernameError}
+                        errorMessage={usernameError}
                     />
                 </div>
                 <div>
@@ -114,7 +100,7 @@ function Join() {
                         id="game-code"
                         placeholder="Game code"
                         value={gameCode}
-                        onChange={(e) => dispatch({ type: "gameCode/set", payload: e.target.value.toUpperCase() })}
+                        onChange={(e) => setGameCode(e.target.value.toUpperCase())}
                         onKeyPress={handleKeyPress}
                         errorCondition={!!gameCodeError}
                         errorMessage={gameCodeError}

@@ -7,7 +7,7 @@ const blank = /_+/g;
 
 function Card({ type, children, selectedIndex, showIndex, onClick, ...others }) {
     /* Figure out which css classes to give the card. It always has 'card', will have exactly one
-     * of [prompt, response], and 0 or more of [clickable, selected]
+     * of [prompt, response, multi-response], and 0 or more of [clickable, selected]
      */
     const clickable = typeof onClick === "function";
     const selected = selectedIndex > -1;
@@ -40,7 +40,7 @@ function Card({ type, children, selectedIndex, showIndex, onClick, ...others }) 
                 j++;
             }
         }
-    } else if (type === "response" && Array.isArray(children)) {
+    } else if (type === "multi-response") {
         /* This is a special response card used to show a user's response as one entity even if it
          * contained multiple cards. Notice that the "children" attribute is an array of strings.
          */

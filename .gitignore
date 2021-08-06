@@ -1,6 +1,7 @@
 **/.DS_Store
 **/node_modules
 **/build
+**/dist
+workspace.code-workspace
 
-dist
 cards-against-covid-server/cards/custom-cards.json

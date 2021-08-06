@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
-import * as api from "../../lib/api";
+import { useApi, send } from "../../lib/api";
 import TextBox from "../../components/TextBox";
 import CheckBox from "../../components/CheckBox";
 import "./StartGame.css";
@@ -11,34 +10,46 @@ import Dropdown from "../../components/Dropdown";
 
 function StartGame() {
     const history = useHistory();
-    const dispatch = useDispatch();
-
-    const user = useSelector((state) => state.user);
-
+    const [username, setUsername] = useState(localStorage.getItem("last-username") ?? "");
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [decks, setDecks] = useState([]);
     const [expansions, setExpansions] = useState([]);
     const [isRoundLimitEnabled, setRoundLimitEnabled] = useState(false);
     const [roundLimit, setRoundLimit] = useState(1);
+    const [hasDisplayedWarning, setDisplayedWarning] = useState(false);
 
-    /* On page load, get list of available cards. Use a useEffect so this doesn't happen every time
-     * the user selects something.
-     */
+    // When a game is created, join that game
+    useApi("gameCreated", (gameCode) => {
+        send("joinGame", { gameCode, playerName: username });
+    }, [username]);
+
+    // After creating and joining a game, proceed to the wait screen
+    useApi("joinedGame", ({ gameCode, playerList }) => {
+        // Save the last successfully used name for future games
+        try {
+            localStorage.setItem("last-username", username);
+        } catch (e) {
+            // Not allowed, but that's ok
+        }
+
+        // Navigate to the wait screen
+        history.push("/waiting", { username, gameCode, playerList });
+    }, [username]);
+
+    useApi("deckList", (deckList) => {
+        // Initialize 'isSelected' to true for the first deck and false for the others
+        setDecks(deckList.map((deck, i) => ({ ...deck, isSelected: i === 0 })));
+    });
+
+    useApi("packList", (packList) => {
+        // Initialize 'isSelected' to false for all packs
+        setExpansions(packList.map((pack) => ({ ...pack, isSelected: false })));
+    });
+
+    // On page load, get list of available cards
     useEffect(() => {
-        api.getJson("deckList").then((deckList) => {
-            // Set isSelected to true for the first deck and false for the others
-            deckList.forEach((deck, i) => {
-                deck.isSelected = i === 0;
-            });
-            setDecks(deckList);
-        });
-        api.getJson("expansionList").then((expansionPackList) => {
-            // Initialize all expansion packs to not selected
-            expansionPackList.forEach((expansionPack) => {
-                expansionPack.isSelected = false;
-            });
-            setExpansions(expansionPackList);
-        });
+        send("getDecks");
+        send("getExpansionPacks");
     }, []);
 
     const handleDeckChange = (e) => {
@@ -49,6 +60,9 @@ function StartGame() {
             ...deck,
             isSelected: deck.name === e.target.value,
         })));
+
+        // Reset warning state so deck size is validated again before the user creates the game
+        setDisplayedWarning(false);
     };
     const handlePackChange = (selectedPack) => {
         // Toggle the value of the input that was clicked, leaving others as-is
@@ -56,6 +70,9 @@ function StartGame() {
             ...pack,
             isSelected: pack === selectedPack ? !pack.isSelected : pack.isSelected,
         })));
+
+        // Reset warning state so deck size is validated again before the user creates the game
+        setDisplayedWarning(false);
     };
     const handleToggleRoundLimit = (event) => {
         setRoundLimitEnabled(event.target.checked);
@@ -68,57 +85,59 @@ function StartGame() {
         setRoundLimit(Math.max(Math.floor(roundLimit), 1));
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         setHasSubmitted(true);
 
         // Make sure the user entered a name
-        if (!user.name) {
+        if (!username) {
             // No name was entered, so abort the process
             return;
         }
 
-        /* If the user has a game where there are not enough cards selected, show an error and
-         * prevent them from continuing.
-         */
         const deckName = decks.find((deck) => deck.isSelected).name;
         const expansionPacks = expansions.filter((pack) => pack.isSelected);
-        if (deckName === "None (expansion packs only)" && expansionPacks.length === 0) {
-            toast.error("Please choose a deck or select at least one expansion pack");
-            return;
-        } if (deckName === "None (expansion packs only)") {
-            // Make sure there's a reasonable number of cards selected
+
+        if (deckName === "None (expansion packs only)") {
+            // Don't let the user create a game with no cards
+            if (expansionPacks.length === 0) {
+                toast.error("Please choose a deck or select at least one expansion pack");
+                return;
+            }
+
+            // Check that there's a reasonable number of cards selected
             const numPrompts = expansionPacks.reduce((acc, curr) => acc + curr.numPrompts, 0);
             const numResponses = expansionPacks.reduce((acc, curr) => acc + curr.numResponses, 0);
             if (numPrompts < 7 || numResponses < 21) {
-                toast.error("Please include at least 7 prompt and 21 response cards");
-                return;
+                // The first time the user tries to proceed, show a warning
+                if (!hasDisplayedWarning) {
+                    /* Build a string that includes the prompt count if less than 7, and the
+                     * response count if less than 21.
+                     * Examples: '5 prompts', '3 responses', or '5 prompts and 3 responses'
+                     */
+                    const lowCounts = [];
+                    if (numPrompts === 1) {
+                        lowCounts.push("1 prompt");
+                    } else if (numPrompts < 7) {
+                        lowCounts.push(`${numPrompts} prompts`);
+                    }
+                    if (numResponses === 1) {
+                        lowCounts.push("1 response");
+                    } else if (numResponses < 21) {
+                        lowCounts.push(`${numResponses} responses`);
+                    }
+                    const lowCountString = lowCounts.join(" and ");
+                    toast.warn(`This game only has ${lowCountString}, which seems low. If this is intentional, hit Continue again.`);
+                    setDisplayedWarning(true);
+                    return;
+                }
             }
         }
 
-        // Create a game, then join it
-        let gameCode;
-        try {
-            const gameDetails = {
-                deckName,
-                expansionPacks: expansionPacks.map((pack) => pack.name),
-            };
-            if (isRoundLimitEnabled) {
-                gameDetails.roundLimit = roundLimit;
-            }
-            gameCode = await api.post("startGame", gameDetails);
-            await api.post("joinGame", { code: gameCode, name: user.name });
-        } catch (e) {
-            toast.error("There was an error creating your game. Please try again later.");
-            return;
-        }
-
-        // Save the last good game code and name for future games (or if user gets disconnected)
-        localStorage.setItem("last-username", user.name);
-        localStorage.setItem("last-game-code", gameCode);
-
-        // Everything went ok. Set the new game code, then move to the wait screen.
-        dispatch({ type: "gameCode/set", payload: gameCode });
-        history.replace("/waiting");
+        send("createGame", {
+            deckName,
+            expansionPackNames: expansionPacks.map((pack) => pack.name),
+            roundLimit: isRoundLimitEnabled ? roundLimit : undefined,
+        });
     };
 
     return (
@@ -131,9 +150,9 @@ function StartGame() {
                     <TextBox
                         id="player-name"
                         placeholder="Your name"
-                        value={useSelector((state) => state.user.name)}
-                        onChange={(e) => dispatch({ type: "user/setName", payload: e.target.value })}
-                        errorCondition={hasSubmitted && !user.name}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        errorCondition={hasSubmitted && !username}
                         errorMessage="Please enter a name."
                     />
                 </div>

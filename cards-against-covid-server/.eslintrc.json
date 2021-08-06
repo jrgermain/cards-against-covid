@@ -1,8 +1,51 @@
 {
+    "root": true,
+    "extends": "airbnb-typescript/base",
+    "env": { "node": true },
     "rules": {
-        "no-console": "off"
+        "indent": "off",
+        "@typescript-eslint/indent": ["warn", 4, { "SwitchCase": 1 }],
+        "quotes": "off",
+        "@typescript-eslint/quotes": ["error", "double"],
+        "max-len": ["warn", {
+            "code": 100,
+            "ignoreUrls": true,
+            "ignoreComments": false,
+            "ignoreRegExpLiterals": true,
+            "ignoreStrings": true,
+            "ignoreTemplateLiterals": true
+        }],
+        "no-multi-spaces": ["error", { "ignoreEOLComments": true }],
+        "no-param-reassign": ["error", { "props": false }],
+        "no-plusplus": "off",
+        "object-curly-newline": ["error", { "multiline": true }],
+        
+        "no-console": "off",
+        "import/no-unresolved": "error",
+        "lines-between-class-members": "off",
+        "@typescript-eslint/lines-between-class-members": "off"
     },
-    "env": {
-        "node": true
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "modules": true
+        },
+        "project": "cards-against-covid-server/tsconfig.json"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "import"
+    ],
+    "settings": {
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts", ".tsx"]
+        },
+        "import/resolver": {
+            "typescript": {
+                "alwaysTryTypes": true,
+                "project": "cards-against-covid-server/tsconfig.json"
+            }
+        }
     }
 }

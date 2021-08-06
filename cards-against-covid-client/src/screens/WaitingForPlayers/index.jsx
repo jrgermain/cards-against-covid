@@ -1,102 +1,78 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useLocation } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { toast } from "react-toastify";
-
 import List from "../../components/List";
 import "./WaitingForPlayers.css";
 import Button from "../../components/Button";
 import TextBox from "../../components/TextBox";
+import { useApi, send } from "../../lib/api";
+import { closePopup, handlePopupOpen } from "../../lib/popupFixes";
 
-import { socket } from "../../serverConfig";
-import * as socketListener from "../../redux/socket";
-import * as api from "../../lib/api";
+const handleCopy = () => {
+    const link = document.getElementById("invite-link");
+    link.select();
+    if (document.execCommand("copy")) {
+        toast.success("Link copied to clipboard");
+        closePopup();
+    } else {
+        toast.error("Could not copy link");
+    }
+};
 
 function WaitingForPlayers() {
     const history = useHistory();
-    const dispatch = useDispatch();
-    const players = useSelector((state) => state.players.filter((player) => player.isConnected));
-    const gameCode = useSelector((state) => state.gameCode);
-    const user = useSelector((state) => state.user);
-    const status = useSelector((state) => state.status.name);
-    const [textName, setTextName] = useState(user.name);
+    const location = useLocation();
+    const [players, setPlayers] = useState(location.state?.playerList ?? []);
+    const [username, setUsername] = useState(location.state?.username ?? "");
+    const [tempUsername, setTempUsername] = useState(location.state?.username ?? "");
+    const [gameCode] = useState(location.state?.gameCode ?? "");
 
-    /* When the page is loaded/reloaded, clear the local player list and then send a request to the
-     * socket. This request tells the socket the player is here, and the socket will respond with
-     * the correct player list. Put this in a useEffect so it doesn't happen every time we re-
-     * render the view (such as when another player joins).
-     */
+    // When a player joins, add them to the player list
+    useApi("playerJoined", (name) => {
+        setPlayers([...players, name]);
+    }, [players]);
+
+    // When a user changes their name, update the state
+    useApi("nameChanged", ({ oldName, newName }) => {
+        // Replace the entry in the player list
+        const newPlayers = players.map((name) => (name === oldName ? newName : name));
+        setPlayers(newPlayers);
+
+        // If the current user is the one who changed their name, update the rest of the UI too
+        if (oldName === username) {
+            setUsername(newName);
+        }
+    }, [players, username]);
+
+    // When the game starts, move to the play screen
+    useApi("gameStarted", (gameData) => {
+        history.replace("/play", { ...gameData, username });
+    }, [username]);
+
+    // When we receive the list of players, update the state
+    useApi("playerList", (playerList) => {
+        if (playerList) {
+            setPlayers(playerList);
+        } else {
+            // Getting null/undefined instead of an array means there is no game on the server
+            history.replace("/");
+        }
+    });
+
+    // Ask for the list of players
     useEffect(() => {
-        // Check that the game exists first and make sure it hasn't already started
-        api.getText(`gameState?code=${gameCode}`).then((statusText) => {
-            if (statusText === "INVALID") {
-                toast.error("The specified game does not exist");
-                history.replace("/");
-            } else if (statusText === "IN_PROGRESS") {
-                history.replace("/play");
-            }
-        });
-        socketListener.start();
-        dispatch({ type: "players/clear" });
-        socket.emit("join game", gameCode, user.name);
-        socket.emit("client reload", gameCode, user.name);
+        send("getPlayerList");
     }, []);
-
-    // If game has started, redirect to Play screen
-    if (status === "IN_PROGRESS") {
-        history.replace("/play");
-    }
 
     // If user loaded this page directly without actually joining a game, kick them out
     if (!gameCode) {
         history.replace("/");
     }
 
-    // Respond to the user pressing "Everybody's In"
-    const handleStart = () => {
-        if (players.length < 3) {
-            toast.error("Please wait for at least 3 players to join");
-        } else {
-            socket.emit("start game", gameCode);
-        }
-    };
-
-    const closePopup = () => {
-        // Close the window by simulating esc key
-        document.dispatchEvent(new KeyboardEvent("keyup", { key: "Escape" }));
-    };
-
-    // Respond to the user pressing "Submit" within the "Change Name" popup
-    const handleChangeName = () => {
-        socket.emit("change name", gameCode, user.name, textName);
+    const submitName = () => {
+        send("changeName", tempUsername);
         closePopup();
-    };
-
-    const handleCopy = () => {
-        const link = document.getElementById("invite-link");
-        link.select();
-        if (document.execCommand("copy")) {
-            toast.success("Link copied to clipboard");
-            closePopup();
-        } else {
-            toast.error("Could not copy link");
-        }
-    };
-
-    const handlePopupOpen = (ariaLabel) => {
-        const popup = document.querySelector(".popup-content");
-        if (popup) {
-            popup.setAttribute("role", "dialog");
-            popup.setAttribute("aria-label", ariaLabel);
-        }
-
-        /* Force the popup to reposition itself (workaround for the popup's initial position being
-         * too far right)
-         */
-        window.setTimeout(() => {
-            window.dispatchEvent(new Event("resize"));
-        }, 100);
     };
 
     return (
@@ -111,12 +87,12 @@ function WaitingForPlayers() {
                     </div>
                     <div>
                         <span>Your name: </span>
-                        <strong className="player-name">{user.name}</strong>
+                        <strong className="player-name">{username}</strong>
                     </div>
                 </section>
                 <section className="currently-joined">
                     <h2>Currently joined:</h2>
-                    <List items={players} map={(player) => player.name} />
+                    <List items={players} />
                 </section>
                 <section className="button-group">
                     <Popup trigger={<button type="button" className="Button">Change My Name</button>} position="top center" arrow onOpen={() => handlePopupOpen("Enter a new name")}>
@@ -125,11 +101,11 @@ function WaitingForPlayers() {
                             <TextBox
                                 id="player-name"
                                 placeholder="Your name"
-                                value={textName}
-                                onChange={(e) => setTextName(e.target.value)}
-                                onKeyPress={(e) => e.key === "Enter" && handleChangeName()}
+                                value={tempUsername}
+                                onChange={(e) => setTempUsername(e.target.value)}
+                                onKeyPress={(e) => e.key === "Enter" && submitName()}
                             />
-                            <Button onClick={handleChangeName}>Submit</Button>
+                            <Button onClick={submitName}>Submit</Button>
                         </div>
                     </Popup>
                     <Popup trigger={<button type="button" className="Button">Invite Others</button>} position="top center" arrow onOpen={() => handlePopupOpen("Copy invite link")}>
@@ -139,7 +115,7 @@ function WaitingForPlayers() {
                             <Button onClick={handleCopy}>Copy</Button>
                         </span>
                     </Popup>
-                    <Button primary onClick={handleStart}>Everybody&apos;s In</Button>
+                    <Button primary onClick={() => send("startGame")}>Everybody&apos;s In</Button>
                 </section>
             </main>
         </div>

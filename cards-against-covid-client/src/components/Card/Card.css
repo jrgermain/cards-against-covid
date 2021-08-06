@@ -20,7 +20,8 @@
     color: white;
 }
 
-.response {
+.response,
+.multi-response {
     background: white;
     color: black;
 }

@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Button from "../../components/Button";
 import DeckMaker from "../../components/DeckMaker";
 import TextBox from "../../components/TextBox";
-import * as api from "../../lib/api";
+import { useApi, send } from "../../lib/api";
 import "./Expansions.css";
 
 function Expansions() {
@@ -13,6 +13,12 @@ function Expansions() {
     const [name, setName] = useState("Untitled Expansion Pack");
     const [prompts, setPrompts] = useState([]);
     const [responses, setResponses] = useState([]);
+
+    // When a pack is created, show a message and move back to the home screen
+    useApi("expansionPackCreated", (packName) => {
+        toast.success(`Successfully saved expansion pack: ${packName}`);
+        history.push("/");
+    });
 
     // Perform basic validations, then send to the server and process response
     async function submitPack() {
@@ -31,26 +37,11 @@ function Expansions() {
             return;
         }
 
-        const pack = { name, prompts: filteredPrompts, responses: filteredResponses };
-        try {
-            await api.post("expansionPack", pack);
-        } catch (e) {
-            /* An error response was received. If it was a known error, display it.
-             * Otherwise, log it and display a generic message.
-             */
-            if (e === "Bad Request") {
-                toast.error("A pack with this name already exists. Please choose a new name.");
-            } else {
-                toast.error("An unexpected error occurred.");
-            }
-            return;
-        }
-
-        /* We got a success response, so the pack must have been saved.
-         * Bring the user back to the previous page.
-         */
-        toast.success(`Successfully saved expansion pack: ${name}`);
-        history.push("/");
+        send("createExpansionPack", {
+            name,
+            prompts: filteredPrompts,
+            responses: filteredResponses,
+        });
     }
 
     const handleNameChange = (e) => setName(e.target.value);

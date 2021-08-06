@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import ChatMessage from "./ChatMessage";
 import "./Chat.css";
 import ChatSubmit from "./ChatSubmit";
+import { useApi } from "../../lib/api";
 
-function Chat({ gameCode, name }) {
-    const messages = useSelector((state) => state.messages);
+function Chat() {
+    const [messages, setMessages] = useState([]);
 
     const [numRead, setNumRead] = useState(0);
     const [collapsed, setCollapsed] = useState(true);
@@ -16,6 +16,10 @@ function Chat({ gameCode, name }) {
 
     const hasUnread = collapsed && numRead < messages.length;
 
+    useApi("chatMessage", (message) => {
+        setMessages([...messages, message]);
+    }, [messages]);
+
     return (
         <aside className="panel chat" data-collapsed={collapsed}>
             <button type="button" className="panel-toggle" onClick={toggle} aria-label={collapsed ? "Open chat" : "Dismiss chat"}>Toggle Chat</button>
@@ -23,7 +27,7 @@ function Chat({ gameCode, name }) {
             <div className="chat-messages" aria-live="polite">
                 {messages.map(ChatMessage)}
             </div>
-            <ChatSubmit gameCode={gameCode} name={name} />
+            <ChatSubmit />
         </aside>
     );
 }

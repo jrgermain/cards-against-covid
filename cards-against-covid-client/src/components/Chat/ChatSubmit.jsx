@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { socket } from "../../serverConfig";
+import { send } from "../../lib/api";
 import Button from "../Button";
 import TextBox from "../TextBox";
 
-function ChatSubmit({ gameCode, name }) {
+function ChatSubmit() {
     const [value, setValue] = useState("");
     const submit = () => {
         if (value) {
-            socket.emit("new message", gameCode, name, value);
+            send("sendChat", value);
             setValue("");
         }
     };

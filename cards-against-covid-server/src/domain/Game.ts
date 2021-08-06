@@ -1,25 +1,64 @@
-const Enum = require("./Enum");
+import type Deck from "./Deck";
+import type Player from "./Player";
+import type Connection from "./Connection";
+
+enum GameState {
+    WAITING,
+    IN_PROGRESS,
+    ENDED,
+}
 
 class Game {
-    constructor(deck, roundLimit) {
-        this.players = [];
+    deck: Deck;
+    roundLimit: number;
+    connections: Connection[] = [];
+    prompt: string = "";
+    state: GameState = GameState.WAITING;
+    round: number = 0;
+    cardsPerPlayer: number = 0;
+
+    get players() {
+        return (
+            this.connections
+                .map((connection) => connection.playerInfo)
+                .filter(Boolean) as Player[]
+        );
+    }
+
+    get numBlanks() {
+        return this.prompt.match(/_+/g)?.length ?? 1;
+    }
+
+    get promptIsMultiSelect() {
+        return this.numBlanks > 1;
+    }
+
+    get isLocked() {
+        const { numBlanks } = this;
+        return this.connections.length > 0 && this.players.every((p) => (
+            p.isJudge || p.responses.length === numBlanks
+        ));
+    }
+
+    constructor(deck: Deck, roundLimit: number) {
         this.deck = deck;
-        this.prompt = "";
-        this.state = Game.State.WAITING;
-        this.round = -1;
-        this.cardsPerPlayer = 0;
-        this.roundLimit = roundLimit ?? Infinity;
+        this.roundLimit = roundLimit;
     }
 
     start() {
-        this.state = Game.State.IN_PROGRESS;
+        if (this.state === GameState.WAITING) {
+            this.state = GameState.IN_PROGRESS;
 
-        /* By default, players get 7 response cards each. Every player should start off with the
-         * same number of cards. If there aren't enough cards for everyone to get 7, lower this
-         * size so everyone can start with the same number. Enforce a maximum of 7 cards per player.
-         */
-        const totalCardsPerPlayer = Math.floor(this.deck.responses.length / this.players.length);
-        this.cardsPerPlayer = Math.min(7, totalCardsPerPlayer);
+            /* By default, players get 7 response cards each. Every player should start off with the
+             * same number of cards. If there aren't enough cards for everyone to get 7, lower this
+             * size so everyone can start with the same number. Enforce a maximum of 7 per player.
+             */
+            const totalCardsPerPlayer = Math.floor(this.deck.responses.length / this.players.length);
+            this.cardsPerPlayer = Math.min(7, totalCardsPerPlayer);
+
+            // Start the first round
+            this.nextRound();
+        }
     }
 
     nextRound() {
@@ -50,7 +89,9 @@ class Game {
         if (judge) {
             judge.isJudge = false;
         }
-        nextJudge.isJudge = true;
+        if (nextJudge) {
+            nextJudge.isJudge = true;
+        }
 
         // Reset 'ready for next round' and 'is winner' to false for all players
         this.players.forEach((player) => {
@@ -61,7 +102,7 @@ class Game {
         // Select new prompt
         if (this.deck.prompts.length > 0) {
             // If there are prompts left, remove the last one from the deck and use it
-            this.prompt = this.deck.prompts.pop();
+            this.prompt = this.deck.prompts.pop() as string; // Will not be undefined if length > 0
         } else {
             // All prompts have been exhausted
             this.end();
@@ -78,11 +119,13 @@ class Game {
         }
 
         this.round++;
+        console.log(this.getRoundInfo());
+        console.log(this.players);
     }
 
     end() {
         // Set state
-        this.state = Game.State.ENDED;
+        this.state = GameState.ENDED;
 
         // Sort players by score
         this.players.sort((a, b) => b.score - a.score);
@@ -97,6 +140,12 @@ class Game {
                 break;
             }
         }
+
+        // Delete info specific to this game from the connections
+        this.connections.forEach((c) => {
+            delete c.playerInfo;
+            delete c.game;
+        });
     }
 
     getNextJudge() {
@@ -130,7 +179,7 @@ class Game {
         let round = 0;
         while (prompts.length > 0) {
             // Simulate playing the required number of cards
-            const numBlanks = prompts.pop().match(/_+/g)?.length ?? 1;
+            const numBlanks = prompts.pop()?.match(/_+/g)?.length ?? 1;
             for (let i = 0; i < activePlayers.length; i++) {
                 // Skip over judge
                 if (i !== judgeIndex) {
@@ -169,24 +218,47 @@ class Game {
         console.log(`Game.calculateRoundsLeft: Can do ${round} more round(s)`);
         return round;
     }
-}
 
-Game.State = Enum("WAITING", "IN_PROGRESS", "ENDED");
+    // Get player-specific info
+    getPlayerInfo(player: Player) {
+        // Send users the game state, extended with role-specific info
+        const info: any = {};
 
-Game.Code = {
-    alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    generate(games = {}) {
-        let code = "";
+        if (player.isJudge) {
+            info.role = "judging";
 
-        // Get 4 random letters
-        for (let i = 0; i < 4; i++) {
-            const random = Math.floor(Math.random() * 26);
-            code += Game.Code.alphabet[random];
+            /* Add a 'players' item that is similar to this.players but doesn't
+             * include the judge and only includes 'name' and 'responses'
+             */
+            info.players = this.players
+                .filter((p) => !p.isJudge)
+                .map(({ name, responses }) => ({ name, responses }));
+        } else {
+            info.role = "answering";
+            info.judge = this.players.find((p) => p.isJudge)?.name;
+            info.userCards = player.cards;
+            info.userResponses = player.responses;
         }
 
-        // If the code already exists, make a new one
-        return (code in games) ? Game.Code.generate(games) : code;
-    },
-};
+        return info;
+    }
 
-module.exports = Game;
+    // Get info about the state of the game at the current round
+    getRoundInfo() {
+        return ({
+            prompt: this.prompt,
+            numBlanks: this.numBlanks,
+            round: this.round,
+            roundsLeft: this.calculateRoundsLeft(),
+        });
+    }
+
+    sendAll(event: string, payload?: any) {
+        this.connections.forEach((c) => {
+            c.send(event, payload);
+        });
+    }
+}
+
+export default Game;
+export { GameState };
