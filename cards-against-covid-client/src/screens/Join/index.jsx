@@ -7,6 +7,14 @@ import { useApi, send } from "../../lib/api";
 import TextBox from "../../components/TextBox";
 
 const gameCodeRegex = /^[a-z]{4}$/i;
+const saveUsername = (username) => {
+    // Save this as the default username for future games
+    try {
+        localStorage.setItem("last-username", username);
+    } catch (e) {
+        // Not allowed, but that's ok
+    }
+};
 
 function Join() {
     const history = useHistory();
@@ -32,17 +40,22 @@ function Join() {
     }, []);
 
     // When the user successfully joins a game, move on to the wait screen
-    useApi("joinedGame", ({ playerList }) => {
-        // Save the last successfully used name for future games
-        try {
-            localStorage.setItem("last-username", username);
-        } catch (e) {
-            // Not allowed, but that's ok
-        }
+    useApi("joinedGame", () => {
+        // Update last used username
+        saveUsername(username);
 
         // Navigate to the wait screen
-        history.push("/waiting", { username, gameCode, playerList });
+        history.push("/waiting", { username, gameCode });
     }, [username, gameCode]);
+
+    // When the user successfully rejoins a game, move on to the play screen and restore game state
+    useApi("restoreState", (gameData) => {
+        // Update last used username
+        saveUsername(username);
+
+        // Navigate to the play screen
+        history.push("/play", { ...gameData, username });
+    }, [username]);
 
     async function joinGame() {
         // Clear any error messages currently displayed

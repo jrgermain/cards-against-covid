@@ -36,7 +36,7 @@ class Game {
     get isLocked() {
         const { numBlanks } = this;
         return this.connections.length > 0 && this.players.every((p) => (
-            p.isJudge || p.responses.length === numBlanks
+            p.isJudge || !p.isConnected || p.responses.length === numBlanks
         ));
     }
 
@@ -119,8 +119,15 @@ class Game {
         }
 
         this.round++;
-        console.log(this.getRoundInfo());
-        console.log(this.players);
+
+        // Send each player the info they need for the game
+        const roundInfo = this.getRoundInfo();
+        this.connections.forEach((c) => {
+            c.send("newRound", {
+                ...roundInfo,
+                ...this.getPlayerInfo(c.playerInfo as Player),
+            });
+        });
     }
 
     end() {
@@ -232,7 +239,7 @@ class Game {
              */
             info.players = this.players
                 .filter((p) => !p.isJudge)
-                .map(({ name, responses }) => ({ name, responses }));
+                .map(({ name, responses, isConnected }) => ({ name, responses, isConnected }));
         } else {
             info.role = "answering";
             info.judge = this.players.find((p) => p.isJudge)?.name;
@@ -253,10 +260,43 @@ class Game {
         });
     }
 
+    // Get a subset of the data in the player list
+    getLeaderboard() {
+        return this.players
+            .map(({
+                name,
+                responses,
+                score,
+                isJudge,
+                isWinner,
+                isConnected,
+            }) => ({
+                name,
+                responses,
+                score,
+                isJudge,
+                isWinner,
+                isConnected,
+            }));
+    }
+
     sendAll(event: string, payload?: any) {
         this.connections.forEach((c) => {
             c.send(event, payload);
         });
+    }
+
+    // connection is a connection in this game
+    removeConnection(connection: Connection) {
+        if (connection.playerInfo) {
+            connection.playerInfo.isConnected = false;
+            this.sendAll("playerDisconnected", connection.playerInfo.name);
+
+            // If all connected players are ready for the next round, advance the game
+            if (this.players.every((p) => p.isReadyForNextRound || !p.isConnected)) {
+                this.nextRound();
+            }
+        }
     }
 }
 

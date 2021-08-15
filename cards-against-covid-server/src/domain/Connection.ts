@@ -29,11 +29,14 @@ type EventName = (
     "getGameStatus"
 );
 type EventHandler = (eventPayload: any) => void;
+enum PingStatus { UNHEALTHY, PENDING, HEALTHY }
 
 class Connection {
     id: string;
     playerInfo?: Player;
     game?: Game;
+    private pingStatus?: PingStatus;
+    private pingInterval?: NodeJS.Timeout;
     private socket: WebSocket;
     private handlers: Record<EventName, EventHandler> = {
         init: (sessionId: string | null) => {
@@ -43,16 +46,14 @@ class Connection {
              * when the tab is closed.
              *
              * When a user loads the app, the uuid in sessionStorage (or null, for a new session) is
-             * sent as the 'sessionId' argument above. If a session with that id exists and is not
-             * active, this connection "merges" with the existing inactive one.
+             * sent as the 'sessionId' argument above. If an inactive session with that id exists in
+             * an ongoing game, this connection "merges" with the existing inactive one.
              */
             if (sessionId) {
                 const existingConnection = connections.get(sessionId);
                 if (existingConnection && !existingConnection.isActive) {
                     // Merge this connection with the existing, inactive one
-                    console.log("Replacing connection", sessionId);
-                    existingConnection.reconnect(this.socket);
-                    connections.remove(this);
+                    this.transferTo(existingConnection);
                     return;
                 }
             }
@@ -111,7 +112,9 @@ class Connection {
         },
 
         joinGame: ({ gameCode, playerName }: IJoinGameArgs) => {
-            if (playerName.trim() === "") {
+            const trimmedName = playerName?.trim();
+
+            if (!trimmedName) {
                 this.sendError("A name is required, but none was provided");
                 return;
             }
@@ -122,49 +125,42 @@ class Connection {
                 return;
             }
 
-            const trimmedName = playerName.trim();
+            const existingPlayer = game.players.find((p) => p.name === trimmedName);
 
             if (game.state === GameState.WAITING) {
-                if (game.players.some((p) => p.name === trimmedName)) {
+                if (existingPlayer?.isConnected) {
                     this.sendError("A player with that name already exists");
-                    return;
+                } else if (existingPlayer) {
+                    // Transfer to existing, inactive connection
+                    const existingConnectionIndex = game.players.indexOf(existingPlayer);
+                    this.transferTo(game.connections[existingConnectionIndex]);
+                } else {
+                    // Tell current players that this player joined the game
+                    game.sendAll("playerJoined", { name: trimmedName, isConnected: true });
+
+                    // Update this connection and the game object
+                    this.playerInfo = new Player(trimmedName);
+                    this.game = game;
+                    this.send("joinedGame", gameCode);
+                    game.connections.push(this);
                 }
-                this.playerInfo = new Player(trimmedName);
-                game.connections.push(this);
-                game.connections.forEach((c) => {
-                    if (c === this) {
-                        // Send the player who joined a list of players in the game
-                        const playerList = game.players.map((p) => p.name);
-                        c.send("joinedGame", {
-                            playerList,
-                            gameCode,
-                        });
-                    } else {
-                        // Tell other players that this player joined the game
-                        c.send("playerJoined", playerName);
-                    }
-                });
             } else if (game.state === GameState.IN_PROGRESS) {
-                if (game.players.some((p) => p.name === trimmedName && !p.isConnected)) {
-                    // eslint-disable-next-line max-len
-                    const peers = game.connections.filter((c) => c.playerInfo?.name !== trimmedName);
-                    peers.forEach((p) => {
-                        p.send("playerReconnected", trimmedName);
-                    });
+                if (existingPlayer?.isConnected) {
+                    this.sendError("This player is already connected. If you think this is a mistake, try closing this tab and re-joining.");
+                } else if (existingPlayer) {
+                    // Transfer to existing, inactive connection
+                    const existingConnectionIndex = game.players.indexOf(existingPlayer);
+                    this.transferTo(game.connections[existingConnectionIndex]);
                 } else {
                     this.sendError("The game is not accepting new players");
-                    return;
                 }
             } else {
                 this.sendError("The game has ended");
-                return;
             }
-
-            this.game = game;
         },
 
         getPlayerList: () => {
-            this.send("playerList", this.game?.players?.map((p) => p.name));
+            this.send("playerList", this.game?.players?.map((p) => ({ name: p.name, isConnected: p.isConnected })));
         },
 
         startGame: () => {
@@ -232,8 +228,8 @@ class Connection {
                 return;
             }
 
-            const { name, responses } = player;
-            judge.send("cardSelected", { name, responses });
+            const { name, responses, isConnected } = player;
+            judge.send("cardSelected", { name, responses, isConnected });
             this.send("cardSelected", responses);
         },
 
@@ -259,25 +255,7 @@ class Connection {
             winner.isWinner = true;
             winner.score++;
 
-            // Get a subset of the data in the player list--only the names, responses, and roles
-            const leaderboard = game.players
-                .map(({
-                    name,
-                    responses,
-                    score,
-                    isJudge: _isJudge, // Fixes eslint error since isJudge is already in scope
-                    isWinner,
-                    isConnected,
-                }) => ({
-                    name,
-                    responses,
-                    score,
-                    isJudge: _isJudge,
-                    isWinner,
-                    isConnected,
-                }));
-
-            game.sendAll("winnerSelected", leaderboard);
+            game.sendAll("winnerSelected", game.getLeaderboard());
         },
 
         sendChat: (content: string) => {
@@ -310,18 +288,9 @@ class Connection {
             if (this.playerInfo) {
                 this.playerInfo.isReadyForNextRound = true;
 
-                // If all players are ready for the next round, advance the game
-                if (game.players.every((p) => p.isReadyForNextRound)) {
+                // If all connected players are ready for the next round, advance the game
+                if (game.players.every((p) => p.isReadyForNextRound || !p.isConnected)) {
                     game.nextRound();
-
-                    // Send each player the info they need for the game
-                    const roundInfo = game.getRoundInfo();
-                    game.connections.forEach((c) => {
-                        c.send("newRound", {
-                            ...roundInfo,
-                            ...game.getPlayerInfo(c.playerInfo as Player),
-                        });
-                    });
                 }
             }
         },
@@ -351,42 +320,108 @@ class Connection {
     };
 
     get isActive() {
-        return this.socket.readyState === WebSocket.OPEN;
+        return this.socket.readyState === WebSocket.OPEN && this.pingStatus === PingStatus.HEALTHY;
     }
 
     constructor(socket: WebSocket) {
         this.id = randomUUID();
         this.socket = socket;
+        this.initSocket();
+    }
+
+    stopHealthCheck() {
+        if (this.pingInterval) {
+            globalThis.clearInterval(this.pingInterval);
+        }
+    }
+
+    private initSocket() {
+        // Message handling
         this.socket.on("message", (message) => {
             if (typeof message === "string") {
                 this.processMessage(message);
             }
         });
+
+        // Health check - send pings periodically to check that connection is healthy
+        this.pingStatus = PingStatus.HEALTHY;
+        this.pingInterval = globalThis.setInterval(() => {
+            if (this.isActive) {
+                this.socket.ping();
+                this.pingStatus = PingStatus.PENDING;
+            } else {
+                if (isDev) {
+                    console.warn("Unhealthy connection", this.id);
+                }
+                this.end();
+            }
+        }, 2000);
+
+        this.socket.on("pong", () => {
+            this.pingStatus = PingStatus.HEALTHY;
+        });
+
+        this.socket.on("close", () => {
+            this.end();
+        });
     }
 
-    reconnect(newSocket: WebSocket) {
+    transferTo(existingConnection: Connection) {
+        if (isDev) {
+            console.log(`Transferring data from temporary connection ${this.id} to existing connection ${existingConnection.id}`);
+        }
+
+        // Tell the client to use the existing session id
+        this.send("sessionEstablished", existingConnection.id);
+
+        // Stop polling for connection health, since we are closing this connection
+        this.stopHealthCheck();
+
+        // Transfer everything to the existing connection
+        existingConnection.takeOver(this);
+
+        // Remove this connection, as it is no longer needed
+        connections.remove(this);
+    }
+
+    takeOver(tempConnection: Connection) {
         // Replace the old socket connection with the new one
         const oldSocket = this.socket;
+        const newSocket = tempConnection.socket;
         if (oldSocket !== newSocket) {
             this.socket = newSocket;
             if (oldSocket.readyState === WebSocket.OPEN) {
-                oldSocket.close();
+                oldSocket.terminate();
             }
+
+            // Remove event listeners bound to the previous Connection instance
+            const events = ["message", "pong", "close"];
+            events.forEach((event) => {
+                oldSocket.removeAllListeners(event);
+                newSocket.removeAllListeners(event);
+            });
+
+            // Add event handlers to the new socket
+            this.initSocket();
         }
 
-        // Send reconnect message to peers
-        this.game?.connections.forEach((c) => {
-            if (c !== this) {
-                c.send("infoMessage", `${this.playerInfo?.name} reconnected`);
-            }
-        });
+        if (this.playerInfo) {
+            this.playerInfo.isConnected = true;
+        }
+
+        this.game?.connections.filter((c) => c !== this).forEach(((c) => {
+            c.send("playerReconnected", this.playerInfo?.name);
+        }));
 
         // Give the client who reconnected the latest state
         if (this.game?.state === GameState.IN_PROGRESS) {
             this.send("restoreState", {
                 ...this.game.getRoundInfo(),
                 ...this.game.getPlayerInfo(this.playerInfo as Player),
-                username: this.playerInfo?.name,
+                leaderboardContent: this.game.players.some((p) => p.isWinner)
+                    ? this.game.getLeaderboard()
+                    : null,
+                isLocked: this.game.isLocked,
             });
         }
     }
@@ -426,14 +461,19 @@ class Connection {
     }
 
     end() {
-        if (this.playerInfo && this.game) {
-            this.game.connections.forEach((c) => {
-                if (c !== this) {
-                    c.send("infoMessage", `${this.playerInfo?.name} disconnected`);
-                }
-            });
+        if (isDev) {
+            console.log("Closing connection", this.id);
         }
-        this.socket.close();
+
+        this.stopHealthCheck();
+
+        if (this.game) {
+            this.game.removeConnection(this);
+        }
+
+        if (this.socket.readyState === WebSocket.OPEN) {
+            this.socket.terminate();
+        }
     }
 }
 

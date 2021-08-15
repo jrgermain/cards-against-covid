@@ -6,7 +6,7 @@ import { useApi, send } from "../../lib/api";
 
 function JudgeControls({ role }) {
     const location = useLocation();
-    const [players, setPlayers] = useState(location.state?.players ?? []); // {name, response}[]
+    const [players, setPlayers] = useState(location.state?.players ?? []); // {name, responses, isConnected}[]
     const [numBlanks, setNumBlanks] = useState(location.state?.numBlanks ?? 1);
 
     // When a player selects a card, update the state
@@ -23,11 +23,29 @@ function JudgeControls({ role }) {
         }
     });
 
+    // When the page is refreshed, load the correct data
+    useApi("restoreState", (gameData) => {
+        if (gameData.role === "judging") {
+            setPlayers(gameData.players);
+            setNumBlanks(gameData.numBlanks);
+        }
+    });
+
+    // When a player leaves, set isConnected to false for that player
+    useApi("playerDisconnected", (name) => {
+        setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: false } : p)));
+    }, [players]);
+
+    // When a player returns, set isConnected to true for that player
+    useApi("playerReconnected", (name) => {
+        setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: true } : p)));
+    }, [players]);
+
     if (role !== "judging") {
         return <></>;
     }
 
-    const needsToAnswer = (player) => player.responses.length < numBlanks;
+    const needsToAnswer = (player) => player.isConnected && player.responses.length < numBlanks;
 
     if (players.some(needsToAnswer)) {
         return (
@@ -41,7 +59,7 @@ function JudgeControls({ role }) {
     }
 
     // Get an array of <Card> elements displaying each player's responses
-    const responseCards = players.map((player) => {
+    const responseCards = players.filter((p) => p.isConnected).map((player) => {
         // When a card is clicked, send a socket event saying the judge selected a card
         const onClick = () => send("selectAnswer", player.name);
         return <Card type="multi-response" onClick={onClick}>{player.responses}</Card>;

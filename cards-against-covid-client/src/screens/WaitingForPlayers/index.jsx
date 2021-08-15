@@ -23,14 +23,24 @@ const handleCopy = () => {
 function WaitingForPlayers() {
     const history = useHistory();
     const location = useLocation();
-    const [players, setPlayers] = useState(location.state?.playerList ?? []);
+    const [players, setPlayers] = useState([]);
     const [username, setUsername] = useState(location.state?.username ?? "");
     const [tempUsername, setTempUsername] = useState(location.state?.username ?? "");
     const [gameCode] = useState(location.state?.gameCode ?? "");
 
     // When a player joins, add them to the player list
-    useApi("playerJoined", (name) => {
-        setPlayers([...players, name]);
+    useApi("playerJoined", (player) => {
+        setPlayers([...players, player]);
+    }, [players]);
+
+    // When a player leaves, set isConnected to false for that player
+    useApi("playerDisconnected", (name) => {
+        setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: false } : p)));
+    }, [players]);
+
+    // When a player returns, set isConnected to true for that player
+    useApi("playerReconnected", (name) => {
+        setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: true } : p)));
     }, [players]);
 
     // When a user changes their name, update the state
@@ -92,7 +102,7 @@ function WaitingForPlayers() {
                 </section>
                 <section className="currently-joined">
                     <h2>Currently joined:</h2>
-                    <List items={players} />
+                    <List items={players} map={(p) => p.name} filter={(p) => p.isConnected} />
                 </section>
                 <section className="button-group">
                     <Popup trigger={<button type="button" className="Button">Change My Name</button>} position="top center" arrow onOpen={() => handlePopupOpen("Enter a new name")}>

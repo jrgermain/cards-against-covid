@@ -24,7 +24,7 @@ function StartGame() {
     }, [username]);
 
     // After creating and joining a game, proceed to the wait screen
-    useApi("joinedGame", ({ gameCode, playerList }) => {
+    useApi("joinedGame", (gameCode) => {
         // Save the last successfully used name for future games
         try {
             localStorage.setItem("last-username", username);
@@ -33,7 +33,7 @@ function StartGame() {
         }
 
         // Navigate to the wait screen
-        history.push("/waiting", { username, gameCode, playerList });
+        history.push("/waiting", { username, gameCode });
     }, [username]);
 
     useApi("deckList", (deckList) => {

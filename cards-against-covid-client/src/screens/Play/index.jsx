@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import Card from "../../components/Card";
 import Chat from "../../components/Chat";
 import "./Play.css";
@@ -11,6 +12,7 @@ import { useApi } from "../../lib/api";
 const NORMAL_WEIGHT = { fontWeight: "normal" };
 
 function Play() {
+    const history = useHistory();
     const location = useLocation();
     const { username } = location.state || {};
 
@@ -20,10 +22,11 @@ function Play() {
     const [role, setRole] = useState(location.state?.role ?? "");
     const [judge, setJudge] = useState(location.state?.judge ?? "");
     const [leaderboardContent, setLeaderboardContent] = useState(null);
+    const hideLeaderboard = () => setLeaderboardContent(null);
 
     // When a new round starts, hide the leaderboard and update the state
     useApi("newRound", (gameData) => {
-        setLeaderboardContent(null);
+        hideLeaderboard();
         setPrompt(gameData.prompt);
         setRound(gameData.round);
         setRoundsLeft(gameData.roundsLeft);
@@ -35,6 +38,33 @@ function Play() {
     useApi("winnerSelected", (leaderboard) => {
         setLeaderboardContent(leaderboard);
     });
+
+    // When the page is refreshed, load the correct data
+    useApi("restoreState", (gameData) => {
+        setLeaderboardContent(gameData.leaderboardContent);
+        setPrompt(gameData.prompt);
+        setRound(gameData.round);
+        setRoundsLeft(gameData.roundsLeft);
+        setRole(gameData.role);
+        setJudge(gameData.judge);
+    });
+
+    // When a player leaves, alert the user
+    useApi("playerDisconnected", (name) => {
+        toast.info(`${name} disconnected`);
+    });
+
+    // When a player re-joins the game, alert the user
+    useApi("playerReconnected", (name) => {
+        toast.info(`${name} reconnected`);
+    });
+
+    /* Once the page loads, remove initial state. This prevents a stale state from being used when
+     * the page reloads.
+     */
+    useEffect(() => {
+        history.replace({ state: { username } });
+    }, []);
 
     return (
         <div className="view" id="play">

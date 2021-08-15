@@ -26,6 +26,16 @@ function PlayerControls({ role }) {
         }
     });
 
+    // When the page is refreshed, load the correct data
+    useApi("restoreState", (gameData) => {
+        if (gameData.role === "answering") {
+            setUserCards(gameData.userCards);
+            setUserResponses(gameData.userResponses);
+            setNumBlanks(gameData.numBlanks);
+            setDisabled(gameData.isLocked);
+        }
+    });
+
     useApi("lockPlayerInputs", () => { setDisabled(true); });
 
     if (role !== "answering") {
