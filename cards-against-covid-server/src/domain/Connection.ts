@@ -176,7 +176,7 @@ class Connection {
                 const roundInfo = game.getRoundInfo();
                 game.connections.forEach((c) => c.send("gameStarted", {
                     ...roundInfo,
-                    ...game.getPlayerInfo(c.playerInfo as Player),
+                    ...game.getPlayerInfo(c.playerInfo!),
                 }));
             } else if (game.state === GameState.WAITING) {
                 this.sendError("Please wait for at least 3 players to join");
@@ -429,7 +429,7 @@ class Connection {
         if (this.game?.state === GameState.IN_PROGRESS) {
             this.send("restoreState", {
                 ...this.game.getRoundInfo(),
-                ...this.game.getPlayerInfo(this.playerInfo as Player),
+                ...this.game.getPlayerInfo(this.playerInfo!),
                 leaderboardContent: this.game.players.some((p) => p.isWinner)
                     ? this.game.getLeaderboard()
                     : null,

@@ -104,7 +104,7 @@ class Game {
         // Select new prompt
         if (this.deck.prompts.length > 0) {
             // If there are prompts left, remove the last one from the deck and use it
-            this.prompt = this.deck.prompts.pop() as string; // Will not be undefined if length > 0
+            this.prompt = this.deck.prompts.pop()!; // Will not be undefined if length > 0
         } else {
             // All prompts have been exhausted
             this.end();
@@ -127,7 +127,7 @@ class Game {
         this.connections.forEach((c) => {
             c.send("newRound", {
                 ...roundInfo,
-                ...this.getPlayerInfo(c.playerInfo as Player),
+                ...this.getPlayerInfo(c.playerInfo!),
             });
         });
     }
