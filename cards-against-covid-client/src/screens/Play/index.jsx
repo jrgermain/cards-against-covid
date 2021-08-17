@@ -59,6 +59,11 @@ function Play() {
         toast.info(`${name} reconnected`);
     });
 
+    // When a player re-joins the game, alert the user
+    useApi("gameOver", (players) => {
+        history.replace("/game-over", { players });
+    });
+
     /* Once the page loads, remove initial state. This prevents a stale state from being used when
      * the page reloads.
      */

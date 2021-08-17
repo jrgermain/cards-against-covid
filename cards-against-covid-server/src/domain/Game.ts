@@ -1,6 +1,7 @@
 import type Deck from "./Deck";
 import type Player from "./Player";
 import type Connection from "./Connection";
+import * as games from "../state/games";
 
 enum GameState {
     WAITING,
@@ -16,6 +17,7 @@ class Game {
     state: GameState = GameState.WAITING;
     round: number = 0;
     cardsPerPlayer: number = 0;
+    code?: string;
 
     get players() {
         return (
@@ -131,21 +133,25 @@ class Game {
     }
 
     end() {
-        // Set state
-        this.state = GameState.ENDED;
+        if (this.state === GameState.IN_PROGRESS) {
+            // Sort players by score
+            this.players.sort((a, b) => b.score - a.score);
 
-        // Sort players by score
-        this.players.sort((a, b) => b.score - a.score);
-
-        // There might be a tie, so we can't just mark the first player as winner
-        const topScore = this.players[0].score;
-        for (let i = 0; i < this.players.length; i++) {
-            const player = this.players[i];
-            if (player.score === topScore) {
-                player.isWinner = true;
-            } else {
-                break;
+            // There might be a tie, so we can't just mark the first player as winner
+            const topScore = this.players[0].score;
+            for (let i = 0; i < this.players.length; i++) {
+                const player = this.players[i];
+                if (player.score === topScore) {
+                    player.isWinner = true;
+                } else {
+                    break;
+                }
             }
+
+            // Tell everybody the game is over
+            this.sendAll("gameOver", this.players.map(
+                ({ name, score, isWinner }) => ({ name, score, isWinner }),
+            ));
         }
 
         // Delete info specific to this game from the connections
@@ -153,6 +159,11 @@ class Game {
             delete c.playerInfo;
             delete c.game;
         });
+
+        // Set state
+        this.state = GameState.ENDED; // TODO: we probably don't need this state
+        console.log("Ending game", this.code);
+        games.remove(this.code!);
     }
 
     getNextJudge() {
@@ -298,10 +309,30 @@ class Game {
          */
         globalThis.setTimeout(() => {
             if (!connection.isActive && connection.playerInfo) {
+                // A player left and has been gone for 2+ seconds
                 this.sendAll("playerDisconnected", connection.playerInfo.name);
 
-                // If all connected players are ready for the next round, advance the game
-                if (this.players.every((p) => p.isReadyForNextRound || !p.isConnected)) {
+                /* End the game if...
+                 * - The game is in progress but there aren't enough players to keep playing, OR
+                 * - Everybody left before the game started
+                 */
+                const connectedPlayers = this.players.filter((p) => p?.isConnected).length;
+                if (
+                    (this.state === GameState.IN_PROGRESS && connectedPlayers < 3)
+                    || (this.state === GameState.WAITING && connectedPlayers === 0)
+                ) {
+                    this.end();
+                    return;
+                }
+
+                /* Advance the game if...
+                 * - All connected players are ready for the next round, OR
+                 * - The judge left
+                 */
+                if (
+                    this.players.every((p) => p.isReadyForNextRound || !p.isConnected)
+                    || connection.playerInfo.isJudge
+                ) {
                     this.nextRound();
                 }
             }

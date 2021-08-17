@@ -16,6 +16,7 @@ function addGame(game: Game): string {
 
     // Add the game to our collection using the new game code as a key
     games.set(code, game);
+    game.code = code;
     return code;
 }
 
@@ -23,4 +24,12 @@ function getGame(gameCode: string): Game | undefined {
     return games.get(gameCode);
 }
 
-export { getGame as get, addGame as add };
+function removeGame(gameCode: string) {
+    games.delete(gameCode);
+}
+
+export {
+    getGame as get,
+    addGame as add,
+    removeGame as remove,
+};
