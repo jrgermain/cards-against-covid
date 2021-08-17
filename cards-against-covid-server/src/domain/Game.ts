@@ -288,15 +288,24 @@ class Game {
 
     // connection is a connection in this game
     removeConnection(connection: Connection) {
+        // Immediately mark player as inactive so they are allowed to reconnect
         if (connection.playerInfo) {
             connection.playerInfo.isConnected = false;
-            this.sendAll("playerDisconnected", connection.playerInfo.name);
-
-            // If all connected players are ready for the next round, advance the game
-            if (this.players.every((p) => p.isReadyForNextRound || !p.isConnected)) {
-                this.nextRound();
-            }
         }
+
+        /* Only tell other players in the game that this player has left if they have been gone for
+         * at least 2 seconds. If they disconnect and reconnect within 2 seconds, don't do anything.
+         */
+        globalThis.setTimeout(() => {
+            if (!connection.isActive && connection.playerInfo) {
+                this.sendAll("playerDisconnected", connection.playerInfo.name);
+
+                // If all connected players are ready for the next round, advance the game
+                if (this.players.every((p) => p.isReadyForNextRound || !p.isConnected)) {
+                    this.nextRound();
+                }
+            }
+        }, 2000);
     }
 }
 

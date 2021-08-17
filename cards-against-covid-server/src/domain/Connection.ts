@@ -35,6 +35,7 @@ class Connection {
     id: string;
     playerInfo?: Player;
     game?: Game;
+    private disconnectTimestamp?: number;
     private pingStatus?: PingStatus;
     private pingInterval?: NodeJS.Timeout;
     private socket: WebSocket;
@@ -409,9 +410,20 @@ class Connection {
             this.playerInfo.isConnected = true;
         }
 
-        this.game?.connections.filter((c) => c !== this).forEach(((c) => {
-            c.send("playerReconnected", this.playerInfo?.name);
-        }));
+        /* If it has been more than 2 seconds after disconnect, show a message that the player
+         * reconnected. This matches how we only notify players of the disconnect if the player has
+         * been away longer than 2 seconds, effectively giving them a 2-second buffer to handle
+         * refreshing the page.
+         */
+        const timeAway = Date.now() - this.disconnectTimestamp!;
+        if (timeAway >= 2000) {
+            if (isDev) {
+                console.log(`${this.playerInfo?.name} returned after being away for ${(timeAway / 1000).toFixed(2)} seconds`);
+            }
+            this.game?.connections.filter((c) => c !== this).forEach(((c) => {
+                c.send("playerReconnected", this.playerInfo?.name);
+            }));
+        }
 
         // Give the client who reconnected the latest state
         if (this.game?.state === GameState.IN_PROGRESS) {
@@ -466,6 +478,7 @@ class Connection {
         }
 
         this.stopHealthCheck();
+        this.disconnectTimestamp = Date.now();
 
         if (this.game) {
             this.game.removeConnection(this);
