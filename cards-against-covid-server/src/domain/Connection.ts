@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { randomUUID } from "crypto";
 import WebSocket from "ws";
 import { isDev } from "../config";
