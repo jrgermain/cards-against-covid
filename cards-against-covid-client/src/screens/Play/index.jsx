@@ -73,12 +73,10 @@ function Play() {
 
     return (
         <div className="view" id="play">
-            {leaderboardContent && (
-                <Leaderboard
-                    players={leaderboardContent}
-                    prompt={prompt}
-                />
-            )}
+            <Leaderboard
+                players={leaderboardContent}
+                prompt={prompt}
+            />
 
             <main>
                 <div className="round">

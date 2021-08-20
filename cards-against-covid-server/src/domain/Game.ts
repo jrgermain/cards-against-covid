@@ -237,9 +237,8 @@ class Game {
         return round;
     }
 
-    // Get player-specific info
+    // Get player-specific info about the game state
     getPlayerInfo(player: Player) {
-        // Send users the game state, extended with role-specific info
         const info: any = {};
 
         if (player.isJudge) {
@@ -257,6 +256,8 @@ class Game {
             info.userCards = player.cards;
             info.userResponses = player.responses;
         }
+
+        info.readyForNext = player.isReadyForNextRound;
 
         return info;
     }

@@ -3,10 +3,14 @@ import classNames from "classnames";
 import Button from "../Button";
 import Card from "../Card";
 import "./Leaderboard.css";
-import { send } from "../../lib/api";
+import { send, useApi } from "../../lib/api";
 
 function Leaderboard({ players, prompt }) {
     const [isWaiting, setWaiting] = useState(false);
+
+    useApi("restoreState", (gameData) => {
+        setWaiting(gameData.readyForNext);
+    });
 
     const renderPlayer = (player) => {
         // Figure out which css classes to give the card
@@ -40,6 +44,10 @@ function Leaderboard({ players, prompt }) {
             send("readyForNext");
             setWaiting(true);
         }
+    }
+
+    if (!players) {
+        return <></>;
     }
 
     return (
