@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 const wsEndpoint = `ws://${window.location.hostname}:8080`;
-const socket = new WebSocket(wsEndpoint);
-const sendQueue = [];
+let socket = new WebSocket(wsEndpoint);
+let sendQueue = [];
 const handlers = new Map(); // name: string => handlers: Set<function>
 
 /**
@@ -59,7 +59,7 @@ function useApi(eventName, handler, deps = []) {
     }, deps);
 }
 
-socket.onmessage = function onMessage(messageEvent) {
+function onMessage(messageEvent) {
     if (!messageEvent) {
         return;
     }
@@ -74,7 +74,19 @@ socket.onmessage = function onMessage(messageEvent) {
     } catch (e) {
         // Not an event we're interested in
     }
-};
+}
+socket.onmessage = onMessage;
+
+function leaveGame() {
+    if (window.location.pathname === "/play") {
+        // Close the old connection and establish a new session
+        socket.close();
+        sendQueue = [];
+        socket = new WebSocket(wsEndpoint);
+        socket.onmessage = onMessage;
+        send("init", null);
+    }
+}
 
 // Add global event handlers
 on("errorMessage", (e) => toast.error(e));
@@ -89,4 +101,5 @@ export {
     // on,
     // off,
     useApi,
+    leaveGame,
 };
