@@ -77,15 +77,13 @@ function onMessage(messageEvent) {
 }
 socket.onmessage = onMessage;
 
-function leaveGame() {
-    if (window.location.pathname === "/play") {
-        // Close the old connection and establish a new session
-        socket.close();
-        sendQueue = [];
-        socket = new WebSocket(wsEndpoint);
-        socket.onmessage = onMessage;
-        send("init", null);
-    }
+function resetConnection() {
+    // Close the old connection and establish a new session
+    socket.close();
+    sendQueue = [];
+    socket = new WebSocket(wsEndpoint);
+    socket.onmessage = onMessage;
+    send("init", null);
 }
 
 // Add global event handlers
@@ -101,5 +99,5 @@ export {
     // on,
     // off,
     useApi,
-    leaveGame,
+    resetConnection,
 };

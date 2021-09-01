@@ -6,7 +6,7 @@ import List from "../../components/List";
 import "./WaitingForPlayers.css";
 import Button from "../../components/Button";
 import TextBox from "../../components/TextBox";
-import { useApi, send } from "../../lib/api";
+import { useApi, send, resetConnection } from "../../lib/api";
 import { closePopup, handlePopupOpen } from "../../lib/popupFixes";
 
 const handleCopy = () => {
@@ -57,8 +57,8 @@ function WaitingForPlayers() {
 
     // When the game starts, move to the play screen
     useApi("gameStarted", (gameData) => {
-        history.replace("/play", { ...gameData, username });
-    }, [username]);
+        history.replace("/play", { ...gameData, username, gameCode });
+    }, [username, gameCode]);
 
     // When we receive the list of players, update the state
     useApi("playerList", (playerList) => {
@@ -73,6 +73,14 @@ function WaitingForPlayers() {
     // Ask for the list of players
     useEffect(() => {
         send("getPlayerList");
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener("popstate", resetConnection);
+
+        return function cleanup() {
+            window.removeEventListener("popstate", resetConnection);
+        };
     }, []);
 
     // If user loaded this page directly without actually joining a game, kick them out

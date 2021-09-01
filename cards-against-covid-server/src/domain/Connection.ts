@@ -315,7 +315,7 @@ class Connection {
         },
 
         getGameStatus: () => {
-            this.send("statusUpdate", this.game?.state?.valueOf());
+            this.send("gameStatus", this.game?.state?.valueOf());
         },
     };
 
@@ -405,9 +405,11 @@ class Connection {
             this.initSocket();
         }
 
-        if (this.playerInfo) {
-            this.playerInfo.isConnected = true;
+        if (!this.playerInfo) {
+            return;
         }
+
+        this.playerInfo.isConnected = true;
 
         /* If it has been more than 2 seconds after disconnect, show a message that the player
          * reconnected. This matches how we only notify players of the disconnect if the player has
@@ -420,7 +422,7 @@ class Connection {
                 console.log(`${this.playerInfo?.name} returned after being away for ${(timeAway / 1000).toFixed(2)} seconds`);
             }
             this.game?.connections.filter((c) => c !== this).forEach(((c) => {
-                c.send("playerReconnected", this.playerInfo?.name);
+                c.send("playerReconnected", this.playerInfo!.name);
             }));
         }
 
@@ -428,11 +430,12 @@ class Connection {
         if (this.game?.state === GameState.IN_PROGRESS) {
             this.send("restoreState", {
                 ...this.game.getRoundInfo(),
-                ...this.game.getPlayerInfo(this.playerInfo!),
+                ...this.game.getPlayerInfo(this.playerInfo),
                 leaderboardContent: this.game.players.some((p) => p.isWinner)
                     ? this.game.getLeaderboard()
                     : null,
                 isLocked: this.game.isLocked,
+                gameCode: this.game.code,
             });
         }
     }

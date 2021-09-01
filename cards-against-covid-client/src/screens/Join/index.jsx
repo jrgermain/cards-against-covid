@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
 import "./Join.css";
@@ -18,26 +18,43 @@ const saveUsername = (username) => {
 
 function Join() {
     const history = useHistory();
+    const location = useLocation();
     const [username, setUsername] = useState(localStorage.getItem("last-username") ?? "");
     const [gameCode, setGameCode] = useState("");
     const [gameCodeError, setGameCodeError] = useState("");
     const [usernameError, setUsernameError] = useState("");
+    const [autoSubmit, setAutoSubmit] = useState(false);
 
     useEffect(() => {
-        /* If the user came from a join link, populate the game code, then set the URL to the
-         * 'normal' join url
-         */
-        const params = new URLSearchParams(history.location.search);
+        if (!location.search) {
+            return;
+        }
+
+        // Use parameters in the url to set the initial page state
+        const params = new URLSearchParams(location.search);
+
         if (params.has("code")) {
             const code = params.get("code");
             if (gameCodeRegex.test(code)) {
                 setGameCode(code.toUpperCase());
             } else {
                 toast.warn("Invalid join link");
+                setGameCode("");
             }
-            history.replace({ search: "" });
+            params.delete("code");
         }
-    }, []);
+        if (params.has("name")) {
+            const name = params.get("name");
+            setUsername(name);
+            params.delete("name");
+        }
+
+        // Remove join parameters from the url after using them
+        history.replace({ search: params.toString() });
+
+        // Submit the form
+        setAutoSubmit(!!location.state?.submit);
+    }, [location.search, location.state?.submit]);
 
     // When the user successfully joins a game, move on to the wait screen
     useApi("joinedGame", () => {
@@ -90,6 +107,13 @@ function Join() {
             joinGame();
         }
     }
+
+    useEffect(() => {
+        if (autoSubmit) {
+            setAutoSubmit(false);
+            joinGame();
+        }
+    }, [autoSubmit]);
 
     return (
         <main className="view" id="join">

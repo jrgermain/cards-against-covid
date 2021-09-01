@@ -7,14 +7,14 @@ import "./Play.css";
 import Leaderboard from "../../components/Leaderboard";
 import PlayerControls from "./PlayerControls";
 import JudgeControls from "./JudgeControls";
-import { useApi } from "../../lib/api";
+import { useApi, resetConnection, send } from "../../lib/api";
 
 const NORMAL_WEIGHT = { fontWeight: "normal" };
 
 function Play() {
     const history = useHistory();
     const location = useLocation();
-    const { username } = location.state || {};
+    const { username, gameCode } = location.state || {};
 
     const [prompt, setPrompt] = useState(location.state?.prompt ?? "");
     const [round, setRound] = useState(location.state?.round ?? 0);
@@ -23,6 +23,18 @@ function Play() {
     const [judge, setJudge] = useState(location.state?.judge ?? "");
     const [leaderboardContent, setLeaderboardContent] = useState(null);
     const hideLeaderboard = () => setLeaderboardContent(null);
+
+    // Leave the game, but allow the user to easily rejoin by clicking a toast
+    const handlePopState = () => {
+        // Leave the game by resetting the socket connection
+        resetConnection();
+
+        toast.info("You left the game. Click/tap here to rejoin.", {
+            onClick: () => {
+                history.push(`/join?code=${gameCode}&name=${username}`, { submit: true });
+            },
+        });
+    };
 
     // When a new round starts, hide the leaderboard and update the state
     useApi("newRound", (gameData) => {
@@ -64,11 +76,31 @@ function Play() {
         history.replace("/game-over", { players });
     });
 
+    useApi("gameStatus", (state) => {
+        // A state of 1 indicates a game is in progress
+        if (state !== 1) {
+            history.replace("/");
+            resetConnection();
+        }
+    });
+
     /* Once the page loads, remove initial state. This prevents a stale state from being used when
      * the page reloads.
      */
     useEffect(() => {
         history.replace({ state: { username } });
+    }, []);
+
+    useEffect(() => {
+        send("getGameStatus");
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener("popstate", handlePopState);
+
+        return function cleanup() {
+            window.removeEventListener("popstate", handlePopState);
+        };
     }, []);
 
     return (
