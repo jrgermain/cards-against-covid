@@ -2,6 +2,7 @@ import type Deck from "./Deck";
 import type Player from "./Player";
 import type Connection from "./Connection";
 import * as games from "../state/games";
+import type ChatMessage from "./ChatMessage";
 
 enum GameState {
     WAITING,
@@ -18,6 +19,7 @@ class Game {
     round: number = 0;
     cardsPerPlayer: number = 0;
     code?: string;
+    chats: ChatMessage[] = [];
 
     get players() {
         return (

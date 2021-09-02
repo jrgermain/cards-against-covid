@@ -8,6 +8,7 @@ import { getDecks, getExpansionPacks, saveExpansionPack } from "../cards";
 import Deck from "./Deck";
 import Player from "./Player";
 import type { IDeck } from "./Deck";
+import type ChatMessage from "./ChatMessage";
 
 type ICreateGameArgs = { deckName: string, expansionPackNames: string[], roundLimit?: number };
 type IJoinGameArgs = { gameCode: string, playerName: string };
@@ -270,11 +271,12 @@ class Connection {
             }
 
             if (game.state === GameState.IN_PROGRESS) {
-                const message = {
+                const message: ChatMessage = {
                     sender: this.playerInfo.name,
                     content,
                 };
                 game.sendAll("chatMessage", message);
+                game.chats.push(message);
             }
         },
 
@@ -436,6 +438,7 @@ class Connection {
                     : null,
                 isLocked: this.game.isLocked,
                 gameCode: this.game.code,
+                chats: this.game.chats,
             });
         }
     }

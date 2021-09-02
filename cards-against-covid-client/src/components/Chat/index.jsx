@@ -16,6 +16,10 @@ function Chat() {
 
     const hasUnread = collapsed && numRead < messages.length;
 
+    useApi("restoreState", (gameData) => {
+        setMessages(gameData.chats);
+    });
+
     useApi("chatMessage", (message) => {
         setMessages([...messages, message]);
     }, [messages]);
