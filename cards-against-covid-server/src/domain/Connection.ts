@@ -87,7 +87,11 @@ class Connection {
                 await saveExpansionPack(new Deck({ name, prompts, responses }));
                 this.send("expansionPackCreated", name);
             } catch (e) {
-                this.sendError(e?.message);
+                if (e instanceof Error) {
+                    this.sendError(e.message);
+                } else {
+                    this.sendError();
+                }
             }
         },
 
@@ -445,7 +449,9 @@ class Connection {
 
     processMessage(message: string) {
         // CAC messages are in the form: `CAC:${eventName}:${jsonPayload}`
-        if (message.startsWith("CAC:")) {
+        if (message === "ping") {
+            this.socket.send("pong");
+        } else if (message.startsWith("CAC:")) {
             const secondColon = message.indexOf(":", 4);
             const eventName = message.slice(4, secondColon);
             let payload = message.slice(secondColon + 1);

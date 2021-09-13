@@ -14,11 +14,13 @@ import GameOver from "./screens/GameOver";
 import "react-toastify/dist/ReactToastify.min.css";
 import NotFound from "./screens/NotFound";
 import "reactjs-popup/dist/index.css";
+import ConnectionStatus from "./components/ConnectionStatus";
 
 ReactDOM.render(
     <React.StrictMode>
         <BrowserRouter>
             <ToastContainer position="top-center" />
+            <ConnectionStatus />
             <Switch>
                 <Route exact path="/" component={Home} />
                 <Route path="/start" component={StartGame} />

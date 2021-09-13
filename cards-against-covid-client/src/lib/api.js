@@ -5,6 +5,7 @@ const wsEndpoint = `ws://${window.location.hostname}:8080`;
 let socket = new WebSocket(wsEndpoint);
 let sendQueue = [];
 const handlers = new Map(); // name: string => handlers: Set<function>
+let isHealthy = true;
 
 /**
  * Send a message to the server via WebSocket. If the WebSocket connection is not open, add it to a
@@ -59,32 +60,66 @@ function useApi(eventName, handler, deps = []) {
     }, deps);
 }
 
+function handleEvent(event, payload) {
+    if (handlers.get(event)?.size) {
+        Array.from(handlers.get(event)).forEach((handler) => {
+            handler(payload);
+        });
+    }
+}
+
+function setHealthy(newValue) {
+    handleEvent("_healthStatus", newValue);
+    isHealthy = newValue;
+}
+function getHealthy() {
+    return isHealthy && socket.readyState !== WebSocket.CLOSED;
+}
+function resetHealth() {
+    isHealthy = false;
+}
+
 function onMessage(messageEvent) {
     if (!messageEvent) {
         return;
     }
+
+    // If we receive a message, assume the connection is working
+    setHealthy(true);
     try {
         const { event, payload } = JSON.parse(messageEvent.data);
 
-        if (handlers.get(event)?.size) {
-            Array.from(handlers.get(event)).forEach((handler) => {
-                handler(payload);
-            });
-        }
+        handleEvent(event, payload);
     } catch (e) {
         // Not an event we're interested in
     }
 }
 socket.onmessage = onMessage;
 
-function resetConnection() {
+function resetConnection(sessionId = null) {
     // Close the old connection and establish a new session
     socket.close();
     sendQueue = [];
     socket = new WebSocket(wsEndpoint);
     socket.onmessage = onMessage;
-    send("init", null);
+    send("init", sessionId);
 }
+
+// Health check
+// Set healthy=false. If it is not set back to true after some time, connection is unhealthy
+function healthCheck() {
+    if (!getHealthy()) {
+        resetConnection(sessionStorage.getItem("sessionId"));
+    }
+    setHealthy(isHealthy);
+    resetHealth();
+
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send("ping");
+    }
+    setTimeout(healthCheck, 1200);
+}
+healthCheck();
 
 // Add global event handlers
 on("errorMessage", (e) => toast.error(e));
@@ -96,8 +131,6 @@ send("init", sessionStorage.getItem("sessionId"));
 
 export {
     send,
-    // on,
-    // off,
     useApi,
     resetConnection,
 };
