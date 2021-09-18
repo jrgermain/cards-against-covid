@@ -119,7 +119,8 @@ function healthCheck() {
     }
     setTimeout(healthCheck, 1200);
 }
-healthCheck();
+// Wait a few seconds to start health checking
+setTimeout(healthCheck, 2400);
 
 // Add global event handlers
 on("errorMessage", (e) => toast.error(e));
