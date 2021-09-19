@@ -15,7 +15,7 @@ The game is still being maintained, but development is moving slower now that I 
 ## Building and running the server
 ### Prerequisites
 1. You must have Node.js (version 14.17 or later) and npm (included with Node.js) installed. For directions, see [How to install Node.js](https://nodejs.dev/learn/how-to-install-nodejs).
-2. Make sure to install all of the project's dependencies by running `npm install` in both the `cards-against-covid-client` and `cards-against-covid-server` subfolders
+2. Make sure to install all of the project's dependencies by running `npm install` in both the 'cards-against-covid-client' and 'cards-against-covid-server' subfolders
 
 ### Running from source (dev mode)
 This mode allows you to run the game using your local copy of the source code. On the client side, it enables live reload and uses the development version of React. On the server side, more verbose logging is enabled to aid in debugging. To access the game, open http://localhost:3000 in your web browser. Port 3000 is used to host the client. Meanwhile, port 8080 is used by the backend.
@@ -25,10 +25,11 @@ This mode allows you to run the game using your local copy of the source code. O
     - A web browser window should open automatically
 
 ### Building executables (production mode)
-*NOTE: This is currently broken. See here: https://github.com/jrgermain/cards-against-covid/projects/6#card-66348514*
+This mode bundles everything needed to run the game into a single executable file. On the client side, the production version of React is used and the code is compiled to plain HTML, JavaScript, and CSS. On the server side, fewer messages are logged. 
 
-This mode bundles everything needed to run the game into a single executable file. On the client side, the production version of React is used and the code is compiled to plain HTML, JavaScript, and CSS (instead of running as a separate server). On the server side, fewer messages are logged. In production mode, both the client code and the server code are served at port 8080 (port 3000 is not used).
+1. Navigate to the 'cards-against-covid-bundle' directory
+2. Run the following command: `npm run full-build`.
+3. Executables for macOS, Windows, and Linux should now be in a subfolder called 'dist', which will be created if it doesn't already exist.
 
-1. Navigate to the root project directory (the folder named 'cards-against-covid').
-2. Run the following command: `npm run build`.
-3. Executables for macOS, Windows, and Linux should now be in a subfolder called 'build', which will be created if it doesn't already exist.
+#### Running production mode executables
+The executable files built in the previous step should start up a game server when double-clicked
