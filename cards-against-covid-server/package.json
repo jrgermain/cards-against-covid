@@ -13,7 +13,7 @@
   },
   "scripts": {
     "start": "tsc && node dist/index.js --dev",
-    "build": "tsc && pkg . --output ../build/Cards-Against-COVID --targets node14-linux-x64,node14-macos-x64,node14-win-x64"
+    "build": "tsc"
   },
   "pkg": {
     "assets": [

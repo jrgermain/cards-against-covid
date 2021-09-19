@@ -1,0 +1,19 @@
+{
+  "name": "cards-against-covid-bundle",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "prepare-server": "cd ../cards-against-covid-server && npm install && npm run build",
+    "prepare-client": "cd ../cards-against-covid-client && npm install && npm run build",
+    "build": "pkg ../cards-against-covid-server --output ./dist/Cards-Against-COVID --targets node14-linux-x64,node14-macos-x64,node14-win-x64",
+    "full-build": "npm run prepare-client && npm run prepare-server && npm run build"
+  },
+  "pkg": {
+    "assets": [
+      "../cards-against-covid-client/build/**/*"
+    ]
+  },
+  "devDependencies": {
+    "pkg": "^5.3.0"
+  }
+}
