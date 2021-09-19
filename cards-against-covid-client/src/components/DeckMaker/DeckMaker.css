@@ -1,47 +1,48 @@
 .deck-maker {
-    background: whitesmoke;
-    margin: 1rem 0;
-    padding: 1rem;
+  background: whitesmoke;
+  margin: 1rem 0;
+  padding: 1rem;
 }
 
 .deck-maker > label {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .deck-maker > ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
+
 .deck-maker li {
-    display: grid;
-    grid-template-columns: 1fr 3rem;
-    margin: .5rem 0;
+  display: grid;
+  grid-template-columns: 1fr 3rem;
+  margin: 0.5rem 0;
 }
 
 .deck-maker input {
-    width: -moz-available;
-    width: -webkit-fill-available;
-    width: stretch;
+  width: -moz-available;
+  width: -webkit-fill-available;
+  width: stretch;
 }
 
 .deck-maker .Button {
-    display: inline-block;
-    transform: scale(.8);
+  display: inline-block;
+  transform: scale(0.8);
 }
 
 .deck-maker .delete {
-    font-size: 1rem;
-    background: red;
-    color: white;
-    border: 1px solid white;
-    border-radius: 50%;
-    width: 1.5rem;
-    height: 1.5rem;
-    padding: .4rem;
-    margin: auto;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transform: scale(0.75);
-    box-sizing: content-box;
+  font-size: 1rem;
+  background: red;
+  color: white;
+  border: 1px solid white;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0.4rem;
+  margin: auto;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transform: scale(0.75);
+  box-sizing: content-box;
 }

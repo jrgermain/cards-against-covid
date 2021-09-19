@@ -1,86 +1,87 @@
 #waiting-for-players main {
-    height: 100%;
+  height: 100%;
 }
+
 #waiting-for-players .button-group {
-    margin-top: auto;
+  margin-top: auto;
 }
 
 @media only screen and (max-width: 799px) {
-    #waiting-for-players main {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto 1fr;
-    }
+  #waiting-for-players main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto 1fr;
+  }
 }
 
 @media only screen and (min-width: 800px) {
-    #waiting-for-players main {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto 1fr;
-    }
+  #waiting-for-players main {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+  }
 
-    h1, .button-group {
-        grid-column: 1 / span 2;
-    }
+  h1,
+  .button-group {
+    grid-column: 1 / span 2;
+  }
 }
 
-
 .change-name-popup {
-    display: flex;
-    flex-direction: column;
-    margin: .5rem;
-    width: 20rem;
+  display: flex;
+  flex-direction: column;
+  margin: 0.5rem;
+  width: 20rem;
 }
 
 .change-name-popup label {
-    margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 .change-name-popup .big-text {
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: .5rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.5rem;
 }
 
 .change-name-popup .Button {
-    padding: .5rem;
+  padding: 0.5rem;
 }
 
 .invite-popup {
-    display: inline-grid;
-    gap: .5rem;
-    margin: .5rem;
+  display: inline-grid;
+  gap: 0.5rem;
+  margin: 0.5rem;
 }
 
 .invite-popup label {
-    grid-row: 1;
-    grid-column: 1 / span 2;
+  grid-row: 1;
+  grid-column: 1 / span 2;
 }
 
 .invite-popup .text-box {
-    grid-row: 2;
-    grid-column: 1;
+  grid-row: 2;
+  grid-column: 1;
 }
 
 .invite-popup .text-box .big-text {
-    width: 20rem;
-    border: 1px solid rgb(200,200,200);
-    background: rgb(224, 224, 224);
-    height: 2.5rem;
-    box-sizing: border-box;
+  width: 20rem;
+  border: 1px solid rgb(200, 200, 200);
+  background: rgb(224, 224, 224);
+  height: 2.5rem;
+  box-sizing: border-box;
 }
 
 .invite-popup button {
-    grid-row: 2;
-    grid-column: 2;
-    padding: 0 1.2rem;
-    font-size: .9rem;
-    height: 2.5rem;
+  grid-row: 2;
+  grid-column: 2;
+  padding: 0 1.2rem;
+  font-size: 0.9rem;
+  height: 2.5rem;
 }
 
 .start-game button {
-    margin: .2rem;
+  margin: 0.2rem;
 }
 
 .popup-content {
-    width: auto!important;
+  width: auto !important;
 }

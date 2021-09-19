@@ -1,23 +1,23 @@
 #game-over h2 {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 #game-over table {
-    margin-top: .5rem;
-    max-width: 800px;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+  margin-top: 0.5rem;
+  max-width: 800px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #game-over th,
 #game-over td {
-    padding: .4rem;
-    font-size: 1.1rem;
+  padding: 0.4rem;
+  font-size: 1.1rem;
 }
 
 .final-score-wrapper {
-    background: whitesmoke;
-    border-radius: 1rem;
-    padding: 1rem;
+  background: whitesmoke;
+  border-radius: 1rem;
+  padding: 1rem;
 }

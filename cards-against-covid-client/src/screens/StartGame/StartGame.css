@@ -1,52 +1,52 @@
 .expansion-packs {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
-    margin: 10px auto;
-    gap: 1rem;
-    place-items: center;
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  margin: 10px auto;
+  gap: 1rem;
+  place-items: center;
 }
 
 .expansion-packs label {
-    width: 100%;
-    text-align: left;
+  width: 100%;
+  text-align: left;
 }
 
 .pack-num-prompts,
 .pack-num-responses {
-    font-size: .9rem;
-    font-weight: bold;
-    box-shadow: 0 0 4px rgb(106, 106, 106);
-    padding: .4rem;
-    border-radius: 3px;
-    pointer-events: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+  box-shadow: 0 0 4px rgb(106, 106, 106);
+  padding: 0.4rem;
+  border-radius: 3px;
+  pointer-events: none;
 }
 
 .pack-num-prompts {
-    background-color: black;
-    color: white;
+  background-color: black;
+  color: white;
 }
 
 .pack-num-responses {
-    background-color: white;
-    color: black;
+  background-color: white;
+  color: black;
 }
 
 #start-game .view-content {
-    margin: 0 auto;
+  margin: 0 auto;
 }
 
 .game-settings {
-    text-align: left;
+  text-align: left;
 }
 
 .game-settings input[type="checkbox"] + label,
 .round-limit {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 .round-limit-disclaimer {
-    font-size: .9rem;
-    font-style: italic;
-    color: #888;
-    margin-top: 5px;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #888;
+  margin-top: 5px;
 }

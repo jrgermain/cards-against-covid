@@ -1,80 +1,80 @@
 #play {
-    padding: 0;
-    height: 100vh;
-    height: -webkit-fill-available;
-    overflow: hidden;
-    flex-direction: row;
-    transition: filter .3s linear;
+  padding: 0;
+  height: 100vh;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  flex-direction: row;
+  transition: filter 0.3s linear;
 }
 
 #play main {
-    display: flex;
-    flex-direction: column;
-    height: inherit;
-    width: 100vw;
-    padding-bottom: 3.2rem;
+  display: flex;
+  flex-direction: column;
+  height: inherit;
+  width: 100vw;
+  padding-bottom: 3.2rem;
 }
 
 @media only screen and (min-width: 800px) {
-    #play main {
-        width: calc(100vw - 20rem);
-        padding-bottom: 0;
-    }
+  #play main {
+    width: calc(100vw - 20rem);
+    padding-bottom: 0;
+  }
 }
 
-.round{
-    display: block;
-    align-items: right;
-    align-content: right;
-    text-align: right;
-    margin-top: 1%;
-    margin-bottom: 0%;
-    margin-right: .5%;
-    font-size: medium;
-    padding: 0%;
-    color: #666;
+.round {
+  display: block;
+  align-items: right;
+  align-content: right;
+  text-align: right;
+  margin-top: 1%;
+  margin-bottom: 0%;
+  margin-right: 0.5%;
+  font-size: medium;
+  padding: 0%;
+  color: #666;
 }
 
 .game-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: auto;
-    margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  margin-top: 1rem;
 }
 
 .game-controls > * {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .game-controls > h2 {
-    margin: 0;
+  margin: 0;
 }
 
 #play h1 {
-    /* margin-top: 2rem; */
-    margin-top: .5%;
-    margin-bottom: 0;
+  /* margin-top: 2rem; */
+  margin-top: 0.5%;
+  margin-bottom: 0;
 }
 
 .judge-name {
-    color: #666;
-    font-size: 1.5rem;
+  color: #666;
+  font-size: 1.5rem;
 }
 
 .deck {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .player-controls.disabled {
-    opacity: .5;
+  opacity: 0.5;
 }
 
 .player-controls.disabled > * {
-    pointer-events: none!important;
-    cursor: not-allowed!important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
 }
 
 /* .player-controls:not(.multi-select) .card-selected-index {
@@ -82,22 +82,22 @@
 } */
 
 .player-controls {
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 @media only screen and (max-width: 799px) {
-    .player-controls {
-        margin-bottom: 4rem;
-    }
+  .player-controls {
+    margin-bottom: 4rem;
+  }
 }
 
 #play.disconnected {
-    filter: opacity(.5) blur(2px);
-    pointer-events: none;
+  filter: opacity(0.5) blur(2px);
+  pointer-events: none;
 }
 
 #play main .card {
-    max-width: calc(50vw - 2rem);
-    max-height: calc(75vw - 3rem);
-    font-size: 1.2rem;
+  max-width: calc(50vw - 2rem);
+  max-height: calc(75vw - 3rem);
+  font-size: 1.2rem;
 }

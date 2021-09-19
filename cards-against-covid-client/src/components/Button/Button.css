@@ -1,43 +1,43 @@
 .Button {
-    padding: 1.2rem;
-    font-size: 1rem;
-    color: white;
-    background: #444;
-    box-shadow: none;
-    border-radius: 0;
-    border: none;
-    outline: none;
-    transition: background .3s linear;
-    cursor: pointer;
-    text-decoration: none;
+  padding: 1.2rem;
+  font-size: 1rem;
+  color: white;
+  background: #444;
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  outline: none;
+  transition: background 0.3s linear;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .Button:hover {
-    background: #666;
+  background: #666;
 }
 
 .Button:active {
-    background: #222;
+  background: #222;
 }
 
 .Button:focus {
-    outline: 2px solid #8af;
+  outline: 2px solid #8af;
 }
 
 .Button[disabled] {
-    background: #666;
-    color: #ccc;
-    cursor: default;
+  background: #666;
+  color: #ccc;
+  cursor: default;
 }
 
 .Button.primary {
-    background: #286;
+  background: #286;
 }
 
 .Button.primary:hover {
-    background: #4a8;
+  background: #4a8;
 }
 
 .Button.primary:active {
-    background: #064;
+  background: #064;
 }
