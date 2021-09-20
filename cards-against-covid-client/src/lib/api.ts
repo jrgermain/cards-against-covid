@@ -1,17 +1,20 @@
-import { useEffect } from "react";
+import { DependencyList, useEffect } from "react";
 import { toast } from "react-toastify";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- a necessary evil here
+type HandlerFunction<T = any> = (eventData: T) => void;
 
 const wsEndpoint = `ws://${window.location.hostname}:8080`;
 let socket = new WebSocket(wsEndpoint);
-let sendQueue = [];
-const handlers = new Map(); // name: string => handlers: Set<function>
+let sendQueue: string[] = [];
+const handlers: Record<string, Set<HandlerFunction>> = {};
 let isHealthy = true;
 
 /**
  * Send a message to the server via WebSocket. If the WebSocket connection is not open, add it to a
  * queue to be sent once the connection becomes open.
  */
-function send(event, payload) {
+function send(event: string, payload?: unknown): void {
     const message = `CAC:${event}:${JSON.stringify(payload ?? null)}`;
     if (socket.readyState === WebSocket.OPEN) {
         socket.send(message);
@@ -23,22 +26,27 @@ function send(event, payload) {
 window.setInterval(() => {
     if (sendQueue.length && socket.readyState === WebSocket.OPEN) {
         // Send the first message on the send queue
-        socket.send(sendQueue.shift());
+        const message = sendQueue.shift();
+        if (message != null) {
+            socket.send(message);
+        }
     }
 }, 200);
 
 // Add an event listener
-function on(eventName, eventHandler) {
+function on(eventName: string, eventHandler: HandlerFunction) {
     // Make sure there is a set to hold handlers for this event
-    if (!handlers.has(eventName)) {
-        handlers.set(eventName, new Set());
+    if (!(eventName in handlers)) {
+        handlers[eventName] = new Set();
     }
-    handlers.get(eventName).add(eventHandler);
+    handlers[eventName].add(eventHandler);
 }
 
 // Remove an event listener
-function off(eventName, eventHandler) {
-    handlers.get(eventName)?.delete(eventHandler);
+function off(eventName: string, eventHandler: HandlerFunction) {
+    if (eventName in handlers) {
+        handlers[eventName].delete(eventHandler);
+    }
 }
 
 /**
@@ -51,7 +59,7 @@ function off(eventName, eventHandler) {
  * @param handler A function that is called when the event occurs
  * @param deps Any outside values used by the function that are subject to change
  */
-function useApi(eventName, handler, deps = []) {
+function useApi<T = unknown>(eventName: string, handler: HandlerFunction<T>, deps: DependencyList = []): void {
     useEffect(() => {
         on(eventName, handler);
         return function cleanup() {
@@ -60,15 +68,15 @@ function useApi(eventName, handler, deps = []) {
     }, deps);
 }
 
-function handleEvent(event, payload) {
-    if (handlers.get(event)?.size) {
-        Array.from(handlers.get(event)).forEach((handler) => {
+function handleEvent(event: string, payload: unknown) {
+    if (handlers[event]?.size) {
+        handlers[event].forEach((handler) => {
             handler(payload);
         });
     }
 }
 
-function setHealthy(newValue) {
+function setHealthy(newValue: boolean) {
     handleEvent("_healthStatus", newValue);
     isHealthy = newValue;
 }
@@ -79,16 +87,11 @@ function resetHealth() {
     isHealthy = false;
 }
 
-function onMessage(messageEvent) {
-    if (!messageEvent) {
-        return;
-    }
-
+function onMessage(messageEvent: MessageEvent) {
     // If we receive a message, assume the connection is working
     setHealthy(true);
     try {
         const { event, payload } = JSON.parse(messageEvent.data);
-
         handleEvent(event, payload);
     } catch (e) {
         // Not an event we're interested in
@@ -96,7 +99,7 @@ function onMessage(messageEvent) {
 }
 socket.onmessage = onMessage;
 
-function resetConnection(sessionId = null) {
+function resetConnection(sessionId: string | null = null): void {
     // Close the old connection and establish a new session
     socket.close();
     sendQueue = [];
@@ -125,7 +128,7 @@ setTimeout(healthCheck, 2400);
 // Add global event handlers
 on("errorMessage", (e) => toast.error(e));
 on("infoMessage", (e) => toast.info(e));
-on("sessionEstablished", (sessionId) => sessionStorage.setItem("sessionId", sessionId));
+on("sessionEstablished", (sessionId) => sessionStorage.setItem("sessionId", sessionId as string));
 
 // When the app is loaded, establish a session
 send("init", sessionStorage.getItem("sessionId"));

@@ -1,8 +1,8 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import "./Home.css";
 import Button from "../../components/Button";
 
-function Home() {
+function Home(): ReactElement {
     return (
         <div className="view" id="start" role="main">
             <h1 id="game-logo">

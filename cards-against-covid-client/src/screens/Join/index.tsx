@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState, KeyboardEvent, ChangeEvent } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
 import "./Join.css";
 import { useApi, send } from "../../lib/api";
 import TextBox from "../../components/TextBox";
+import { RestoreStateArgs } from "../../lib/commonTypes";
+
+interface JoinLocationState {
+    submit?: boolean;
+}
 
 const gameCodeRegex = /^[a-z]{4}$/i;
-const saveUsername = (username) => {
+
+const saveUsername = (username: string) => {
     // Save this as the default username for future games
     try {
         localStorage.setItem("last-username", username);
@@ -16,14 +22,14 @@ const saveUsername = (username) => {
     }
 };
 
-function Join() {
+function Join(): ReactElement {
     const history = useHistory();
-    const location = useLocation();
-    const [username, setUsername] = useState(localStorage.getItem("last-username") ?? "");
-    const [gameCode, setGameCode] = useState("");
-    const [gameCodeError, setGameCodeError] = useState("");
-    const [usernameError, setUsernameError] = useState("");
-    const [autoSubmit, setAutoSubmit] = useState(false);
+    const location = useLocation<JoinLocationState>();
+    const [username, setUsername] = useState<string>(localStorage.getItem("last-username") ?? "");
+    const [gameCode, setGameCode] = useState<string>("");
+    const [gameCodeError, setGameCodeError] = useState<string>("");
+    const [usernameError, setUsernameError] = useState<string>("");
+    const [autoSubmit, setAutoSubmit] = useState<boolean>(false);
 
     useEffect(() => {
         if (!location.search) {
@@ -35,7 +41,7 @@ function Join() {
 
         if (params.has("code")) {
             const code = params.get("code");
-            if (gameCodeRegex.test(code)) {
+            if (code != null && gameCodeRegex.test(code)) {
                 setGameCode(code.toUpperCase());
             } else {
                 toast.warn("Invalid join link");
@@ -45,7 +51,9 @@ function Join() {
         }
         if (params.has("name")) {
             const name = params.get("name");
-            setUsername(name);
+            if (name != null) {
+                setUsername(name);
+            }
             params.delete("name");
         }
 
@@ -66,7 +74,7 @@ function Join() {
     }, [username, gameCode]);
 
     // When the user successfully rejoins a game, move on to the play screen and restore game state
-    useApi("restoreState", (gameData) => {
+    useApi<RestoreStateArgs>("restoreState", (gameData) => {
         // Update last used username
         saveUsername(username);
 
@@ -102,7 +110,7 @@ function Join() {
         send("joinGame", { gameCode, playerName: username });
     }
 
-    function handleKeyPress(event) {
+    function handleKeyPress(event: KeyboardEvent<HTMLInputElement>) {
         if (event.key === "Enter") {
             joinGame();
         }
@@ -125,7 +133,7 @@ function Join() {
                         id="player-name"
                         placeholder="Your name"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
                         onKeyPress={handleKeyPress}
                         errorCondition={!!usernameError}
                         errorMessage={usernameError}
@@ -137,11 +145,11 @@ function Join() {
                         id="game-code"
                         placeholder="Game code"
                         value={gameCode}
-                        onChange={(e) => setGameCode(e.target.value.toUpperCase())}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setGameCode(e.target.value.toUpperCase())}
                         onKeyPress={handleKeyPress}
                         errorCondition={!!gameCodeError}
                         errorMessage={gameCodeError}
-                        maxLength="4"
+                        maxLength={4}
                     />
                 </div>
             </section>

@@ -1,43 +1,59 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { useLocation } from "react-router-dom";
 import List from "../../components/List";
 import Card from "../../components/Card";
 import { useApi, send } from "../../lib/api";
+import { NewRoundArgs, PlayerRole, RestoreStateArgs } from "../../lib/commonTypes";
 
-function JudgeControls({ role }) {
-    const location = useLocation();
-    const [players, setPlayers] = useState(location.state?.players ?? []); // {name, responses, isConnected}[]
-    const [numBlanks, setNumBlanks] = useState(location.state?.numBlanks ?? 1);
+type JudgeControlsProps = {
+    role: PlayerRole;
+}
+
+type PlayerData = {
+    name: string;
+    responses: string[];
+    isConnected: boolean;
+}
+
+interface JudgeControlsLocationState {
+    players?: PlayerData[];
+    numBlanks?: number;
+}
+
+function JudgeControls({ role }: JudgeControlsProps): ReactElement {
+    const location = useLocation<JudgeControlsLocationState>();
+    const [players, setPlayers] = useState<PlayerData[]>(location.state?.players ?? []); // {name, responses, isConnected}[]
+    const [numBlanks, setNumBlanks] = useState<number>(location.state?.numBlanks ?? 1);
 
     // When a player selects a card, update the state
-    useApi("cardSelected", (updatedPlayer) => {
+    useApi<PlayerData>("cardSelected", (updatedPlayer) => {
         // Replace the player who selected a card's info with the latest
         setPlayers(players.map((p) => (p.name === updatedPlayer.name ? updatedPlayer : p)));
     }, [players]);
 
     // When a new round starts, update the state
-    useApi("newRound", (gameData) => {
+    useApi<NewRoundArgs>("newRound", (gameData) => {
         if (gameData.role === "judging") {
-            setPlayers(gameData.players);
+            setPlayers(gameData.players ?? []);
             setNumBlanks(gameData.numBlanks);
         }
     });
 
     // When the page is refreshed, load the correct data
-    useApi("restoreState", (gameData) => {
+    useApi<RestoreStateArgs>("restoreState", (gameData) => {
         if (gameData.role === "judging") {
-            setPlayers(gameData.players);
+            setPlayers(gameData.players ?? []);
             setNumBlanks(gameData.numBlanks);
         }
     });
 
     // When a player leaves, set isConnected to false for that player
-    useApi("playerDisconnected", (name) => {
+    useApi<string>("playerDisconnected", (name) => {
         setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: false } : p)));
     }, [players]);
 
     // When a player returns, set isConnected to true for that player
-    useApi("playerReconnected", (name) => {
+    useApi<string>("playerReconnected", (name) => {
         setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: true } : p)));
     }, [players]);
 
@@ -45,7 +61,7 @@ function JudgeControls({ role }) {
         return <></>;
     }
 
-    const needsToAnswer = (player) => player.isConnected && player.responses.length < numBlanks;
+    const needsToAnswer = (player: PlayerData) => player.isConnected && player.responses.length < numBlanks;
 
     if (players.some(needsToAnswer)) {
         return (
@@ -59,11 +75,15 @@ function JudgeControls({ role }) {
     }
 
     // Get an array of <Card> elements displaying each player's responses
-    const responseCards = players.filter((p) => p.isConnected).map((player) => {
-        // When a card is clicked, send a socket event saying the judge selected a card
-        const onClick = () => send("selectAnswer", player.name);
-        return <Card type="multi-response" onClick={onClick}>{player.responses}</Card>;
-    });
+    const responseCards = players.filter((p) => p.isConnected).map((player) => (
+        <Card 
+            type="multi-response"
+            onClick={() => send("selectAnswer", player.name)}
+            key={player.name}
+        >
+            {player.responses}
+        </Card>
+    ));
 
     return (
         <div className="judge-controls">

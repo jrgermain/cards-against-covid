@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import ChatMessage from "./ChatMessage";
 import "./Chat.css";
 import ChatSubmit from "./ChatSubmit";
 import { useApi } from "../../lib/api";
+import { ChatMessageData } from "./ChatMessageData";
+import { RestoreStateArgs } from "../../lib/commonTypes";
 
-function Chat() {
-    const [messages, setMessages] = useState([]);
+function Chat(): ReactElement {
+    const [messages, setMessages] = useState<ChatMessageData[]>([]);
 
-    const [numRead, setNumRead] = useState(0);
-    const [collapsed, setCollapsed] = useState(true);
+    const [numRead, setNumRead] = useState<number>(0);
+    const [collapsed, setCollapsed] = useState<boolean>(true);
     const toggle = () => {
         setNumRead(messages.length);
         setCollapsed(!collapsed);
@@ -16,11 +18,11 @@ function Chat() {
 
     const hasUnread = collapsed && numRead < messages.length;
 
-    useApi("restoreState", (gameData) => {
+    useApi<RestoreStateArgs>("restoreState", (gameData) => {
         setMessages(gameData.chats);
     });
 
-    useApi("chatMessage", (message) => {
+    useApi<ChatMessageData>("chatMessage", (message) => {
         setMessages([...messages, message]);
     }, [messages]);
 

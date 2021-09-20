@@ -1,36 +1,47 @@
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Card from "../../components/Card";
 import { useApi, send } from "../../lib/api";
+import { NewRoundArgs, PlayerRole, RestoreStateArgs } from "../../lib/commonTypes";
 
-function PlayerControls({ role }) {
-    const location = useLocation();
-    const [userCards, setUserCards] = useState(location.state?.userCards ?? []);
-    const [userResponses, setUserResponses] = useState(location.state?.userResponses ?? []);
-    const [numBlanks, setNumBlanks] = useState(location.state?.numBlanks ?? 1);
-    const [disabled, setDisabled] = useState(false);
+type PlayerControlsProps = {
+    role: PlayerRole;
+}
+
+interface PlayerControlsLocationState {
+    userCards?: string[];
+    userResponses?: string[];
+    numBlanks?: number;
+}
+
+function PlayerControls({ role }: PlayerControlsProps): ReactElement {
+    const location = useLocation<PlayerControlsLocationState>();
+    const [userCards, setUserCards] = useState<string[]>(location.state?.userCards ?? []);
+    const [userResponses, setUserResponses] = useState<string[]>(location.state?.userResponses ?? []);
+    const [numBlanks, setNumBlanks] = useState<number>(location.state?.numBlanks ?? 1);
+    const [disabled, setDisabled] = useState<boolean>(false);
 
     // When the player selects a card, update the state with the currently selected cards
-    useApi("cardSelected", (responses) => {
+    useApi<string[]>("cardSelected", (responses) => {
         setUserResponses(responses);
     });
 
     // When a new round starts, update the state
-    useApi("newRound", (gameData) => {
+    useApi<NewRoundArgs>("newRound", (gameData) => {
         if (gameData.role === "answering") {
-            setUserCards(gameData.userCards);
-            setUserResponses(gameData.userResponses);
+            setUserCards(gameData.userCards ?? []);
+            setUserResponses(gameData.userResponses ?? []);
             setNumBlanks(gameData.numBlanks);
             setDisabled(false);
         }
     });
 
     // When the page is refreshed, load the correct data
-    useApi("restoreState", (gameData) => {
+    useApi<RestoreStateArgs>("restoreState", (gameData) => {
         if (gameData.role === "answering") {
-            setUserCards(gameData.userCards);
-            setUserResponses(gameData.userResponses);
+            setUserCards(gameData.userCards ?? []);
+            setUserResponses(gameData.userResponses ?? []);
             setNumBlanks(gameData.numBlanks);
             setDisabled(gameData.isLocked);
         }
@@ -57,6 +68,7 @@ function PlayerControls({ role }) {
                         selectedIndex={userResponses.indexOf(text)}
                         onClick={() => send("selectCard", index)}
                         disabled={disabled}
+                        key={index}
                     >
                         {text}
                     </Card>

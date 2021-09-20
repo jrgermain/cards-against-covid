@@ -1,6 +1,9 @@
-import React from "react";
+import React, { ReactElement } from "react";
+import { ChatMessageData } from "./ChatMessageData";
 
-function ChatMessage({ sender, content }) {
+type ChatMessageProps = ChatMessageData;
+
+function ChatMessage({ sender, content }: ChatMessageProps): ReactElement {
     return (
         <div className="chat-message" aria-label={`${sender} says: ${content}`}>
             <strong aria-hidden="true">{sender}</strong>

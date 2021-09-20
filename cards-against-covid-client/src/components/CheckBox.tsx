@@ -1,8 +1,12 @@
-import React from "react";
+import React, { ReactElement, InputHTMLAttributes } from "react";
+
+type CheckBoxProps = InputHTMLAttributes<HTMLInputElement> & {
+    label?: string;
+}
 
 let checkboxCount = 0;
 
-function CheckBox({ label = "", ...others }) {
+function CheckBox({ label = "", ...others }: CheckBoxProps): ReactElement {
     const id = `checkbox-auto-id-${checkboxCount++}`;
     return (
         <>

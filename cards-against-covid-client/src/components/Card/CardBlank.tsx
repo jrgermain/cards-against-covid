@@ -1,6 +1,10 @@
-import React from "react";
+import React, { ReactElement } from "react";
 
-function CardBlank({ index }) {
+type CardBlankProps = {
+    index: number | null;
+}
+
+function CardBlank({ index }: CardBlankProps): ReactElement {
     return (
         <span className="blank">
             <span>________</span>

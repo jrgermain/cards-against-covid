@@ -2,12 +2,12 @@
  * These are a temporary fix until I find a different library to replace it
  */
 
-const closePopup = () => {
+function closePopup(): void {
     // Close the window by simulating esc key
     document.dispatchEvent(new KeyboardEvent("keyup", { key: "Escape" }));
-};
+}
 
-const handlePopupOpen = (ariaLabel) => {
+function handlePopupOpen(ariaLabel: string): void {
     const popup = document.querySelector(".popup-content");
     if (popup) {
         popup.setAttribute("role", "dialog");
@@ -20,6 +20,6 @@ const handlePopupOpen = (ariaLabel) => {
     window.setTimeout(() => {
         window.dispatchEvent(new Event("resize"));
     }, 100);
-};
+}
 
 export { closePopup, handlePopupOpen };

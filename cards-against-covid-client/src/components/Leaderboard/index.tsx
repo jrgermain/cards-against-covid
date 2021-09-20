@@ -1,18 +1,33 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import classNames from "classnames";
 import Button from "../Button";
 import Card from "../Card";
 import "./Leaderboard.css";
 import { send, useApi } from "../../lib/api";
+import { RestoreStateArgs } from "../../lib/commonTypes";
 
-function Leaderboard({ players, prompt }) {
-    const [isWaiting, setWaiting] = useState(false);
+type PlayerData = {
+    isWinner: boolean;
+    isConnected: boolean;
+    isJudge: boolean;
+    name: string;
+    responses: string[];
+    score: number;
+}
 
-    useApi("restoreState", (gameData) => {
+type LeaderboardProps = {
+    players: PlayerData[] | null;
+    prompt: string;
+}
+
+function Leaderboard({ players, prompt }: LeaderboardProps): ReactElement {
+    const [isWaiting, setWaiting] = useState<boolean>(false);
+
+    useApi<RestoreStateArgs>("restoreState", (gameData) => {
         setWaiting(gameData.readyForNext);
     });
 
-    const renderPlayer = (player) => {
+    const renderPlayer = (player: PlayerData) => {
         // Figure out which css classes to give the card
         const rowClass = classNames({
             winner: player.isWinner,

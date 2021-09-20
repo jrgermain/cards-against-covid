@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { useApi } from "../../lib/api";
 import "./ConnectionStatus.css";
 
-function ConnectionStatus() {
-    const [isConnected, setConnected] = useState(true);
-    useApi("_healthStatus", (healthy) => {
+function ConnectionStatus(): ReactElement {
+    const [isConnected, setConnected] = useState<boolean>(true);
+    useApi<boolean>("_healthStatus", (healthy) => {
         setConnected(healthy);
     });
 

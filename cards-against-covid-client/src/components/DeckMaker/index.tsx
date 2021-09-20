@@ -1,9 +1,15 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import Button from "../Button";
 import DeckMakerEntry from "./DeckMakerEntry";
 import "./DeckMaker.css";
 
-function DeckMaker({ label, cards, setCards }) {
+type DeckMakerProps = {
+    label: string;
+    cards: string[];
+    setCards: (cards: string[]) => void;
+}
+
+function DeckMaker({ label, cards, setCards }: DeckMakerProps): ReactElement {
     // Add a blank card to the end of the current list of cards
     function addCard() {
         const newCardList = [...cards, ""];

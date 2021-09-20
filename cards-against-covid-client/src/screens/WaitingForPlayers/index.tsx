@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactElement, ChangeEvent, KeyboardEvent } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { toast } from "react-toastify";
@@ -8,9 +8,25 @@ import Button from "../../components/Button";
 import TextBox from "../../components/TextBox";
 import { useApi, send, resetConnection } from "../../lib/api";
 import { closePopup, handlePopupOpen } from "../../lib/popupFixes";
+import { GameStartedArgs } from "../../lib/commonTypes";
+
+type PlayerData = {
+    name: string;
+    isConnected: boolean;
+}
+
+type NameChangedArgs = {
+    oldName: string;
+    newName: string;
+}
+
+interface WaitingForPlayersLocationState {
+    username?: string;
+    gameCode?: string;
+}
 
 const handleCopy = () => {
-    const link = document.getElementById("invite-link");
+    const link = document.getElementById("invite-link") as HTMLInputElement;
     link.select();
     if (document.execCommand("copy")) {
         toast.success("Link copied to clipboard");
@@ -20,33 +36,37 @@ const handleCopy = () => {
     }
 };
 
-function WaitingForPlayers() {
+const handlePopState = () => {
+    resetConnection();
+};
+
+function WaitingForPlayers(): ReactElement {
     const history = useHistory();
-    const location = useLocation();
-    const [players, setPlayers] = useState([]);
-    const [username, setUsername] = useState(location.state?.username ?? "");
-    const [tempUsername, setTempUsername] = useState(location.state?.username ?? "");
-    const [gameCode] = useState(location.state?.gameCode ?? "");
+    const location = useLocation<WaitingForPlayersLocationState>();
+    const [players, setPlayers] = useState<PlayerData[]>([]);
+    const [username, setUsername] = useState<string>(location.state?.username ?? "");
+    const [tempUsername, setTempUsername] = useState<string>(location.state?.username ?? "");
+    const [gameCode] = useState<string>(location.state?.gameCode ?? "");
 
     // When a player joins, add them to the player list
-    useApi("playerJoined", (player) => {
+    useApi<PlayerData>("playerJoined", (player) => {
         setPlayers([...players, player]);
     }, [players]);
 
     // When a player leaves, set isConnected to false for that player
-    useApi("playerDisconnected", (name) => {
+    useApi<string>("playerDisconnected", (name) => {
         setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: false } : p)));
     }, [players]);
 
     // When a player returns, set isConnected to true for that player
-    useApi("playerReconnected", (name) => {
+    useApi<string>("playerReconnected", (name) => {
         setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: true } : p)));
     }, [players]);
 
     // When a user changes their name, update the state
-    useApi("nameChanged", ({ oldName, newName }) => {
+    useApi<NameChangedArgs>("nameChanged", ({ oldName, newName }) => {
         // Replace the entry in the player list
-        const newPlayers = players.map((name) => (name === oldName ? newName : name));
+        const newPlayers = players.map((player) => (player.name === oldName ? { ...player, name: newName } : player));
         setPlayers(newPlayers);
 
         // If the current user is the one who changed their name, update the rest of the UI too
@@ -56,12 +76,12 @@ function WaitingForPlayers() {
     }, [players, username]);
 
     // When the game starts, move to the play screen
-    useApi("gameStarted", (gameData) => {
+    useApi<GameStartedArgs>("gameStarted", (gameData) => {
         history.replace("/play", { ...gameData, username, gameCode });
     }, [username, gameCode]);
 
     // When we receive the list of players, update the state
-    useApi("playerList", (playerList) => {
+    useApi("playerList", (playerList: PlayerData[]) => {
         if (playerList) {
             setPlayers(playerList);
         } else {
@@ -76,10 +96,10 @@ function WaitingForPlayers() {
     }, []);
 
     useEffect(() => {
-        window.addEventListener("popstate", resetConnection);
+        window.addEventListener("popstate", handlePopState);
 
         return function cleanup() {
-            window.removeEventListener("popstate", resetConnection);
+            window.removeEventListener("popstate", handlePopState);
         };
     }, []);
 
@@ -120,8 +140,8 @@ function WaitingForPlayers() {
                                 id="player-name"
                                 placeholder="Your name"
                                 value={tempUsername}
-                                onChange={(e) => setTempUsername(e.target.value)}
-                                onKeyPress={(e) => e.key === "Enter" && submitName()}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setTempUsername(e.target.value)}
+                                onKeyPress={(e: KeyboardEvent) => e.key === "Enter" && submitName()}
                             />
                             <Button onClick={submitName}>Submit</Button>
                         </div>

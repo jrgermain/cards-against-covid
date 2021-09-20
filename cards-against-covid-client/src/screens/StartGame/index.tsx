@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
@@ -8,23 +8,30 @@ import CheckBox from "../../components/CheckBox";
 import "./StartGame.css";
 import Dropdown from "../../components/Dropdown";
 
-function StartGame() {
+type DeckData = {
+    name: string;
+    numPrompts: number;
+    numResponses: number;
+    isSelected: boolean;
+}
+
+function StartGame(): ReactElement {
     const history = useHistory();
-    const [username, setUsername] = useState(localStorage.getItem("last-username") ?? "");
-    const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [decks, setDecks] = useState([]);
-    const [expansions, setExpansions] = useState([]);
-    const [isRoundLimitEnabled, setRoundLimitEnabled] = useState(false);
-    const [roundLimit, setRoundLimit] = useState(1);
-    const [hasDisplayedWarning, setDisplayedWarning] = useState(false);
+    const [username, setUsername] = useState<string>(localStorage.getItem("last-username") ?? "");
+    const [hasSubmitted, setHasSubmitted] = useState<boolean>(false);
+    const [decks, setDecks] = useState<DeckData[]>([]);
+    const [expansions, setExpansions] = useState<DeckData[]>([]);
+    const [isRoundLimitEnabled, setRoundLimitEnabled] = useState<boolean>(false);
+    const [roundLimit, setRoundLimit] = useState<number>(1);
+    const [hasDisplayedWarning, setDisplayedWarning] = useState<boolean>(false);
 
     // When a game is created, join that game
-    useApi("gameCreated", (gameCode) => {
+    useApi<string>("gameCreated", (gameCode) => {
         send("joinGame", { gameCode, playerName: username });
     }, [username]);
 
     // After creating and joining a game, proceed to the wait screen
-    useApi("joinedGame", (gameCode) => {
+    useApi<string>("joinedGame", (gameCode) => {
         // Save the last successfully used name for future games
         try {
             localStorage.setItem("last-username", username);
@@ -36,12 +43,12 @@ function StartGame() {
         history.push("/waiting", { username, gameCode });
     }, [username]);
 
-    useApi("deckList", (deckList) => {
+    useApi<DeckData[]>("deckList", (deckList) => {
         // Initialize 'isSelected' to true for the first deck and false for the others
         setDecks(deckList.map((deck, i) => ({ ...deck, isSelected: i === 0 })));
     });
 
-    useApi("packList", (packList) => {
+    useApi<DeckData[]>("packList", (packList) => {
         // Initialize 'isSelected' to false for all packs
         setExpansions(packList.map((pack) => ({ ...pack, isSelected: false })));
     });
@@ -52,7 +59,7 @@ function StartGame() {
         send("getExpansionPacks");
     }, []);
 
-    const handleDeckChange = (e) => {
+    const handleDeckChange = (e: ChangeEvent<HTMLSelectElement>) => {
         /* Set isSelected to true for the deck whose name matches e.target.value and false for the
          * others
          */
@@ -64,7 +71,7 @@ function StartGame() {
         // Reset warning state so deck size is validated again before the user creates the game
         setDisplayedWarning(false);
     };
-    const handlePackChange = (selectedPack) => {
+    const handlePackChange = (selectedPack: DeckData) => {
         // Toggle the value of the input that was clicked, leaving others as-is
         setExpansions(expansions.map((pack) => ({
             ...pack,
@@ -74,11 +81,11 @@ function StartGame() {
         // Reset warning state so deck size is validated again before the user creates the game
         setDisplayedWarning(false);
     };
-    const handleToggleRoundLimit = (event) => {
+    const handleToggleRoundLimit = (event: ChangeEvent<HTMLInputElement>) => {
         setRoundLimitEnabled(event.target.checked);
     };
-    const handleChangeNumRounds = (event) => {
-        setRoundLimit(event.target.value);
+    const handleChangeNumRounds = (event: ChangeEvent<HTMLInputElement>) => {
+        setRoundLimit(Number(event.target.value));
     };
     const handleBlurNumRounds = () => {
         // Make sure number is a positive integer, in case the user typed in a bad value
@@ -94,7 +101,7 @@ function StartGame() {
             return;
         }
 
-        const deckName = decks.find((deck) => deck.isSelected).name;
+        const deckName = decks.find((deck) => deck.isSelected)?.name ?? "None (expansion packs only)";
         const expansionPacks = expansions.filter((pack) => pack.isSelected);
 
         if (deckName === "None (expansion packs only)") {
@@ -151,7 +158,7 @@ function StartGame() {
                         id="player-name"
                         placeholder="Your name"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
                         errorCondition={hasSubmitted && !username}
                         errorMessage="Please enter a name."
                     />
@@ -192,6 +199,7 @@ function StartGame() {
                 <h2 className="header-css" id="choose-game-settings">Choose game settings:</h2>
                 <div className="game-settings">
                     <CheckBox label="Limit the number of rounds" checked={isRoundLimitEnabled} onChange={handleToggleRoundLimit} />
+                    
                     {isRoundLimitEnabled
                         && (
                             <>

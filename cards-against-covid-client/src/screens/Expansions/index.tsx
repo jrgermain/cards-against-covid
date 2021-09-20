@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, ReactElement, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
@@ -7,12 +7,12 @@ import TextBox from "../../components/TextBox";
 import { useApi, send } from "../../lib/api";
 import "./Expansions.css";
 
-function Expansions() {
+function Expansions(): ReactElement {
     const history = useHistory();
 
-    const [name, setName] = useState("Untitled Expansion Pack");
-    const [prompts, setPrompts] = useState([]);
-    const [responses, setResponses] = useState([]);
+    const [name, setName] = useState<string>("Untitled Expansion Pack");
+    const [prompts, setPrompts] = useState<string[]>([]);
+    const [responses, setResponses] = useState<string[]>([]);
 
     // When a pack is created, show a message and move back to the home screen
     useApi("expansionPackCreated", (packName) => {
@@ -44,7 +44,7 @@ function Expansions() {
         });
     }
 
-    const handleNameChange = (e) => setName(e.target.value);
+    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => setName(e.target.value);
     return (
         <main className="view" id="expansions">
             <h1>Build an expansion pack</h1>

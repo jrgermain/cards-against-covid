@@ -1,8 +1,8 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import "./NotFound.css";
 import Button from "../../components/Button";
 
-function NotFound() {
+function NotFound(): ReactElement {
     return (
         <main className="view" id="not-found">
             <h1>Page not found</h1>

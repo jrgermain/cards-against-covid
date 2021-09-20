@@ -1,9 +1,14 @@
 /* eslint-disable no-alert -- TODO use a modal to confirm card deletion */
-import React from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 
-function DeckMakerEntry({ text, setCards }, index, allEntries) {
+type DeckMakerEntryProps = {
+    text: string;
+    setCards: (cards: string[]) => void;
+}
+
+function DeckMakerEntry({ text, setCards }: DeckMakerEntryProps, index: number, allEntries: string[]): ReactElement {
     // Called when we change the text of a card
-    function update(event) {
+    function update(event: ChangeEvent<HTMLInputElement>) {
         // Get the updated text
         const newValue = event.target.value;
 

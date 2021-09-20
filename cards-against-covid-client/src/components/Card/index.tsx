@@ -1,11 +1,28 @@
-import React from "react";
+import React, { HTMLAttributes, MouseEventHandler, ReactElement } from "react";
 import classNames from "classnames";
 import CardBlank from "./CardBlank";
 import "./Card.css";
 
+type SingleCardProps = {
+    type: "prompt" | "response";
+    children: string;
+}
+
+type MultiCardProps = {
+    type: "multi-response";
+    children: string[];
+}
+
+type CardProps = HTMLAttributes<HTMLElement> & (SingleCardProps | MultiCardProps) & {
+    selectedIndex?: number;
+    showIndex?: boolean;
+    onClick?: MouseEventHandler;
+    disabled?: boolean;
+};
+
 const blank = /_+/g;
 
-function Card({ type, children, selectedIndex, showIndex, onClick, ...others }) {
+function Card({ type, children, selectedIndex = -1, showIndex, onClick, ...others }: CardProps): ReactElement {
     /* Figure out which css classes to give the card. It always has 'card', will have exactly one
      * of [prompt, response, multi-response], and 0 or more of [clickable, selected]
      */
@@ -20,10 +37,12 @@ function Card({ type, children, selectedIndex, showIndex, onClick, ...others }) 
         /* We will replace the blanks in prompts with CardBlank elements, which are numbered.
          * The rest of the text will be put inside <label> elements.
          */
-        const blanks = children.match(blank) || [];
+        const blanks = (children as string).match(blank) || [];
 
-        // Create label elements from text-- "children" should be a string containing card text
-        const textNodes = children.split(blank).map((text) => <span>{text}</span>);
+        // Create label elements from text -- "children" should be a string containing card text
+        const textNodes = (children as string)
+            .split(blank)
+            .map((text, i) => <span key={i}>{text}</span>);
 
         // Create card content. Replace text with label elements and blanks with CardBlank elements.
         let i = 0;
@@ -66,14 +85,14 @@ function Card({ type, children, selectedIndex, showIndex, onClick, ...others }) 
     if (clickable) {
         return (
             <button type="button" aria-pressed={selected} {...{ className, onClick, ...others }}>
-                <div className="card-content" tabIndex="-1">{content}</div>
+                <div className="card-content" tabIndex={-1}>{content}</div>
             </button>
         );
     }
 
     return (
         <div {...{ className, ...others }}>
-            <div className="card-content" tabIndex="-1">{content}</div>
+            <div className="card-content" tabIndex={-1}>{content}</div>
         </div>
     );
 }

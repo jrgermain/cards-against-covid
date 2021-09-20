@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Card from "../../components/Card";
@@ -8,20 +8,31 @@ import Leaderboard from "../../components/Leaderboard";
 import PlayerControls from "./PlayerControls";
 import JudgeControls from "./JudgeControls";
 import { useApi, resetConnection, send } from "../../lib/api";
+import { LeaderboardPlayer, NewRoundArgs, PlayerRole, RestoreStateArgs } from "../../lib/commonTypes";
 
-const NORMAL_WEIGHT = { fontWeight: "normal" };
+interface PlayLocationState {
+    username: string;
+    gameCode: string;
+    prompt?: string;
+    round?: number;
+    roundsLeft?: number;
+    role?: PlayerRole;
+    judge?: string;
+}
 
-function Play() {
+const NORMAL_WEIGHT = { fontWeight: "normal" } as const;
+
+function Play(): ReactElement {
     const history = useHistory();
-    const location = useLocation();
-    const { username, gameCode } = location.state || {};
+    const location = useLocation<PlayLocationState>();
+    const { username, gameCode } = location.state ?? {};
 
-    const [prompt, setPrompt] = useState(location.state?.prompt ?? "");
-    const [round, setRound] = useState(location.state?.round ?? 0);
-    const [roundsLeft, setRoundsLeft] = useState(location.state?.roundsLeft ?? 0);
-    const [role, setRole] = useState(location.state?.role ?? "");
-    const [judge, setJudge] = useState(location.state?.judge ?? "");
-    const [leaderboardContent, setLeaderboardContent] = useState(null);
+    const [prompt, setPrompt] = useState<string>(location.state?.prompt ?? "");
+    const [round, setRound] = useState<number>(location.state?.round ?? 0);
+    const [roundsLeft, setRoundsLeft] = useState<number>(location.state?.roundsLeft ?? 0);
+    const [role, setRole] = useState<PlayerRole>(location.state?.role ?? "answering");
+    const [judge, setJudge] = useState<string | undefined>(location.state?.judge);
+    const [leaderboardContent, setLeaderboardContent] = useState<LeaderboardPlayer[] | null>(null);
     const hideLeaderboard = () => setLeaderboardContent(null);
 
     // Leave the game, but allow the user to easily rejoin by clicking a toast
@@ -37,7 +48,7 @@ function Play() {
     };
 
     // When a new round starts, hide the leaderboard and update the state
-    useApi("newRound", (gameData) => {
+    useApi<NewRoundArgs>("newRound", (gameData) => {
         hideLeaderboard();
         setPrompt(gameData.prompt);
         setRound(gameData.round);
@@ -47,12 +58,12 @@ function Play() {
     });
 
     // When the judge selects a winner, show the leaderboard
-    useApi("winnerSelected", (leaderboard) => {
+    useApi<LeaderboardPlayer[]>("winnerSelected", (leaderboard) => {
         setLeaderboardContent(leaderboard);
     });
 
     // When the page is refreshed, load the correct data
-    useApi("restoreState", (gameData) => {
+    useApi<RestoreStateArgs>("restoreState", (gameData) => {
         setLeaderboardContent(gameData.leaderboardContent);
         setPrompt(gameData.prompt);
         setRound(gameData.round);
@@ -62,12 +73,12 @@ function Play() {
     });
 
     // When a player leaves, alert the user
-    useApi("playerDisconnected", (name) => {
+    useApi<string>("playerDisconnected", (name) => {
         toast.info(`${name} disconnected`);
     });
 
     // When a player re-joins the game, alert the user
-    useApi("playerReconnected", (name) => {
+    useApi<string>("playerReconnected", (name) => {
         toast.info(`${name} reconnected`);
     });
 
@@ -76,7 +87,7 @@ function Play() {
         history.replace("/game-over", { players });
     });
 
-    useApi("gameStatus", (state) => {
+    useApi<number>("gameStatus", (state) => {
         // A state of 1 indicates a game is in progress
         if (state !== 1) {
             history.replace("/");
@@ -121,7 +132,7 @@ function Play() {
                     <span style={NORMAL_WEIGHT}>.</span>
                 </h1>
                 {/* If player is not the judge, show who is */}
-                {role !== "judging" && (
+                {role !== "judging" && judge != null && (
                     <div className="judge-name">
                         <strong>{judge}</strong>
                         {" "}
@@ -132,7 +143,6 @@ function Play() {
                 <div className="game-controls">
                     <h2>Your prompt:</h2>
                     <Card type="prompt">{prompt}</Card>
-                    {/* {role === "judging" ? <JudgeControls /> : <PlayerControls />} */}
                     <JudgeControls role={role} />
                     <PlayerControls role={role} />
                 </div>

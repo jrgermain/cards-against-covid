@@ -1,10 +1,15 @@
 /* eslint-disable react/no-array-index-key -- data is of unspecified type, not necessarily unique */
-import React from "react";
+import React, { ReactChild, ReactElement, TableHTMLAttributes } from "react";
 import "./Table.css";
 
-function Table({ head, body, ...props }) {
+type TableProps = TableHTMLAttributes<HTMLTableElement> & {
+    head: ReactChild[];
+    body: ReactChild[][];
+}
+
+function Table({ head, body, ...others }: TableProps): ReactElement {
     return (
-        <table {...props}>
+        <table {...others}>
             <thead>
                 <tr>{head.map((title, i) => <th key={i}>{title}</th>)}</tr>
             </thead>
