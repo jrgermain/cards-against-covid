@@ -20,16 +20,17 @@ The game is still being maintained, but development is moving slower now that I 
 ### Running from source (dev mode)
 This mode allows you to run the game using your local copy of the source code. On the client side, it enables live reload and uses the development version of React. On the server side, more verbose logging is enabled to aid in debugging. To access the game, open http://localhost:3000 in your web browser. Port 3000 is used to host the client. Meanwhile, port 8080 is used by the backend.
 
-1. In a terminal window, navigate to the 'cards-against-covid-server' directory and run `npm start`
-2. In a second terminal window, navigate to the 'cards-against-covid-client' directory and run `npm start`
+1. In a terminal window, navigate to the 'cards-against-covid-server' directory and run `npm start` (run `npm install` first, if you haven't already)
+2. In a second terminal window, navigate to the 'cards-against-covid-client' directory and run `npm start` (run `npm install` first, if you haven't already)
     - A web browser window should open automatically
 
 ### Building executables (production mode)
 This mode bundles everything needed to run the game into a single executable file. On the client side, the production version of React is used and the code is compiled to plain HTML, JavaScript, and CSS. On the server side, fewer messages are logged. 
 
-1. Navigate to the 'cards-against-covid-bundle' directory
-2. Run the following command: `npm run full-build`.
-3. Executables for macOS, Windows, and Linux should now be in a subfolder called 'dist', which will be created if it doesn't already exist.
+1. Navigate to the 'cards-against-covid-bundle' directory.
+2. Before your first build, run `npm install`. *NOTE: You only need to do this the first time.*
+3. Run the following command: `npm run full-build`.
+4. Executables for macOS, Windows, and Linux should now be in a subfolder called 'dist', which will be created if it doesn't already exist.
 
 #### Running production mode executables
-The executable files built in the previous step should start up a game server when double-clicked
+The executable files built in the previous step should start up a game server when double-clicked. You can also run the app through the command line (e.g. by running `dist/Cards-Against-COVID-linux` from the 'cards-against-covid-bundle' directory on a linux machine).
