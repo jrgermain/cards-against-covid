@@ -24,7 +24,7 @@ function getGame(gameCode: string): Game | undefined {
     return games.get(gameCode);
 }
 
-function removeGame(gameCode: string) {
+function removeGame(gameCode: string): void {
     games.delete(gameCode);
 }
 

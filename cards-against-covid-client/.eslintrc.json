@@ -20,10 +20,14 @@
         "react",
         "@typescript-eslint"
     ],
+    "root": true,
     "rules": {
         "indent": [
             "error",
-            4
+            4,
+            {
+                "SwitchCase": 1
+            }
         ],
         "linebreak-style": [
             "error",
@@ -31,10 +35,44 @@
         ],
         "quotes": [
             "error",
-            "double"
+            "double",
+            {
+                "avoidEscape": true
+            }
         ],
         "semi": [
             "error",
+            "always"
+        ],
+        "max-len": [
+            "warn",
+            {
+                "code": 100,
+                "ignoreUrls": true,
+                "ignoreComments": false,
+                "ignoreRegExpLiterals": true,
+                "ignoreStrings": true,
+                "ignoreTemplateLiterals": true
+            }
+        ],
+        "no-multi-spaces": [
+            "error",
+            {
+                "ignoreEOLComments": true
+            }
+        ],
+        "object-curly-newline": [
+            "error",
+            {
+                "multiline": true
+            }
+        ],
+        "comma-dangle": [
+            "error",
+            "always-multiline"
+        ],
+        "arrow-parens": [
+            "error", 
             "always"
         ]
     },

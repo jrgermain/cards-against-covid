@@ -37,7 +37,7 @@ async function getUserExpansionPacks(): Promise<Deck[]> {
     }
 
     // Check if the file is a JSON array of objects that conform to the Deck interface (IDeck)
-    if (Array.isArray(fileContent) && fileContent.every((item: any) => Deck.isIDeck(item))) {
+    if (Array.isArray(fileContent) && fileContent.every((item: unknown) => Deck.isIDeck(item))) {
         // Convert to deck objects
         return fileContent.map((iDeck) => new Deck(iDeck));
     }

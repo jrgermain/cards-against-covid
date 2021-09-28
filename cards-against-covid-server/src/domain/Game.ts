@@ -14,14 +14,14 @@ class Game {
     deck: Deck;
     roundLimit: number;
     connections: Connection[] = [];
-    prompt: string = "";
-    state: GameState = GameState.WAITING;
-    round: number = 0;
-    cardsPerPlayer: number = 0;
+    prompt = "";
+    state = GameState.WAITING;
+    round = 0;
+    cardsPerPlayer = 0;
     code?: string;
     chats: ChatMessage[] = [];
 
-    get players() {
+    get players(): Player[] {
         return (
             this.connections
                 .map((connection) => connection.playerInfo)
@@ -29,15 +29,15 @@ class Game {
         );
     }
 
-    get numBlanks() {
+    get numBlanks(): number {
         return this.prompt.match(/_+/g)?.length ?? 1;
     }
 
-    get promptIsMultiSelect() {
+    get promptIsMultiSelect(): boolean {
         return this.numBlanks > 1;
     }
 
-    get isLocked() {
+    get isLocked(): boolean {
         const { numBlanks } = this;
         return this.connections.length > 0 && this.players.every((p) => (
             p.isJudge || !p.isConnected || p.responses.length === numBlanks
@@ -49,7 +49,7 @@ class Game {
         this.roundLimit = roundLimit;
     }
 
-    start() {
+    start(): void {
         if (this.state === GameState.WAITING) {
             this.state = GameState.IN_PROGRESS;
 
@@ -65,7 +65,7 @@ class Game {
         }
     }
 
-    nextRound() {
+    nextRound(): void {
         // If we reached the user-defined round limit, end the game
         if (this.round + 1 >= this.roundLimit) {
             this.end();
@@ -106,7 +106,8 @@ class Game {
         // Select new prompt
         if (this.deck.prompts.length > 0) {
             // If there are prompts left, remove the last one from the deck and use it
-            this.prompt = this.deck.prompts.pop()!; // Will not be undefined if length > 0
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- array is non-empty
+            this.prompt = this.deck.prompts.pop()!;
         } else {
             // All prompts have been exhausted
             this.end();
@@ -127,14 +128,14 @@ class Game {
         // Send each player the info they need for the game
         const roundInfo = this.getRoundInfo();
         this.connections.forEach((c) => {
-            c.send("newRound", {
+            c.playerInfo && c.send("newRound", {
                 ...roundInfo,
-                ...this.getPlayerInfo(c.playerInfo!),
+                ...this.getPlayerInfo(c.playerInfo),
             });
         });
     }
 
-    end() {
+    end(): void {
         if (this.state === GameState.IN_PROGRESS) {
             // Sort players by score
             this.players.sort((a, b) => b.score - a.score);
@@ -164,11 +165,13 @@ class Game {
 
         // Set state
         this.state = GameState.ENDED; // TODO: we probably don't need this state
-        console.log("Ending game", this.code);
-        games.remove(this.code!);
+        if (this.code) {
+            console.log("Ending game", this.code);
+            games.remove(this.code);    
+        }
     }
 
-    getNextJudge() {
+    getNextJudge(): Player | null {
         // Index of current judge in players array
         const judgeIndex = this.players.findIndex((player) => player.isJudge);
 
@@ -187,7 +190,7 @@ class Game {
     }
 
     // Call this after the game has started and nextRound has been called at least once
-    calculateRoundsLeft() {
+    calculateRoundsLeft(): number {
         /* Simulate playing multiple rounds until we run out of cards. Record how many rounds we
          * were able to play.
          */
@@ -240,8 +243,8 @@ class Game {
     }
 
     // Get player-specific info about the game state
-    getPlayerInfo(player: Player) {
-        const info: any = {};
+    getPlayerInfo(player: Player): PlayerInfo {
+        const info: Partial<PlayerInfo> = {};
 
         if (player.isJudge) {
             info.role = "judging";
@@ -261,11 +264,11 @@ class Game {
 
         info.readyForNext = player.isReadyForNextRound;
 
-        return info;
+        return info as PlayerInfo;
     }
 
     // Get info about the state of the game at the current round
-    getRoundInfo() {
+    getRoundInfo(): RoundInfo {
         return ({
             prompt: this.prompt,
             numBlanks: this.numBlanks,
@@ -275,7 +278,7 @@ class Game {
     }
 
     // Get a subset of the data in the player list
-    getLeaderboard() {
+    getLeaderboard(): LeaderboardEntry[] {
         return this.players
             .map(({
                 name,
@@ -294,14 +297,14 @@ class Game {
             }));
     }
 
-    sendAll(event: string, payload?: any) {
+    sendAll(event: string, payload?: unknown): void {
         this.connections.forEach((c) => {
             c.send(event, payload);
         });
     }
 
     // connection is a connection in this game
-    removeConnection(connection: Connection) {
+    removeConnection(connection: Connection): void {
         // Immediately mark player as inactive so they are allowed to reconnect
         if (connection.playerInfo) {
             connection.playerInfo.isConnected = false;
@@ -341,6 +344,37 @@ class Game {
             }
         }, 2000);
     }
+}
+
+type JudgePlayerInfo = {
+    name: string;
+    responses: string[];
+    isConnected: boolean;
+}
+
+type PlayerInfo = {
+    readyForNext: boolean;
+    role: "judging" | "answering";
+    players?: JudgePlayerInfo[];
+    judge?: string;
+    userCards?: string[];
+    userResponses?: string[];
+}
+
+type RoundInfo = {
+    prompt: string;
+    numBlanks: number;
+    round: number;
+    roundsLeft: number;
+}
+
+type LeaderboardEntry = {
+    name: string;
+    responses: string[];
+    score: number;
+    isJudge: boolean;
+    isWinner: boolean;
+    isConnected: boolean;
 }
 
 export default Game;

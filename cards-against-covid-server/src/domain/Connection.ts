@@ -7,11 +7,10 @@ import * as games from "../state/games";
 import { getDecks, getExpansionPacks, saveExpansionPack } from "../cards";
 import Deck from "./Deck";
 import Player from "./Player";
-import type { IDeck } from "./Deck";
 import type ChatMessage from "./ChatMessage";
 
-type ICreateGameArgs = { deckName: string, expansionPackNames: string[], roundLimit?: number };
-type IJoinGameArgs = { gameCode: string, playerName: string };
+type CreateGameArgs = { deckName: string, expansionPackNames: string[], roundLimit?: number };
+type JoinGameArgs = { gameCode: string, playerName: string };
 type EventName = (
     "init" |
     "getDecks" |
@@ -28,7 +27,7 @@ type EventName = (
     "changeName" |
     "getGameStatus"
 );
-type EventHandler = (eventPayload: any) => void;
+type EventHandler = (eventPayload: unknown) => void;
 enum PingStatus { UNHEALTHY, PENDING, HEALTHY }
 
 class Connection {
@@ -40,7 +39,10 @@ class Connection {
     private pingInterval?: NodeJS.Timeout;
     private socket: WebSocket;
     private handlers: Record<EventName, EventHandler> = {
-        init: (sessionId: string | null) => {
+        init: (sessionId) => {
+            if (!(typeof sessionId === "string" || sessionId === null)) {
+                return;
+            }
             /* Every time the player refreshes the screen, they are given a brand new WebSocket
              * connection, so the server generates uuids to track sessions. The client stores its
              * assigned id in sessionStorage so it will persist when the page is reloaded, but not
@@ -82,10 +84,13 @@ class Connection {
             })));
         },
 
-        createExpansionPack: async ({ name, prompts, responses }: IDeck) => {
+        createExpansionPack: async (deckInfo) => {
+            if (!Deck.isIDeck(deckInfo)) {
+                return;
+            }
             try {
-                await saveExpansionPack(new Deck({ name, prompts, responses }));
-                this.send("expansionPackCreated", name);
+                await saveExpansionPack(new Deck(deckInfo));
+                this.send("expansionPackCreated", deckInfo.name);
             } catch (e) {
                 if (e instanceof Error) {
                     this.sendError(e.message);
@@ -95,7 +100,11 @@ class Connection {
             }
         },
 
-        createGame: async ({ deckName, expansionPackNames, roundLimit = Infinity }: ICreateGameArgs) => {
+        createGame: async (args) => {
+            if (!isCreateGameArgs(args)) {
+                return;
+            }
+            const { deckName, expansionPackNames, roundLimit = Infinity } = args;
             const allDecks = await getDecks();
             const allExpansionPacks = await getExpansionPacks();
 
@@ -116,8 +125,12 @@ class Connection {
             this.send("gameCreated", gameCode);
         },
 
-        joinGame: ({ gameCode, playerName }: IJoinGameArgs) => {
-            const trimmedName = playerName?.trim();
+        joinGame: (args) => {
+            if (!isJoinGameArgs(args)) {
+                return;
+            }
+            const { gameCode, playerName } = args;
+            const trimmedName = playerName.trim();
 
             if (!trimmedName) {
                 this.sendError("A name is required, but none was provided");
@@ -178,9 +191,9 @@ class Connection {
             if (game.state === GameState.WAITING && game.connections.length > 2) {
                 game.start();
                 const roundInfo = game.getRoundInfo();
-                game.connections.forEach((c) => c.send("gameStarted", {
+                game.connections.forEach((c) => c.playerInfo && c.send("gameStarted", {
                     ...roundInfo,
-                    ...game.getPlayerInfo(c.playerInfo!),
+                    ...game.getPlayerInfo(c.playerInfo),
                 }));
             } else if (game.state === GameState.WAITING) {
                 this.sendError("Please wait for at least 3 players to join");
@@ -189,7 +202,10 @@ class Connection {
             }
         },
 
-        selectCard: (index: number) => {
+        selectCard: (index) => {
+            if (typeof index !== "number") {
+                return;
+            }
             const { game } = this;
             if (!game) {
                 this.sendError("The game does not exist");
@@ -238,7 +254,10 @@ class Connection {
             this.send("cardSelected", responses);
         },
 
-        selectAnswer: (playerName: string) => {
+        selectAnswer: (playerName) => {
+            if (typeof playerName !== "string") {
+                return;
+            }
             const { game } = this;
             if (!game) {
                 this.sendError("The game does not exist");
@@ -263,7 +282,10 @@ class Connection {
             game.sendAll("winnerSelected", game.getLeaderboard());
         },
 
-        sendChat: (content: string) => {
+        sendChat: (content) => {
+            if (typeof content !== "string") {
+                return;
+            }
             const { game } = this;
             if (!game) {
                 this.sendError("The game does not exist");
@@ -301,7 +323,10 @@ class Connection {
             }
         },
 
-        changeName: (newName: string) => {
+        changeName: (newName) => {
+            if (typeof newName !== "string") {
+                return;
+            }
             if (!newName) {
                 this.sendError("A name is required, but none was provided");
                 return;
@@ -325,7 +350,7 @@ class Connection {
         },
     };
 
-    get isActive() {
+    get isActive(): boolean {
         return this.socket.readyState === WebSocket.OPEN && this.pingStatus === PingStatus.HEALTHY;
     }
 
@@ -335,13 +360,13 @@ class Connection {
         this.initSocket();
     }
 
-    stopHealthCheck() {
+    stopHealthCheck(): void {
         if (this.pingInterval) {
             globalThis.clearInterval(this.pingInterval);
         }
     }
 
-    private initSocket() {
+    private initSocket(): void {
         // Message handling
         this.socket.on("message", (message) => {
             if (typeof message === "string") {
@@ -372,7 +397,7 @@ class Connection {
         });
     }
 
-    transferTo(existingConnection: Connection) {
+    transferTo(existingConnection: Connection): void {
         if (isDev) {
             console.log(`Transferring data from temporary connection ${this.id} to existing connection ${existingConnection.id}`);
         }
@@ -390,7 +415,7 @@ class Connection {
         connections.remove(this);
     }
 
-    takeOver(tempConnection: Connection) {
+    takeOver(tempConnection: Connection): void {
         // Replace the old socket connection with the new one
         const oldSocket = this.socket;
         const newSocket = tempConnection.socket;
@@ -422,13 +447,16 @@ class Connection {
          * been away longer than 2 seconds, effectively giving them a 2-second buffer to handle
          * refreshing the page.
          */
-        const timeAway = Date.now() - this.disconnectTimestamp!;
+        if (this.disconnectTimestamp == null) {
+            return;
+        }
+        const timeAway = Date.now() - this.disconnectTimestamp;
         if (timeAway >= 2000) {
             if (isDev) {
                 console.log(`${this.playerInfo?.name} returned after being away for ${(timeAway / 1000).toFixed(2)} seconds`);
             }
             this.game?.connections.filter((c) => c !== this).forEach(((c) => {
-                c.send("playerReconnected", this.playerInfo!.name);
+                this.playerInfo && c.send("playerReconnected", this.playerInfo.name);
             }));
         }
 
@@ -447,7 +475,7 @@ class Connection {
         }
     }
 
-    processMessage(message: string) {
+    processMessage(message: string): void {
         // CAC messages are in the form: `CAC:${eventName}:${jsonPayload}`
         if (message === "ping") {
             this.socket.send("pong");
@@ -472,18 +500,18 @@ class Connection {
         }
     }
 
-    send(event: string, payload?: any) {
+    send(event: string, payload?: unknown): void {
         this.socket.send(JSON.stringify({ event, payload }));
     }
 
-    sendError(message?: string) {
+    sendError(message?: string): void {
         if (isDev) {
             console.error("Sending error to socket: ", message);
         }
         this.send("errorMessage", message || "An unexpected error occurred");
     }
 
-    end() {
+    end(): void {
         if (isDev) {
             console.log("Closing connection", this.id);
         }
@@ -500,5 +528,26 @@ class Connection {
         }
     }
 }
+
+const isCreateGameArgs = (x: unknown): x is CreateGameArgs => {
+    if (x === null || typeof x !== "object") {
+        return false;
+    }
+    const args = x as CreateGameArgs;
+    return (
+        typeof args.deckName === "string"
+        && Array.isArray(args.expansionPackNames)
+        && args.expansionPackNames.every((p: unknown) => typeof p === "string")
+        && ["undefined", "number"].includes(typeof args.roundLimit)
+    );
+};
+
+const isJoinGameArgs = (x: unknown): x is JoinGameArgs => {
+    if (x === null || typeof x !== "object") {
+        return false;
+    }
+    const args = x as JoinGameArgs;
+    return typeof args.gameCode === "string" && typeof args.playerName === "string";
+};
 
 export default Connection;
