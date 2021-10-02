@@ -1,19 +1,10 @@
 import React, { ReactElement, useState } from "react";
-import classNames from "classnames";
 import Button from "../Button";
-import Card from "../Card";
 import "./Leaderboard.css";
 import { send, useApi } from "../../lib/api";
 import { RestoreStateArgs } from "../../lib/commonTypes";
-
-type PlayerData = {
-    isWinner: boolean;
-    isConnected: boolean;
-    isJudge: boolean;
-    name: string;
-    responses: string[];
-    score: number;
-}
+import type { PlayerData } from "./PlayerData";
+import Row from "./Row";
 
 type LeaderboardProps = {
     players: PlayerData[] | null;
@@ -26,32 +17,6 @@ function Leaderboard({ players, prompt }: LeaderboardProps): ReactElement {
     useApi<RestoreStateArgs>("restoreState", (gameData) => {
         setWaiting(gameData.readyForNext);
     });
-
-    const renderPlayer = (player: PlayerData) => {
-        // Figure out which css classes to give the card
-        const rowClass = classNames({
-            winner: player.isWinner,
-            inactive: !player.isConnected,
-        });
-
-        return (
-            <div role="row" className={rowClass}>
-                <span className="cell" role="gridcell">
-                    <span className="player-name">{player.name}</span>
-                    {player.isWinner && <span className="winner-label">Winner!</span>}
-                    {!player.isConnected && <span className="inactive-label">Inactive</span>}
-                </span>
-                <span className="cell" role="gridcell">
-                    {player.isJudge
-                        ? <Card type="prompt">{prompt}</Card>
-                        : <Card type="multi-response">{player.responses}</Card>}
-                </span>
-                <span className="cell" role="gridcell">
-                    <span className="player-score">{player.score || 0}</span>
-                </span>
-            </div>
-        );
-    };
 
     function handleNextRound() {
         // Tell the server this player is ready and show that we are waiting on the others
@@ -79,7 +44,9 @@ function Leaderboard({ players, prompt }: LeaderboardProps): ReactElement {
                         </div>
                     </div>
                     <div className="leaderboard-grid-body" role="rowgroup">
-                        {players.map(renderPlayer)}
+                        {players.map((player) => (
+                            <Row player={player} prompt={prompt} key={player.name} />
+                        ))}
                     </div>
                 </div>
                 <Button onClick={handleNextRound} aria-pressed={isWaiting} disabled={isWaiting}>

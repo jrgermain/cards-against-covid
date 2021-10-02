@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import React, { ChangeEvent, Fragment, ReactElement, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
@@ -17,7 +17,7 @@ type DeckData = {
 
 function StartGame(): ReactElement {
     const history = useHistory();
-    const [username, setUsername] = useState<string>(localStorage.getItem("last-username") ?? "");
+    const [username, setUsername] = useState<string>(() => localStorage.getItem("last-username") ?? "");
     const [hasSubmitted, setHasSubmitted] = useState<boolean>(false);
     const [decks, setDecks] = useState<DeckData[]>([]);
     const [expansions, setExpansions] = useState<DeckData[]>([]);
@@ -183,16 +183,15 @@ function StartGame(): ReactElement {
 
                     {/* Content */}
                     {expansions.map((pack) => (
-                        <>
+                        <Fragment key={pack.name}>
                             <CheckBox
-                                key={`${pack.name}_checkBox`}
                                 label={pack.name}
                                 onChange={() => handlePackChange(pack)}
                                 checked={pack.isSelected}
                             />
-                            <span key={`${pack.name}_numPrompts`} className="pack-num-prompts" title="Prompt cards">{pack.numPrompts}</span>
-                            <span key={`${pack.name}_numResponses`} className="pack-num-responses" title="Response cards">{pack.numResponses}</span>
-                        </>
+                            <span className="pack-num-prompts" title="Prompt cards">{pack.numPrompts}</span>
+                            <span className="pack-num-responses" title="Response cards">{pack.numResponses}</span>
+                        </Fragment>
                     ))}
                 </div>
 

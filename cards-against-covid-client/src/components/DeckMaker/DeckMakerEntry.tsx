@@ -4,9 +4,11 @@ import React, { ChangeEvent, ReactElement } from "react";
 type DeckMakerEntryProps = {
     text: string;
     setCards: (cards: string[]) => void;
+    index: number;
+    allEntries: string[];
 }
 
-function DeckMakerEntry({ text, setCards }: DeckMakerEntryProps, index: number, allEntries: string[]): ReactElement {
+function DeckMakerEntry({ text, setCards, index, allEntries }: DeckMakerEntryProps): ReactElement {
     // Called when we change the text of a card
     function update(event: ChangeEvent<HTMLInputElement>) {
         // Get the updated text

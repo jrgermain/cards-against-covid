@@ -25,7 +25,7 @@ const saveUsername = (username: string) => {
 function Join(): ReactElement {
     const history = useHistory();
     const location = useLocation<JoinLocationState>();
-    const [username, setUsername] = useState<string>(localStorage.getItem("last-username") ?? "");
+    const [username, setUsername] = useState<string>(() => localStorage.getItem("last-username") ?? "");
     const [gameCode, setGameCode] = useState<string>("");
     const [gameCodeError, setGameCodeError] = useState<string>("");
     const [usernameError, setUsernameError] = useState<string>("");

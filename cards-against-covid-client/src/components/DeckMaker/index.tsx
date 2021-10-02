@@ -19,7 +19,15 @@ function DeckMaker({ label, cards, setCards }: DeckMakerProps): ReactElement {
         <div className="deck-maker">
             <h2>{label}</h2>
             <ul aria-label="Cards in this set">
-                {cards.map((text, index, arr) => DeckMakerEntry({ text, setCards }, index, arr))}
+                {cards.map((text, index, array) => (
+                    <DeckMakerEntry
+                        key={index}
+                        text={text}
+                        setCards={setCards}
+                        index={index}
+                        allEntries={array}
+                    />
+                ))}
             </ul>
             <Button onClick={addCard}>Add Card</Button>
         </div>

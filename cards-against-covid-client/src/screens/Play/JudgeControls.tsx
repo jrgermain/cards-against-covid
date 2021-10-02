@@ -22,7 +22,7 @@ interface JudgeControlsLocationState {
 
 function JudgeControls({ role }: JudgeControlsProps): ReactElement {
     const location = useLocation<JudgeControlsLocationState>();
-    const [players, setPlayers] = useState<PlayerData[]>(location.state?.players ?? []); // {name, responses, isConnected}[]
+    const [players, setPlayers] = useState<PlayerData[]>(location.state?.players ?? []);
     const [numBlanks, setNumBlanks] = useState<number>(location.state?.numBlanks ?? 1);
 
     // When a player selects a card, update the state

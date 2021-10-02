@@ -31,7 +31,7 @@ function Chat(): ReactElement {
             <button type="button" className="panel-toggle" onClick={toggle} aria-label={collapsed ? "Open chat" : "Dismiss chat"}>Toggle Chat</button>
             {hasUnread && <span className="unread-count">{messages.length - numRead}</span>}
             <div className="chat-messages" aria-live="polite">
-                {messages.map(ChatMessage)}
+                {messages.map((messageData, i) => <ChatMessage {...messageData} key={i} />)}
             </div>
             <ChatSubmit />
         </aside>

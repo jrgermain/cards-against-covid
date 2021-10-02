@@ -55,7 +55,7 @@ function Card({ type, children, selectedIndex = -1, showIndex, onClick, ...other
             // If there are is another blank, add it
             if (j < blanks.length) {
                 const indexLabel = blanks.length === 1 ? null : j + 1;
-                content.push(<CardBlank index={indexLabel} />);
+                content.push(<CardBlank key={`blank${j}`} index={indexLabel} />);
                 j++;
             }
         }
@@ -66,20 +66,20 @@ function Card({ type, children, selectedIndex = -1, showIndex, onClick, ...other
         const numSeparators = children.length - 1;
         for (let i = 0; i < children.length; i++) {
             if (children.length > 1) {
-                content.push(<span className="card-response-index">{i + 1}</span>);
+                content.push(<span key={`index${i}`} className="card-response-index">{i + 1}</span>);
             }
-            content.push(children[i]);
+            content.push(<span key={`text${i}`}>{children[i]}</span>);
             if (children.length > 1 && i < numSeparators) {
-                content.push(<hr />);
+                content.push(<hr key={`break${i}`} />);
             }
         }
     } else if (type === "response") {
         // This is a response card being shown to a player who is answering
         // Number them if there are more than 1
         if (showIndex && selectedIndex > -1) {
-            content.push(<span className="card-selected-index">{selectedIndex + 1}</span>);
+            content.push(<span key="index" className="card-selected-index">{selectedIndex + 1}</span>);
         }
-        content.push(children);
+        content.push(<span key="text">{children}</span>);
     }
 
     if (clickable) {
