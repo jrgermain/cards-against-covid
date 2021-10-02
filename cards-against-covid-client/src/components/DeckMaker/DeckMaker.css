@@ -32,7 +32,7 @@
 
 .deck-maker .delete {
   font-size: 1rem;
-  background: red;
+  background: #d22;
   color: white;
   border: 1px solid white;
   border-radius: 50%;
@@ -45,4 +45,13 @@
   place-items: center;
   transform: scale(0.75);
   box-sizing: content-box;
+  transition: background 0.3s linear;
+}
+
+.deck-maker .delete:hover {
+  background: #e33;
+}
+
+.deck-maker .delete:active {
+  background: #c11;
 }

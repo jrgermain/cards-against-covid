@@ -14,7 +14,11 @@ function Dropdown({ items = [], selectedItem, emptyMessage = "No items available
     } else {
         content = items.map((item) => <option key={item}>{item}</option>);
     }
-    return <select className="Dropdown" value={selectedItem} {...others}>{content}</select>;
+    return (
+        <span className="Dropdown">
+            <select value={selectedItem} {...others}>{content}</select>
+        </span>
+    );
 }
 
 export default Dropdown;

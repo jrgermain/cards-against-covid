@@ -8,10 +8,12 @@
   border: none;
   outline: none;
   color: white;
-  appearance: none;
   transition: background-color 0.3s linear;
   padding: 1.2rem;
+  height: 1rem;
   box-shadow: none;
+  display: inline-block;
+  position: relative;
 }
 
 .Dropdown:hover {
@@ -39,4 +41,35 @@
   display: inline-block;
   margin-left: 40px;
   padding-bottom: 300px;
+}
+
+.Dropdown > select {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  padding: 1.2rem;
+  height: 100%;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: inherit;
+  background-color: inherit;
+  border: none;
+  outline: none;
+  color: inherit;
+  transition: background-color 0.3s linear;
+  box-shadow: none;
+  appearance: none;
+}
+
+.Dropdown::after {
+  content: "⌄";
+  position: absolute;
+  right: 1.2rem;
+  z-index: 2;
+  pointer-events: none;
+  font-size: 1.6rem;
+  top: .4rem;
 }

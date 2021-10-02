@@ -211,6 +211,7 @@ function StartGame(): ReactElement {
                                     value={roundLimit}
                                     onChange={handleChangeNumRounds}
                                     onBlur={handleBlurNumRounds}
+                                    aria-label="Maximum rounds"
                                 />
                                 <div className="round-limit-disclaimer">
                                     NOTE: if there are not enough cards to play this many rounds,

@@ -31,13 +31,13 @@
 }
 
 .Button.primary {
-  background: #286;
+  background: #26b;
 }
 
 .Button.primary:hover {
-  background: #4a8;
+  background: #37c;
 }
 
 .Button.primary:active {
-  background: #064;
+  background: #15a;
 }
