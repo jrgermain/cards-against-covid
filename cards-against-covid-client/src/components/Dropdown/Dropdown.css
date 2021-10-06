@@ -73,3 +73,7 @@
   font-size: 1.6rem;
   top: .4rem;
 }
+
+.Dropdown > select:focus {
+  outline: 3px solid #8af;
+}
