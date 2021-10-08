@@ -71,7 +71,7 @@
   z-index: 2;
   pointer-events: none;
   font-size: 1.6rem;
-  top: .4rem;
+  top: 0.4rem;
 }
 
 .Dropdown > select:focus {

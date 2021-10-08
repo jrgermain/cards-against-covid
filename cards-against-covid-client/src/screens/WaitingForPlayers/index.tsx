@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactElement, ChangeEvent, KeyboardEvent } from "react";
+import React, { useState, useEffect, ReactElement } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { toast } from "react-toastify";
@@ -67,7 +67,11 @@ function WaitingForPlayers(): ReactElement {
     // When a user changes their name, update the state
     useApi<NameChangedArgs>("nameChanged", ({ oldName, newName }) => {
         // Replace the entry in the player list
-        const newPlayers = players.map((player) => (player.name === oldName ? { ...player, name: newName } : player));
+        const newPlayers = players.map((player) => (
+            player.name === oldName 
+                ? { ...player, name: newName }
+                : player
+        ));
         setPlayers(newPlayers);
 
         // If the current user is the one who changed their name, update the rest of the UI too
