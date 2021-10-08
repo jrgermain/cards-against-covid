@@ -4,9 +4,11 @@ import { useLocation } from "react-router-dom";
 import Card from "../../components/Card";
 import { useApi, send } from "../../lib/api";
 import { NewRoundArgs, PlayerRole, RestoreStateArgs } from "../../lib/commonTypes";
+import ButtonGroup from "../../components/ButtonGroup";
 
 type PlayerControlsProps = {
     role: PlayerRole;
+    disabled?: boolean;
 }
 
 interface PlayerControlsLocationState {
@@ -15,12 +17,13 @@ interface PlayerControlsLocationState {
     numBlanks?: number;
 }
 
-function PlayerControls({ role }: PlayerControlsProps): ReactElement {
+function PlayerControls({ role, disabled }: PlayerControlsProps): ReactElement {
     const location = useLocation<PlayerControlsLocationState>();
     const [userCards, setUserCards] = useState<string[]>(location.state?.userCards ?? []);
     const [userResponses, setUserResponses] = useState<string[]>(location.state?.userResponses ?? []);
     const [numBlanks, setNumBlanks] = useState<number>(location.state?.numBlanks ?? 1);
-    const [disabled, setDisabled] = useState<boolean>(false);
+    const [isLocked, setLocked] = useState<boolean>(false);
+    const isDisabled = isLocked || disabled;
 
     // When the player selects a card, update the state with the currently selected cards
     useApi<string[]>("cardSelected", (responses) => {
@@ -33,7 +36,7 @@ function PlayerControls({ role }: PlayerControlsProps): ReactElement {
             setUserCards(gameData.userCards ?? []);
             setUserResponses(gameData.userResponses ?? []);
             setNumBlanks(gameData.numBlanks);
-            setDisabled(false);
+            setLocked(false);
         }
     });
 
@@ -43,19 +46,23 @@ function PlayerControls({ role }: PlayerControlsProps): ReactElement {
             setUserCards(gameData.userCards ?? []);
             setUserResponses(gameData.userResponses ?? []);
             setNumBlanks(gameData.numBlanks);
-            setDisabled(gameData.isLocked);
+            setLocked(gameData.isLocked);
         }
     });
 
-    useApi("lockPlayerInputs", () => { setDisabled(true); });
+    useApi("lockPlayerInputs", () => { setLocked(true); });
 
     if (role !== "answering") {
         return <></>;
     }
 
     return (
-        <div className={classNames("player-controls", { disabled })} aria-disabled={disabled}>
-            <div className="deck" aria-label={`Your response cards; select ${numBlanks}`}>
+        <div className={classNames("player-controls", { disabled: isDisabled })} aria-disabled={isDisabled}>
+            <ButtonGroup
+                className="deck"
+                aria-label={`Your response cards; select ${numBlanks}`}
+                disabled={isDisabled}
+            >
                 {userCards.map((text, index) => (
                     /* Create a <Card> element for each of the user's cards. When clicked, a
                      * message is sent to the server, where the selection logic takes place.
@@ -67,13 +74,13 @@ function PlayerControls({ role }: PlayerControlsProps): ReactElement {
                         showIndex={numBlanks > 1}
                         selectedIndex={userResponses.indexOf(text)}
                         onClick={() => send("selectCard", index)}
-                        disabled={disabled}
+                        disabled={isDisabled}
                         key={index}
                     >
                         {text}
                     </Card>
                 ))}
-            </div>
+            </ButtonGroup>
         </div>
     );
 }

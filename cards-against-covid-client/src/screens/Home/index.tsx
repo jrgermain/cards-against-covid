@@ -1,10 +1,11 @@
 import React, { ReactElement } from "react";
 import "./Home.css";
 import Button from "../../components/Button";
+import ButtonGroup from "../../components/ButtonGroup";
 
 function Home(): ReactElement {
     return (
-        <div className="view" id="start" role="main">
+        <main className="view" id="start">
             <h1 id="game-logo">
                 Cards
                 <br />
@@ -12,12 +13,12 @@ function Home(): ReactElement {
                 <br />
                 COVID
             </h1>
-            <nav className="button-group">
+            <ButtonGroup role="navigation">
                 <Button link="/start">Start New Game</Button>
                 <Button link="/join">Join Existing Game</Button>
                 <Button link="/expansions">Create Expansion Pack</Button>
-            </nav>
-        </div>
+            </ButtonGroup>
+        </main>
     );
 }
 

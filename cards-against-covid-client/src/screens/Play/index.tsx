@@ -143,8 +143,8 @@ function Play(): ReactElement {
                 <div className="game-controls">
                     <h2>Your prompt:</h2>
                     <Card type="prompt">{prompt}</Card>
-                    <JudgeControls role={role} />
-                    <PlayerControls role={role} />
+                    <JudgeControls role={role} disabled={!!leaderboardContent} />
+                    <PlayerControls role={role} disabled={!!leaderboardContent} />
                 </div>
             </main>
             <Chat />

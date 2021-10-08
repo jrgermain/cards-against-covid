@@ -158,7 +158,7 @@ function StartGame(): ReactElement {
                         id="player-name"
                         placeholder="Your name"
                         value={username}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+                        onChange={(e) => setUsername(e.target.value)}
                         errorCondition={hasSubmitted && !username}
                         errorMessage="Please enter a name."
                     />

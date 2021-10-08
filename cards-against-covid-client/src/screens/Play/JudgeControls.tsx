@@ -4,9 +4,11 @@ import List from "../../components/List";
 import Card from "../../components/Card";
 import { useApi, send } from "../../lib/api";
 import { NewRoundArgs, PlayerRole, RestoreStateArgs } from "../../lib/commonTypes";
+import ButtonGroup from "../../components/ButtonGroup";
 
 type JudgeControlsProps = {
     role: PlayerRole;
+    disabled?: boolean;
 }
 
 type PlayerData = {
@@ -20,7 +22,7 @@ interface JudgeControlsLocationState {
     numBlanks?: number;
 }
 
-function JudgeControls({ role }: JudgeControlsProps): ReactElement {
+function JudgeControls({ role, disabled }: JudgeControlsProps): ReactElement {
     const location = useLocation<JudgeControlsLocationState>();
     const [players, setPlayers] = useState<PlayerData[]>(location.state?.players ?? []);
     const [numBlanks, setNumBlanks] = useState<number>(location.state?.numBlanks ?? 1);
@@ -61,7 +63,9 @@ function JudgeControls({ role }: JudgeControlsProps): ReactElement {
         return <></>;
     }
 
-    const needsToAnswer = (player: PlayerData) => player.isConnected && player.responses.length < numBlanks;
+    const needsToAnswer = (player: PlayerData) => (
+        player.isConnected && player.responses.length < numBlanks
+    );
 
     if (players.some(needsToAnswer)) {
         return (
@@ -80,6 +84,7 @@ function JudgeControls({ role }: JudgeControlsProps): ReactElement {
             type="multi-response"
             onClick={() => send("selectAnswer", player.name)}
             key={player.name}
+            disabled={disabled}
         >
             {player.responses}
         </Card>
@@ -88,9 +93,13 @@ function JudgeControls({ role }: JudgeControlsProps): ReactElement {
     return (
         <div className="judge-controls">
             <h2>Select a winning response</h2>
-            <div className="deck" aria-label="Player responses; select a favorite">
+            <ButtonGroup
+                className="deck"
+                aria-label="Player responses; select a favorite"
+                disabled={disabled}
+            >
                 {responseCards}
-            </div>
+            </ButtonGroup>
         </div>
     );
 }

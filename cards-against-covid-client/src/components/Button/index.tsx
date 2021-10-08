@@ -26,9 +26,9 @@ function Button({ link, onClick, children, disabled, primary, ...others }: Butto
     };
 
     if (link) {
-        return <Link to={link} tabIndex={0} {...props} />;
+        return <Link to={link} {...props} />;
     }
-    return <button type="button" tabIndex={disabled ? -1 : 0} {...props} />;
+    return <button type="button" tabIndex={disabled ? -1 : undefined} {...props} />;
 }
 
 export default Button;

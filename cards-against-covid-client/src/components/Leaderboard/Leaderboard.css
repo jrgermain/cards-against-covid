@@ -124,3 +124,12 @@
 .leaderboard-grid-body .inactive {
   opacity: 0.5;
 }
+
+/* Hack to provide same appearance as the usual button:focus
+   (which uses outline isntead of border) while handling the
+   leaderboard-content's rounded corners and hidden overflow */
+.leaderboard-content > .Button:focus {
+  outline: 0;
+  border: 3px solid #8af;
+  padding: calc(1.2rem - 3px);
+}

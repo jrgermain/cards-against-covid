@@ -133,7 +133,7 @@ function Join(): ReactElement {
                         id="player-name"
                         placeholder="Your name"
                         value={username}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+                        onChange={(e) => setUsername(e.target.value)}
                         onKeyPress={handleKeyPress}
                         errorCondition={!!usernameError}
                         errorMessage={usernameError}
@@ -145,7 +145,7 @@ function Join(): ReactElement {
                         id="game-code"
                         placeholder="Game code"
                         value={gameCode}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setGameCode(e.target.value.toUpperCase())}
+                        onChange={(e) => setGameCode(e.target.value.toUpperCase())}
                         onKeyPress={handleKeyPress}
                         errorCondition={!!gameCodeError}
                         errorMessage={gameCodeError}

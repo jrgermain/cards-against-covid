@@ -9,6 +9,7 @@ import TextBox from "../../components/TextBox";
 import { useApi, send, resetConnection } from "../../lib/api";
 import { closePopup, handlePopupOpen } from "../../lib/popupFixes";
 import { GameStartedArgs } from "../../lib/commonTypes";
+import ButtonGroup from "../../components/ButtonGroup";
 
 type PlayerData = {
     name: string;
@@ -132,21 +133,21 @@ function WaitingForPlayers(): ReactElement {
                     <h2>Currently joined:</h2>
                     <List items={players} map={(p) => p.name} filter={(p) => p.isConnected} />
                 </section>
-                <section className="button-group">
-                    <Popup trigger={<button type="button" className="Button">Change My Name</button>} position="top center" arrow onOpen={() => handlePopupOpen("Enter a new name")}>
+                <ButtonGroup role="menu">
+                    <Popup trigger={<button type="button" className="Button" role="menuitem">Change My Name</button>} position="top center" arrow onOpen={() => handlePopupOpen("Enter a new name")}>
                         <div className="change-name-popup">
                             <label id="player-name-label" htmlFor="player-name">Enter a new name:</label>
                             <TextBox
                                 id="player-name"
                                 placeholder="Your name"
                                 value={tempUsername}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => setTempUsername(e.target.value)}
-                                onKeyPress={(e: KeyboardEvent) => e.key === "Enter" && submitName()}
+                                onChange={(e) => setTempUsername(e.target.value)}
+                                onKeyPress={(e) => e.key === "Enter" && submitName()}
                             />
-                            <Button onClick={submitName}>Submit</Button>
+                            <Button onClick={submitName} >Submit</Button>
                         </div>
                     </Popup>
-                    <Popup trigger={<button type="button" className="Button">Invite Others</button>} position="top center" arrow onOpen={() => handlePopupOpen("Copy invite link")}>
+                    <Popup trigger={<button type="button" className="Button" role="menuitem">Invite Others</button>} position="top center" arrow onOpen={() => handlePopupOpen("Copy invite link")}>
                         <span className="invite-popup">
                             <span>Friends can use the link below to join this game:</span>
                             <TextBox disabled value={`${window.location.origin}/join/${gameCode}`} id="invite-link" />
@@ -154,7 +155,7 @@ function WaitingForPlayers(): ReactElement {
                         </span>
                     </Popup>
                     <Button primary onClick={() => send("startGame")}>Everybody&apos;s In</Button>
-                </section>
+                </ButtonGroup>
             </main>
         </div>
     );
