@@ -9,10 +9,10 @@ let checkboxCount = 0;
 function CheckBox({ label = "", ...others }: CheckBoxProps): ReactElement {
     const id = `checkbox-auto-id-${checkboxCount++}`;
     return (
-        <>
-            <input type="checkbox" id={id} key={`${id}_input`} {...others} />
-            <label htmlFor={id} key={`${id}_label`}>{label}</label>
-        </>
+        <span className="CheckBox">
+            <input type="checkbox" id={id} {...others} />
+            <label htmlFor={id}>{label}</label>
+        </span>
     );
 }
 

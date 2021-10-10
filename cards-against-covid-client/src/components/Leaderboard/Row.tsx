@@ -21,6 +21,7 @@ function Row({ player, prompt }: RowProps): ReactElement {
                 <span className="player-name">{player.name}</span>
                 {player.isWinner && <span className="winner-label">Winner!</span>}
                 {!player.isConnected && <span className="inactive-label">Inactive</span>}
+                {player.isJudge && <span className="sr-only">Judge</span>}
             </span>
             <span className="cell" role="gridcell">
                 {player.isJudge

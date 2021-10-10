@@ -95,6 +95,13 @@ function Play(): ReactElement {
         }
     });
 
+    useApi("lockPlayerInputs", () => {
+        const directions = role === "judging"
+            ? "Pick a favorite response"
+            : "Wait for the judge to pick a favorite";
+        toast.info(`All players have answered. ${directions}.`);
+    });
+
     /* Once the page loads, remove initial state. This prevents a stale state from being used when
      * the page reloads.
      */
@@ -123,7 +130,7 @@ function Play(): ReactElement {
 
             <main>
                 <div className="round">
-                    {`Round ${round}/${round + roundsLeft}`}
+                    {`Round ${round} of ${round + roundsLeft}`}
                 </div>
                 <h1>
                     {username}

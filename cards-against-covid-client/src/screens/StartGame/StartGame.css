@@ -1,13 +1,8 @@
-.expansion-packs {
-  display: grid;
-  grid-template-columns: auto auto auto auto;
-  margin: 10px auto;
-  gap: 1rem;
-  place-items: center;
+.expansion-packs tr {
+  height: 2.5rem;
 }
 
-.expansion-packs label {
-  width: 100%;
+.expansion-packs tbody td:first-child {
   text-align: left;
 }
 
@@ -39,9 +34,8 @@
   text-align: left;
 }
 
-.game-settings input[type="checkbox"] + label,
 .round-limit {
-  margin-left: 5px;
+  margin-left: 0.5em;
 }
 
 .round-limit-disclaimer {

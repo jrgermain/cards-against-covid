@@ -7,6 +7,7 @@ import TextBox from "../../components/TextBox";
 import CheckBox from "../../components/CheckBox";
 import "./StartGame.css";
 import Dropdown from "../../components/Dropdown";
+import Table from "../../components/Table";
 
 type DeckData = {
     name: string;
@@ -153,7 +154,7 @@ function StartGame(): ReactElement {
                 <h1>Start a game</h1>
 
                 <div>
-                    <label htmlFor="player-name">Enter your name: </label>
+                    <label htmlFor="player-name">Your name: </label>
                     <TextBox
                         id="player-name"
                         placeholder="Your name"
@@ -170,29 +171,44 @@ function StartGame(): ReactElement {
                     selectedItem={decks.find((deck) => deck.isSelected)?.name}
                     emptyMessage="Loading decks..."
                     onChange={handleDeckChange}
-                    aria-labelledby="choose-deck"
+                    aria-label="Deck List"
                 />
 
-                <h2 className="header-css" id="choose-expansion-pack">Choose expansion pack(s):</h2>
+                <h2
+                    className="header-css"
+                    id="choose-expansion-pack"
+                    aria-label="Choose expansion packs"
+                >
+                    Choose expansion pack(s):
+                </h2>
                 <div className="expansion-packs">
-                    {/* Header */}
-                    <strong>Select</strong>
-                    <strong>Name</strong>
-                    <strong>Prompts</strong>
-                    <strong>Responses</strong>
-
-                    {/* Content */}
-                    {expansions.map((pack) => (
-                        <Fragment key={pack.name}>
+                    <Table
+                        head={["Name", "Prompts", "Responses"]}
+                        body={expansions.map((pack) => [
                             <CheckBox
+                                key="box"
                                 label={pack.name}
                                 onChange={() => handlePackChange(pack)}
                                 checked={pack.isSelected}
-                            />
-                            <span className="pack-num-prompts" title="Prompt cards">{pack.numPrompts}</span>
-                            <span className="pack-num-responses" title="Response cards">{pack.numResponses}</span>
-                        </Fragment>
-                    ))}
+                            />,
+                            <span
+                                key="prompts"
+                                className="pack-num-prompts"
+                                title="Prompt cards"
+                                aria-label={`This pack has ${pack.numPrompts} prompt cards`}
+                            >
+                                {pack.numPrompts}
+                            </span>,
+                            <span
+                                key="responses"
+                                className="pack-num-responses"
+                                title="Response cards"
+                                aria-label={`This pack has ${pack.numResponses} response cards`}
+                            >
+                                {pack.numResponses}
+                            </span>,
+                        ])}
+                    />
                 </div>
 
                 <h2 className="header-css" id="choose-game-settings">Choose game settings:</h2>

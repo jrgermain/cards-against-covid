@@ -6,7 +6,7 @@ import ButtonGroup from "../../components/ButtonGroup";
 function Home(): ReactElement {
     return (
         <main className="view" id="start">
-            <h1 id="game-logo">
+            <h1 id="game-logo" aria-label="Game logo">
                 Cards
                 <br />
                 Against

@@ -244,3 +244,16 @@ main {
     transform: rotate(360deg);
   }
 }
+
+input[type="checkbox"] + label {
+  margin-left: 0.5em;
+}
+
+.sr-only {
+  position: absolute !important;
+  left: -10000px !important;
+  top: auto !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}

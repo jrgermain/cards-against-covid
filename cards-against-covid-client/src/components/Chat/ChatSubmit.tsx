@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent, ReactElement, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { send } from "../../lib/api";
 import Button from "../Button";
 import TextBox from "../TextBox";
@@ -14,11 +14,11 @@ function ChatSubmit(): ReactElement {
     return (
         <div className="chat-submit">
             <TextBox
-                aria-label="Type a message"
+                aria-label="Compose chat message"
                 placeholder="Type a message"
                 value={value}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
-                onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => event.key === "Enter" && submit()}
+                onChange={(event) => setValue(event.target.value)}
+                onKeyPress={(event) => event.key === "Enter" && submit()}
             />
             <Button onClick={submit} aria-label="Send message">Send</Button>
         </div>
