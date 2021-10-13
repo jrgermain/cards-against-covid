@@ -34,6 +34,7 @@ function Chat(): ReactElement {
             <div className="chat-messages" aria-live="polite">
                 <h2 className="sr-only">Messages</h2>
                 {messages.map((messageData, i) => <ChatMessage {...messageData} key={i} />)}
+                {messages.length === 0 && <span className="sr-only">No messages to display</span>}
             </div>
             <ChatSubmit />
         </aside>

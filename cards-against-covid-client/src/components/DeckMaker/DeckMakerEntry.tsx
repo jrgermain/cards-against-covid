@@ -38,8 +38,22 @@ function DeckMakerEntry({ text, setCards, index, allEntries }: DeckMakerEntryPro
 
     return (
         <li>
-            <input type="text" className="big-text" value={text} onChange={update} aria-label="Card text" />
-            <button type="button" className="delete" onClick={remove} title="Delete this card" aria-label="Delete">X</button>
+            <input
+                type="text"
+                className="big-text"
+                value={text}
+                onChange={update}
+                aria-label={`Card ${index + 1} text`}
+            />
+            <button
+                type="button"
+                className="delete"
+                onClick={remove}
+                title="Delete this card"
+                aria-label={`Delete card ${index + 1}`}
+            >
+                X
+            </button>
         </li>
     );
 }

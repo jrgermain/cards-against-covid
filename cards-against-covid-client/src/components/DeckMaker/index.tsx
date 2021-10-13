@@ -4,12 +4,13 @@ import DeckMakerEntry from "./DeckMakerEntry";
 import "./DeckMaker.css";
 
 type DeckMakerProps = {
+    description: string;
     label: string;
     cards: string[];
     setCards: (cards: string[]) => void;
 }
 
-function DeckMaker({ label, cards, setCards }: DeckMakerProps): ReactElement {
+function DeckMaker({ description, label, cards, setCards }: DeckMakerProps): ReactElement {
     // Add a blank card to the end of the current list of cards
     function addCard() {
         const newCardList = [...cards, ""];
@@ -18,7 +19,7 @@ function DeckMaker({ label, cards, setCards }: DeckMakerProps): ReactElement {
     return (
         <div className="deck-maker">
             <h2>{label}</h2>
-            <ul aria-label="Cards in this set">
+            <ul aria-label={description}>
                 {cards.map((text, index, array) => (
                     <DeckMakerEntry
                         key={index}

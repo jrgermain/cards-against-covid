@@ -99,8 +99,9 @@ function Card({ type, children, selectedIndex = -1, showIndex, onClick, ...other
     }
 
     return (
-        <div aria-label={label} {...{ className, ...others }}>
+        <div {...{ className, ...others }}>
             <div className="card-content" tabIndex={-1} aria-hidden="true">{content}</div>
+            <span className="sr-only">{label}</span>
         </div>
     );
 }

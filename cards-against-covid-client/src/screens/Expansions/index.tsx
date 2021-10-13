@@ -61,10 +61,20 @@ function Expansions(): ReactElement {
             </section>
             <div className="deck-maker-wrapper">
                 <section aria-label="Add prompt cards">
-                    <DeckMaker label="Prompts" cards={prompts} setCards={setPrompts} />
+                    <DeckMaker
+                        label="Prompts"
+                        description="Prompt cards"
+                        cards={prompts}
+                        setCards={setPrompts}
+                    />
                 </section>
                 <section aria-label="Add response cards">
-                    <DeckMaker label="Responses" cards={responses} setCards={setResponses} />
+                    <DeckMaker
+                        label="Responses"
+                        description="Response cards"
+                        cards={responses}
+                        setCards={setResponses}
+                    />
                 </section>
             </div>
             <Button onClick={submitPack}>Save</Button>
