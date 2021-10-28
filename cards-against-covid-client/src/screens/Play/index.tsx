@@ -40,7 +40,7 @@ function Play(): ReactElement {
         // Leave the game by resetting the socket connection
         resetConnection();
 
-        toast.info("You left the game. Click/tap here to rejoin.", {
+        toast.info(`You left game ${gameCode}. Click/tap here to rejoin.`, {
             onClick: () => {
                 history.push(`/join?code=${gameCode}&name=${username}`, { submit: true });
             },
@@ -106,7 +106,7 @@ function Play(): ReactElement {
      * the page reloads.
      */
     useEffect(() => {
-        history.replace({ state: { username } });
+        history.replace({ state: { username, gameCode } });
     }, []);
 
     useEffect(() => {

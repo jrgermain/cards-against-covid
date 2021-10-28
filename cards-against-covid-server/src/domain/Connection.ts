@@ -34,6 +34,7 @@ class Connection {
     id: string;
     playerInfo?: Player;
     game?: Game;
+    private initialized: boolean;
     private disconnectTimestamp?: number;
     private pingStatus?: PingStatus;
     private pingInterval?: NodeJS.Timeout;
@@ -62,6 +63,7 @@ class Connection {
             }
 
             this.send("sessionEstablished", this.id);
+            this.initialized = true;
         },
 
         getDecks: async () => {
@@ -149,7 +151,11 @@ class Connection {
                 if (existingPlayer?.isConnected) {
                     this.sendError("A player with that name already exists");
                 } else if (existingPlayer) {
-                    // Transfer to existing, inactive connection
+                    // The user left the lobby and came back
+                    // Tell current players that this player rejoined the game
+                    game.sendAll("playerReconnected", trimmedName);
+
+                    // Transfer to existing, inactive connection object
                     const existingConnectionIndex = game.players.indexOf(existingPlayer);
                     this.transferTo(game.connections[existingConnectionIndex]);
                 } else {
@@ -358,6 +364,7 @@ class Connection {
         this.id = randomUUID();
         this.socket = socket;
         this.initSocket();
+        this.initialized = false;
     }
 
     stopHealthCheck(): void {
@@ -472,6 +479,8 @@ class Connection {
                 gameCode: this.game.code,
                 chats: this.game.chats,
             });
+        } else if (this.game?.state === GameState.WAITING) {
+            this.send("joinedGame", this.game.code);
         }
     }
 
@@ -493,7 +502,11 @@ class Connection {
                 if (isDev) {
                     console.log("(Connection.processMessage): executing handler", { eventName, payload });
                 }
-                this.handlers[eventName as EventName](payload);
+
+                // Do not respond to events until we process an init request
+                if (this.initialized || eventName === "init") {
+                    this.handlers[eventName as EventName](payload);
+                }
             } else if (isDev) {
                 console.log(`(Connection.processMessage): no handler for "${eventName}"`);
             }

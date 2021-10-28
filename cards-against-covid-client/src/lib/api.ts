@@ -9,6 +9,7 @@ let socket = new WebSocket(wsEndpoint);
 let sendQueue: string[] = [];
 const handlers: Record<string, Set<HandlerFunction>> = {};
 let isHealthy = true;
+let initialized = false;
 
 /**
  * Send a message to the server via WebSocket. If the WebSocket connection is not open, add it to a
@@ -16,7 +17,7 @@ let isHealthy = true;
  */
 function send(event: string, payload?: unknown): void {
     const message = `CAC:${event}:${JSON.stringify(payload ?? null)}`;
-    if (socket.readyState === WebSocket.OPEN) {
+    if (socket.readyState === WebSocket.OPEN && (initialized || event === "init")) {
         socket.send(message);
     } else {
         sendQueue.push(message);
@@ -25,10 +26,17 @@ function send(event: string, payload?: unknown): void {
 
 window.setInterval(() => {
     if (sendQueue.length && socket.readyState === WebSocket.OPEN) {
-        // Send the first message on the send queue
-        const message = sendQueue.shift();
-        if (message != null) {
-            socket.send(message);
+        if (initialized) {
+            // Send the first message on the send queue
+            socket.send(sendQueue.shift() as string);
+        } else {
+            // If any "init" messages are queued, send the latest and remove any others.
+            // This is really an edge case; typically there will only be one.
+            const inits = sendQueue.filter((msg) => msg.startsWith("CAC:init:"));
+            if (inits.length) {
+                socket.send(inits[inits.length - 1]);
+                sendQueue = sendQueue.filter((msg) => !msg.startsWith("CAC:init:"));
+            }
         }
     }
 }, 200);
@@ -128,7 +136,10 @@ setTimeout(healthCheck, 2400);
 // Add global event handlers
 on("errorMessage", (e) => toast.error(e));
 on("infoMessage", (e) => toast.info(e));
-on("sessionEstablished", (sessionId) => sessionStorage.setItem("sessionId", sessionId as string));
+on("sessionEstablished", (sessionId) => {
+    sessionStorage.setItem("sessionId", sessionId as string);
+    initialized = true;
+});
 
 // When the app is loaded, establish a session
 send("init", sessionStorage.getItem("sessionId"));
