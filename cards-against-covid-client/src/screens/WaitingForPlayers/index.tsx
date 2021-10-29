@@ -51,34 +51,37 @@ function WaitingForPlayers(): ReactElement {
 
     // When a player joins, add them to the player list
     useApi<PlayerData>("playerJoined", (player) => {
-        setPlayers([...players, player]);
-    }, [players]);
+        setPlayers((players) => [...players, player]);
+    });
 
     // When a player leaves, set isConnected to false for that player
     useApi<string>("playerDisconnected", (name) => {
-        setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: false } : p)));
-    }, [players]);
+        setPlayers((players) => (
+            players.map((p) => (p.name === name ? { ...p, isConnected: false } : p))
+        ));
+    });
 
     // When a player returns, set isConnected to true for that player
     useApi<string>("playerReconnected", (name) => {
-        setPlayers(players.map((p) => (p.name === name ? { ...p, isConnected: true } : p)));
-    }, [players]);
+        setPlayers((players) => (
+            players.map((p) => (p.name === name ? { ...p, isConnected: true } : p))
+        ));
+    });
 
     // When a user changes their name, update the state
     useApi<NameChangedArgs>("nameChanged", ({ oldName, newName }) => {
         // Replace the entry in the player list
-        const newPlayers = players.map((player) => (
+        setPlayers((players) => players.map((player) => (
             player.name === oldName 
                 ? { ...player, name: newName }
                 : player
-        ));
-        setPlayers(newPlayers);
+        )));
 
         // If the current user is the one who changed their name, update the rest of the UI too
         if (oldName === username) {
             setUsername(newName);
         }
-    }, [players, username]);
+    }, [username]);
 
     // When the game starts, move to the play screen
     useApi<GameStartedArgs>("gameStarted", (gameData) => {
