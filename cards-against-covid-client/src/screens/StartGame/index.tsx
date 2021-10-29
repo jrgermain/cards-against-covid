@@ -8,6 +8,7 @@ import CheckBox from "../../components/CheckBox";
 import "./StartGame.css";
 import Dropdown from "../../components/Dropdown";
 import Table from "../../components/Table";
+import { loadUsername, saveUsername } from "../../lib/username";
 
 type DeckData = {
     name: string;
@@ -18,7 +19,7 @@ type DeckData = {
 
 function StartGame(): ReactElement {
     const history = useHistory();
-    const [username, setUsername] = useState<string>(() => localStorage.getItem("last-username") ?? "");
+    const [username, setUsername] = useState<string>(() => loadUsername() ?? "");
     const [hasSubmitted, setHasSubmitted] = useState<boolean>(false);
     const [decks, setDecks] = useState<DeckData[]>([]);
     const [expansions, setExpansions] = useState<DeckData[]>([]);
@@ -34,11 +35,7 @@ function StartGame(): ReactElement {
     // After creating and joining a game, proceed to the wait screen
     useApi<string>("joinedGame", (gameCode) => {
         // Save the last successfully used name for future games
-        try {
-            localStorage.setItem("last-username", username);
-        } catch (e) {
-            // Not allowed, but that's ok
-        }
+        saveUsername(username);
 
         // Navigate to the wait screen
         history.push("/waiting", { username, gameCode });

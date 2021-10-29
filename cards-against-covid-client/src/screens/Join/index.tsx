@@ -6,6 +6,7 @@ import "./Join.css";
 import { useApi, send } from "../../lib/api";
 import TextBox from "../../components/TextBox";
 import { RestoreStateArgs } from "../../lib/commonTypes";
+import { loadUsername, saveUsername } from "../../lib/username";
 
 interface JoinLocationState {
     submit?: boolean;
@@ -13,19 +14,10 @@ interface JoinLocationState {
 
 const gameCodeRegex = /^[a-z]{4}$/i;
 
-const saveUsername = (username: string) => {
-    // Save this as the default username for future games
-    try {
-        localStorage.setItem("last-username", username);
-    } catch (e) {
-        // Not allowed, but that's ok
-    }
-};
-
 function Join(): ReactElement {
     const history = useHistory();
     const location = useLocation<JoinLocationState>();
-    const [username, setUsername] = useState<string>(() => localStorage.getItem("last-username") ?? "");
+    const [username, setUsername] = useState<string>(() => loadUsername() ?? "");
     const [gameCode, setGameCode] = useState<string>("");
     const [gameCodeError, setGameCodeError] = useState<string>("");
     const [usernameError, setUsernameError] = useState<string>("");
