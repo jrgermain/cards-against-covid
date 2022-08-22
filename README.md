@@ -10,7 +10,7 @@ We have decided to make a webapp that adapts the gameplay of Cards Against Human
 The game has two main components: a React-based frontend (cards-against-covid-client) and a Node-based backend (cards-against-covid-server). The two pieces work together to form a client-server application in which clients connect through a web browser.
 
 ## Project status
-The game is still being maintained, but development is moving slower now that I graduated and am working full time. To track development progress, check out the Projects link at the top of the repository.
+@jrgermain: now that I'm working full-time and have started other projects, I don't have time to keep contributing to this one. I had a great time building it (and learned a ton in the process), but probably won't revisit it anytime soon.
 
 ## Building and running the server
 ### Prerequisites
